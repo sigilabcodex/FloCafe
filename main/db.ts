@@ -10343,6 +10343,59 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       }
     },
   },
+  {
+    version: 126,
+    name: 'add_production_batches',
+    up: () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS prep_recipes (
+          id TEXT PRIMARY KEY,
+          output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+          version INTEGER NOT NULL CHECK (version > 0),
+          yield_quantity REAL NOT NULL CHECK (yield_quantity > 0),
+          components_json TEXT NOT NULL,
+          is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(output_supply_id, version)
+        );
+        CREATE INDEX IF NOT EXISTS idx_prep_recipes_output_active
+          ON prep_recipes(output_supply_id, is_active, version);
+
+        CREATE TABLE IF NOT EXISTS production_orders (
+          id TEXT PRIMARY KEY,
+          prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+          output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          status TEXT NOT NULL CHECK (status IN ('queued', 'in_progress', 'completed')),
+          planned_quantity REAL NOT NULL CHECK (planned_quantity > 0),
+          actual_quantity REAL CHECK (actual_quantity > 0),
+          snapshot_json TEXT NOT NULL,
+          total_input_cost REAL,
+          cost_known INTEGER NOT NULL DEFAULT 0 CHECK (cost_known IN (0, 1)),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          started_by TEXT REFERENCES users(id),
+          completed_by TEXT REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          started_at TEXT,
+          completed_at TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_production_orders_status_created
+          ON production_orders(status, created_at);
+
+        CREATE TABLE IF NOT EXISTS production_order_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          action TEXT NOT NULL CHECK (action IN ('created', 'started', 'completed')),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          details_json TEXT NOT NULL DEFAULT '{}',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(production_order_id, action)
+        );
+      `);
+    },
+  },
 ];
 
 export function backfillWhatsAppMessageAttempts(
