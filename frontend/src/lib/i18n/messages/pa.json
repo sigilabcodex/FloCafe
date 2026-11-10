@@ -570,7 +570,9 @@
     "unitCost": "ਇਕਾਈ ਲਾਗਤ",
     "totalBatchCost": "ਕੁੱਲ ਬੈਚ ਲਾਗਤ",
     "recipeCost": "ਰੈਸਿਪੀ ਲਾਗਤ",
-    "costUnknown": "ਲਾਗਤ ਅਣਜਾਣ"
+    "costUnknown": "ਲਾਗਤ ਅਣਜਾਣ",
+    "productionIssue": "ਉਤਪਾਦਨ ਦੀ ਖਪਤ",
+    "productionOutput": "ਉਤਪਾਦਨ ਦਾ ਨਤੀਜਾ"
   },
   "kds": {
     "addonsLabel": "ਐਡ-ਆਨ",
@@ -2876,7 +2878,8 @@
       "settings": "ਸੈਟਿੰਗਾਂ",
       "integrations": "ਏਕੀਕਰਣ",
       "system": "ਸਿਸਟਮ",
-      "support": "ਸਹਾਇਤਾ"
+      "support": "ਸਹਾਇਤਾ",
+      "production": "ਉਤਪਾਦਨ"
     },
     "capabilities": {
       "tablesView": "ਟੇਬਲ ਦੇਖੋ",
@@ -2944,7 +2947,10 @@
       "support": "ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਅਤੇ ਡਾਇਗਨੌਸਟਿਕਸ ਦੇਖੋ",
       "inventoryManage": "ਸਪਲਾਈ ਅਤੇ ਰੈਸਿਪੀਆਂ ਪ੍ਰਬੰਧਿਤ ਕਰੋ",
       "orderItemPriceOverride": "ਆਰਡਰ ਆਈਟਮ ਦੀਆਂ ਕੀਮਤਾਂ ਬਦਲੋ",
-      "offlineMode": "ਆਫਲਾਈਨ ਮੋਡ ਚਾਲੂ ਜਾਂ ਬੰਦ ਕਰੋ"
+      "offlineMode": "ਆਫਲਾਈਨ ਮੋਡ ਚਾਲੂ ਜਾਂ ਬੰਦ ਕਰੋ",
+      "productionView": "ਉਤਪਾਦਨ ਵੇਖੋ",
+      "productionExecute": "ਉਤਪਾਦਨ ਸ਼ੁਰੂ ਅਤੇ ਪੂਰਾ ਕਰੋ",
+      "productionManage": "ਉਤਪਾਦਨ ਪ੍ਰਬੰਧਿਤ ਕਰੋ"
     },
     "editorSubtitle": "ਭੂਮਿਕਾ ਦੀਆਂ ਡਿਫੌਲਟ ਸੈਟਿੰਗਾਂ ਕੌਂਫਿਗਰ ਕਰੋ ਜਾਂ ਕਿਸੇ ਇੱਕ ਸਟਾਫ ਮੈਂਬਰ ਲਈ ਛੋਟ ਬਣਾਓ। ਬਦਲਾਅ ਉਹਨਾਂ ਦੀ ਅਗਲੀ ਕਾਰਵਾਈ ਉੱਤੇ ਲਾਗੂ ਹੁੰਦੇ ਹਨ।",
     "roleDefaultsTab": "ਭੂਮਿਕਾ ਡਿਫੌਲਟ",

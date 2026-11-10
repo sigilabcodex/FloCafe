@@ -570,7 +570,9 @@
     "unitCost": "Ragad per unit",
     "totalBatchCost": "Gunggung ragad batch",
     "recipeCost": "Ragad resep",
-    "costUnknown": "Ragad durung dingerteni"
+    "costUnknown": "Ragad durung dingerteni",
+    "productionIssue": "Panggunaan produksi",
+    "productionOutput": "Asil produksi"
   },
   "kds": {
     "addonsLabel": "Imbuhan",
@@ -2876,7 +2878,8 @@
       "settings": "Pangaturan",
       "integrations": "Integrasi",
       "system": "Sistem",
-      "support": "Pitulungan"
+      "support": "Pitulungan",
+      "production": "Produksi"
     },
     "capabilities": {
       "tablesView": "Deleng meja",
@@ -2944,7 +2947,10 @@
       "support": "Nghubungi pitulungan lan ndeleng diagnostik",
       "inventoryManage": "Atur pasokan",
       "orderItemPriceOverride": "Ngowahi rega item pesenan",
-      "offlineMode": "Uripake utawa pateni mode offline"
+      "offlineMode": "Uripake utawa pateni mode offline",
+      "productionView": "Deleng produksi",
+      "productionExecute": "Miwiti lan ngrampungake produksi",
+      "productionManage": "Atur produksi"
     },
     "editorSubtitle": "Konfigurasi default peran utawa gawe pambebasan kanggo siji staf. Owah-owahan lumaku ing tumindak sabanjure.",
     "roleDefaultsTab": "Default peran",

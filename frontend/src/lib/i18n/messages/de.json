@@ -570,7 +570,9 @@
     "unitCost": "Stückkosten",
     "totalBatchCost": "Gesamte Chargenkosten",
     "recipeCost": "Rezeptkosten",
-    "costUnknown": "Kosten unbekannt"
+    "costUnknown": "Kosten unbekannt",
+    "productionIssue": "Produktionsverbrauch",
+    "productionOutput": "Produktionsertrag"
   },
   "kds": {
     "addonsLabel": "Zusätze",
@@ -2876,7 +2878,8 @@
       "settings": "Einstellungen",
       "integrations": "Integrationen",
       "system": "System",
-      "support": "Support"
+      "support": "Support",
+      "production": "Produktion"
     },
     "capabilities": {
       "tablesView": "Tische ansehen",
@@ -2944,7 +2947,10 @@
       "support": "Support kontaktieren und Diagnosedaten einsehen",
       "inventoryManage": "Vorräte und Rezepte verwalten",
       "orderItemPriceOverride": "Preise von Bestellartikeln ändern",
-      "offlineMode": "Offline-Modus ein- oder ausschalten"
+      "offlineMode": "Offline-Modus ein- oder ausschalten",
+      "productionView": "Produktion anzeigen",
+      "productionExecute": "Produktion starten und abschließen",
+      "productionManage": "Produktion verwalten"
     },
     "editorSubtitle": "Konfigurieren Sie Rollenvorgaben oder legen Sie eine Ausnahme für ein Teammitglied fest. Änderungen gelten ab der nächsten Aktion.",
     "roleDefaultsTab": "Rollenvorgaben",

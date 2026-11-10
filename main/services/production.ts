@@ -10,6 +10,12 @@ import {
 import { SupplyUnit, assertSupplyUnit, convertQuantity, roundQuantity } from './units';
 
 type Db = ReturnType<typeof getDatabase>;
+export type ProductionOrderStatus =
+  | 'queued'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled'
+  | 'abandoned';
 
 export class ProductionServiceError extends Error {
   constructor(
@@ -41,7 +47,7 @@ interface ProductionOrderRow {
   prep_recipe_id: string;
   output_supply_id: string;
   idempotency_key: string;
-  status: 'queued' | 'in_progress' | 'completed';
+  status: ProductionOrderStatus;
   planned_quantity: number;
   actual_quantity: number | null;
   snapshot_json: string;
@@ -51,6 +57,7 @@ interface ProductionOrderRow {
   created_by: string;
   started_by: string | null;
   completed_by: string | null;
+  terminal_reason: string | null;
   created_at: string;
   started_at: string | null;
   completed_at: string | null;
@@ -58,14 +65,13 @@ interface ProductionOrderRow {
 
 const id = (prefix: string) => `${prefix}_${randomBytes(12).toString('hex')}`;
 const positiveFinite = (value: unknown, field: string): number => {
-  const number = Number(value);
-  if (!Number.isFinite(number) || number <= 0)
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
     throw new ProductionServiceError(
       400,
       `${field} must be positive and finite`,
       'quantity_invalid',
     );
-  const rounded = roundQuantity(number);
+  const rounded = roundQuantity(value);
   if (rounded <= 0)
     throw new ProductionServiceError(
       400,
@@ -111,6 +117,8 @@ export function createPrepRecipeVersion(
       'At least one component is required',
       'components_missing',
     );
+  if (input.components.some((component) => !component || typeof component !== 'object'))
+    throw new ProductionServiceError(400, 'Each component must be an object', 'component_invalid');
 
   const seen = new Set<string>();
   const components = input.components.map((component) => {
@@ -169,6 +177,20 @@ export function createPrepRecipeVersion(
       return db.prepare('SELECT * FROM prep_recipes WHERE id = ?').get(recipeId);
     })
     .immediate();
+}
+
+export function listPrepRecipeVersions(db: Db, outputSupplyId?: string) {
+  const rows = outputSupplyId
+    ? (db
+        .prepare('SELECT * FROM prep_recipes WHERE output_supply_id = ? ORDER BY version DESC')
+        .all(outputSupplyId) as Array<Record<string, unknown>>)
+    : (db
+        .prepare('SELECT * FROM prep_recipes ORDER BY output_supply_id, version DESC')
+        .all() as Array<Record<string, unknown>>);
+  return rows.map((row) => ({
+    ...row,
+    components: JSON.parse(String(row.components_json)),
+  }));
 }
 
 export function createProductionOrder(
@@ -257,6 +279,8 @@ export function startProductionOrder(
     .transaction(() => {
       const order = orderById(db, orderId);
       if (order.status === 'in_progress' || order.status === 'completed') return decodeOrder(order);
+      if (order.status === 'cancelled' || order.status === 'abandoned')
+        throw new ProductionServiceError(409, 'Production order is terminal', 'state_terminal');
       if (order.version !== expectedVersion)
         throw new ProductionServiceError(
           409,
@@ -314,7 +338,7 @@ export function startProductionOrder(
         const result = applySupplyStockChange(db, {
           supplyId: component.supply_id,
           quantityDelta: -component.quantity,
-          movementType: 'recipe_depletion',
+          movementType: 'production_issue',
           unit: component.unit,
           unitCost: component.unit_cost,
           totalCost: component.line_cost,
@@ -372,6 +396,8 @@ export function completeProductionOrder(
           );
         return decodeOrder(order);
       }
+      if (order.status === 'cancelled' || order.status === 'abandoned')
+        throw new ProductionServiceError(409, 'Production order is terminal', 'state_terminal');
       if (order.status !== 'in_progress' || order.version !== input.expectedVersion)
         throw new ProductionServiceError(
           409,
@@ -412,7 +438,7 @@ export function completeProductionOrder(
       applySupplyStockChange(db, {
         supplyId: order.output_supply_id,
         quantityDelta: actualQuantity,
-        movementType: 'adjustment',
+        movementType: 'production_output',
         unit: output.base_unit,
         unitCost: batchUnitCost,
         totalCost,
@@ -450,4 +476,158 @@ export function completeProductionOrder(
 
 export function getProductionOrder(db: Db, orderId: string) {
   return decodeOrder(orderById(db, orderId));
+}
+
+export function listProductionOrders(
+  db: Db,
+  options: { status?: ProductionOrderStatus; limit?: number } = {},
+) {
+  const limit = Math.min(Math.max(Math.trunc(options.limit ?? 100), 1), 500);
+  const rows = options.status
+    ? (db
+        .prepare(
+          'SELECT * FROM production_orders WHERE status = ? ORDER BY created_at DESC, id DESC LIMIT ?',
+        )
+        .all(options.status, limit) as ProductionOrderRow[])
+    : (db
+        .prepare('SELECT * FROM production_orders ORDER BY created_at DESC, id DESC LIMIT ?')
+        .all(limit) as ProductionOrderRow[]);
+  return rows.map(decodeOrder);
+}
+
+export function listProductionOrderEvents(db: Db, orderId: string) {
+  orderById(db, orderId);
+  return db
+    .prepare('SELECT * FROM production_order_events WHERE production_order_id = ? ORDER BY id')
+    .all(orderId);
+}
+
+export function listProductionOrderMovements(db: Db, orderId: string) {
+  orderById(db, orderId);
+  return db
+    .prepare(`SELECT m.*, s.name AS supply_name, u.name AS actor_name
+      FROM supply_movements m
+      LEFT JOIN supplies s ON s.id = m.supply_id
+      LEFT JOIN users u ON u.id = m.actor_user_id
+      WHERE m.reference_type = 'production_order' AND m.reference_id = ?
+      ORDER BY m.created_at, m.id`)
+    .all(orderId);
+}
+
+function normalizeTerminalReason(value: unknown): string {
+  const reason = typeof value === 'string' ? value.trim() : '';
+  if (!reason || reason.length > 500) {
+    throw new ProductionServiceError(
+      400,
+      'reason is required and must be at most 500 characters',
+      'reason_invalid',
+    );
+  }
+  return reason;
+}
+
+export function cancelProductionOrder(
+  db: Db,
+  orderId: string,
+  input: { actorUserId: string; reason: string; expectedVersion: number },
+) {
+  const reason = normalizeTerminalReason(input.reason);
+  if (!input.actorUserId)
+    throw new ProductionServiceError(400, 'actor_user_id is required', 'actor_missing');
+  return db
+    .transaction(() => {
+      const order = orderById(db, orderId);
+      if (order.status === 'cancelled') {
+        if (order.terminal_reason !== reason)
+          throw new ProductionServiceError(
+            409,
+            'Cancelled order has a different reason',
+            'terminal_conflict',
+          );
+        return decodeOrder(order);
+      }
+      if (order.status !== 'queued')
+        throw new ProductionServiceError(
+          409,
+          'Only queued production orders can be cancelled',
+          'state_conflict',
+        );
+      if (order.version !== input.expectedVersion)
+        throw new ProductionServiceError(
+          409,
+          'Production order version changed',
+          'version_conflict',
+        );
+      const timestamp = now();
+      db.prepare(`UPDATE production_orders SET status = 'cancelled', terminal_reason = ?, cancelled_by = ?,
+        cancelled_at = ?, version = version + 1 WHERE id = ?`).run(
+        reason,
+        input.actorUserId,
+        timestamp,
+        order.id,
+      );
+      db.prepare(`INSERT INTO production_order_events
+        (production_order_id, action, actor_user_id, details_json, created_at)
+        VALUES (?, 'cancelled', ?, ?, ?)`).run(
+        order.id,
+        input.actorUserId,
+        JSON.stringify({ reason }),
+        timestamp,
+      );
+      return decodeOrder(orderById(db, order.id));
+    })
+    .immediate();
+}
+
+export function abandonProductionOrder(
+  db: Db,
+  orderId: string,
+  input: { actorUserId: string; reason: string; expectedVersion: number },
+) {
+  const reason = normalizeTerminalReason(input.reason);
+  if (!input.actorUserId)
+    throw new ProductionServiceError(400, 'actor_user_id is required', 'actor_missing');
+  return db
+    .transaction(() => {
+      const order = orderById(db, orderId);
+      if (order.status === 'abandoned') {
+        if (order.terminal_reason !== reason)
+          throw new ProductionServiceError(
+            409,
+            'Abandoned order has a different reason',
+            'terminal_conflict',
+          );
+        return decodeOrder(order);
+      }
+      if (order.status !== 'in_progress')
+        throw new ProductionServiceError(
+          409,
+          'Only in-progress production orders can be abandoned',
+          'state_conflict',
+        );
+      if (order.version !== input.expectedVersion)
+        throw new ProductionServiceError(
+          409,
+          'Production order version changed',
+          'version_conflict',
+        );
+      const timestamp = now();
+      db.prepare(`UPDATE production_orders SET status = 'abandoned', terminal_reason = ?, abandoned_by = ?,
+        abandoned_at = ?, version = version + 1 WHERE id = ?`).run(
+        reason,
+        input.actorUserId,
+        timestamp,
+        order.id,
+      );
+      db.prepare(`INSERT INTO production_order_events
+        (production_order_id, action, actor_user_id, details_json, created_at)
+        VALUES (?, 'abandoned', ?, ?, ?)`).run(
+        order.id,
+        input.actorUserId,
+        JSON.stringify({ reason, ingredients_restored: false }),
+        timestamp,
+      );
+      return decodeOrder(orderById(db, order.id));
+    })
+    .immediate();
 }

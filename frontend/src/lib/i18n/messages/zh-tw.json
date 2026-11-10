@@ -570,7 +570,9 @@
     "unitCost": "單位成本",
     "totalBatchCost": "批次總成本",
     "recipeCost": "配方成本",
-    "costUnknown": "成本未知"
+    "costUnknown": "成本未知",
+    "productionIssue": "生產耗用",
+    "productionOutput": "生產產出"
   },
   "kds": {
     "addonsLabel": "加購",
@@ -2876,7 +2878,8 @@
       "settings": "設定",
       "integrations": "整合",
       "system": "系統",
-      "support": "支援"
+      "support": "支援",
+      "production": "生產"
     },
     "capabilities": {
       "tablesView": "檢視桌位",
@@ -2944,7 +2947,10 @@
       "serverApp": "使用獨立服務員應用程式",
       "support": "聯絡支援並檢視診斷",
       "orderItemPriceOverride": "修改訂單商品價格",
-      "offlineMode": "開啟或關閉離線模式"
+      "offlineMode": "開啟或關閉離線模式",
+      "productionView": "檢視生產",
+      "productionExecute": "開始並完成生產",
+      "productionManage": "管理生產"
     },
     "editorSubtitle": "設定角色預設值，或為單一位員工建立例外。變更會從他的下一個操作開始生效。",
     "roleDefaultsTab": "角色預設值",

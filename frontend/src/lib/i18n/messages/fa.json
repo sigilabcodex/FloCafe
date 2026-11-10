@@ -570,7 +570,9 @@
     "unitCost": "هزینه هر واحد",
     "totalBatchCost": "هزینه کل محموله",
     "recipeCost": "هزینه دستور تهیه",
-    "costUnknown": "هزینه نامشخص"
+    "costUnknown": "هزینه نامشخص",
+    "productionIssue": "مصرف تولید",
+    "productionOutput": "محصول تولید"
   },
   "kds": {
     "addonsLabel": "افزودنی‌ها",
@@ -2876,7 +2878,8 @@
       "settings": "تنظیمات",
       "integrations": "یکپارچه‌سازی‌ها",
       "system": "سیستم",
-      "support": "پشتیبانی"
+      "support": "پشتیبانی",
+      "production": "تولید"
     },
     "capabilities": {
       "tablesView": "مشاهده میزها",
@@ -2944,7 +2947,10 @@
       "support": "تماس با پشتیبانی و مشاهده عیب‌یابی",
       "inventoryManage": "مدیریت مواد اولیه و دستورها",
       "orderItemPriceOverride": "تغییر قیمت آیتم‌های سفارش",
-      "offlineMode": "روشن یا خاموش کردن حالت آفلاین"
+      "offlineMode": "روشن یا خاموش کردن حالت آفلاین",
+      "productionView": "مشاهده تولید",
+      "productionExecute": "شروع و تکمیل تولید",
+      "productionManage": "مدیریت تولید"
     },
     "editorSubtitle": "پیش‌فرض‌های نقش را پیکربندی کنید یا برای یک کارمند استثنا ایجاد کنید. تغییرات در اقدام بعدی او اعمال می‌شود.",
     "roleDefaultsTab": "پیش‌فرض‌های نقش",

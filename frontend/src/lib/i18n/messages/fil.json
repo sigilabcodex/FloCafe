@@ -570,7 +570,9 @@
     "unitCost": "Gastos kada yunit",
     "totalBatchCost": "Kabuuang gastos ng batch",
     "recipeCost": "Gastos sa recipe",
-    "costUnknown": "Hindi alam ang gastos"
+    "costUnknown": "Hindi alam ang gastos",
+    "productionIssue": "Konsumo sa produksyon",
+    "productionOutput": "Output ng produksyon"
   },
   "kds": {
     "addonsLabel": "Mga Addon",
@@ -2876,7 +2878,8 @@
       "settings": "Mga Setting",
       "integrations": "Mga Integration",
       "system": "System",
-      "support": "Suporta"
+      "support": "Suporta",
+      "production": "Produksyon"
     },
     "capabilities": {
       "tablesView": "Tingnan ang mga mesa",
@@ -2944,7 +2947,10 @@
       "support": "Makipag-ugnayan sa suporta at tingnan ang diagnostics",
       "inventoryManage": "Pamahalaan ang mga supply at recipe",
       "orderItemPriceOverride": "Baguhin ang presyo ng mga item sa order",
-      "offlineMode": "I-on o i-off ang Offline mode"
+      "offlineMode": "I-on o i-off ang Offline mode",
+      "productionView": "Tingnan ang produksyon",
+      "productionExecute": "Simulan at tapusin ang produksyon",
+      "productionManage": "Pamahalaan ang produksyon"
     },
     "editorSubtitle": "I-configure ang mga default ng tungkulin o gumawa ng eksepsiyon para sa isang miyembro ng staff. Magkakabisa ang mga pagbabago sa susunod nilang aksyon.",
     "roleDefaultsTab": "Mga default ng tungkulin",

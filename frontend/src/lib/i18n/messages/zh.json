@@ -570,7 +570,9 @@
     "unitCost": "单位成本",
     "totalBatchCost": "批次总成本",
     "recipeCost": "配方成本",
-    "costUnknown": "成本未知"
+    "costUnknown": "成本未知",
+    "productionIssue": "生产耗用",
+    "productionOutput": "生产产出"
   },
   "kds": {
     "addonsLabel": "加购",
@@ -2876,7 +2878,8 @@
       "settings": "设置",
       "integrations": "集成",
       "system": "系统",
-      "support": "支持"
+      "support": "支持",
+      "production": "生产"
     },
     "capabilities": {
       "tablesView": "查看桌位",
@@ -2944,7 +2947,10 @@
       "serverApp": "使用独立服务员应用",
       "support": "联系支持并查看诊断",
       "orderItemPriceOverride": "修改订单商品价格",
-      "offlineMode": "开启或关闭离线模式"
+      "offlineMode": "开启或关闭离线模式",
+      "productionView": "查看生产",
+      "productionExecute": "开始并完成生产",
+      "productionManage": "管理生产"
     },
     "editorSubtitle": "配置角色默认权限，或为某位员工设置例外。更改将在其下次操作时生效。",
     "roleDefaultsTab": "角色默认值",

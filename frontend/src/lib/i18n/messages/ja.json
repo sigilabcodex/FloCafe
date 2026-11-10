@@ -570,7 +570,9 @@
     "unitCost": "単位原価",
     "totalBatchCost": "仕入合計原価",
     "recipeCost": "レシピ原価",
-    "costUnknown": "原価未設定"
+    "costUnknown": "原価未設定",
+    "productionIssue": "製造消費",
+    "productionOutput": "製造出力"
   },
   "kds": {
     "addonsLabel": "追加項目",
@@ -2876,7 +2878,8 @@
       "settings": "設定",
       "integrations": "連携",
       "system": "システム",
-      "support": "サポート"
+      "support": "サポート",
+      "production": "製造"
     },
     "capabilities": {
       "tablesView": "テーブルを表示",
@@ -2944,7 +2947,10 @@
       "serverApp": "スタンドアロンのサーバーアプリを使用",
       "support": "サポートに連絡し診断情報を表示",
       "orderItemPriceOverride": "注文商品の価格を変更",
-      "offlineMode": "オフラインモードの切り替え"
+      "offlineMode": "オフラインモードの切り替え",
+      "productionView": "製造を表示",
+      "productionExecute": "製造を開始して完了",
+      "productionManage": "製造を管理"
     },
     "editorSubtitle": "役割の既定値を設定するか、特定のスタッフの例外を作成します。変更は次の操作から適用されます。",
     "roleDefaultsTab": "役割の既定値",

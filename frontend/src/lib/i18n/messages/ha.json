@@ -570,7 +570,9 @@
     "unitCost": "Farashin kowane ɗaya",
     "totalBatchCost": "Jimillar farashin haɗi",
     "recipeCost": "Farashin tsarin girki",
-    "costUnknown": "Ba a san farashin samarwa ba"
+    "costUnknown": "Ba a san farashin samarwa ba",
+    "productionIssue": "Amfani wajen samarwa",
+    "productionOutput": "Abin da aka samar"
   },
   "kds": {
     "addonsLabel": "Ƙarin Abubuwa",
@@ -2876,7 +2878,8 @@
       "settings": "Saituna",
       "integrations": "Haɗin kai",
       "system": "Tsari",
-      "support": "Tallafi"
+      "support": "Tallafi",
+      "production": "Samarwa"
     },
     "capabilities": {
       "tablesView": "Duba tebura",
@@ -2944,7 +2947,10 @@
       "support": "Tuntuɓi tallafi kuma duba binciken matsala",
       "inventoryManage": "Sarrafa kayan aiki da girke-girke",
       "orderItemPriceOverride": "Sauya farashin kayan oda",
-      "offlineMode": "Kunna ko kashe Yanayin ba a kan layi ba"
+      "offlineMode": "Kunna ko kashe Yanayin ba a kan layi ba",
+      "productionView": "Duba samarwa",
+      "productionExecute": "Fara kuma kammala samarwa",
+      "productionManage": "Sarrafa samarwa"
     },
     "editorSubtitle": "Saita izinin asali na matsayi ko yi keɓancewa ga ma'aikaci ɗaya. Sauye-sauye suna aiki a matakinsu na gaba.",
     "roleDefaultsTab": "Asalin matsayi",

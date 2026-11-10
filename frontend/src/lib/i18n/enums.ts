@@ -119,6 +119,9 @@ export const PERMISSION_LABEL_KEYS = {
   'inventory.view': 'inventoryView',
   'inventory.manage': 'inventoryManage',
   'supplies.manage': 'inventoryManage',
+  'production.view': 'productionView',
+  'production.execute': 'productionExecute',
+  'production.manage': 'productionManage',
 
   'kitchen.use': 'kds',
   'kitchen.status.update': 'kitchenStatusUpdate',
@@ -172,6 +175,7 @@ export const PERMISSION_AREA_KEYS = {
   customers: 'customers',
   menu: 'menu',
   inventory: 'inventory',
+  production: 'production',
   kitchen: 'kitchen',
   reports: 'reports',
   staff: 'staff',

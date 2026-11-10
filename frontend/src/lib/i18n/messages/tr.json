@@ -570,7 +570,9 @@
     "unitCost": "Birim maliyet",
     "totalBatchCost": "Toplam parti maliyeti",
     "recipeCost": "Reçete maliyeti",
-    "costUnknown": "Maliyet bilinmiyor"
+    "costUnknown": "Maliyet bilinmiyor",
+    "productionIssue": "Üretim tüketimi",
+    "productionOutput": "Üretim çıktısı"
   },
   "kds": {
     "addonsLabel": "Eklentiler",
@@ -2876,7 +2878,8 @@
       "settings": "Ayarlar",
       "integrations": "Entegrasyonlar",
       "system": "Sistem",
-      "support": "Destek"
+      "support": "Destek",
+      "production": "Üretim"
     },
     "capabilities": {
       "tablesView": "Masaları görüntüle",
@@ -2944,7 +2947,10 @@
       "support": "Destek ekibiyle iletişime geçme ve sistem tanılamayı görme",
       "inventoryManage": "Sarf malzemelerini ve tarifleri yönetme",
       "orderItemPriceOverride": "Sipariş ürün fiyatlarını değiştir",
-      "offlineMode": "Çevrimdışı modu aç veya kapat"
+      "offlineMode": "Çevrimdışı modu aç veya kapat",
+      "productionView": "Üretimi görüntüle",
+      "productionExecute": "Üretimi başlat ve tamamla",
+      "productionManage": "Üretimi yönet"
     },
     "editorSubtitle": "Rol varsayılanlarını yapılandırın veya tek bir personel için istisna oluşturun. Değişiklikler bir sonraki işlemlerinde geçerli olur.",
     "roleDefaultsTab": "Rol varsayılanları",

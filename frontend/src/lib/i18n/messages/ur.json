@@ -570,7 +570,9 @@
     "unitCost": "فی یونٹ لاگت",
     "totalBatchCost": "کل کھیپ کی لاگت",
     "recipeCost": "ترکیب کی لاگت",
-    "costUnknown": "لاگت نامعلوم"
+    "costUnknown": "لاگت نامعلوم",
+    "productionIssue": "پیداواری استعمال",
+    "productionOutput": "پیداواری پیداوار"
   },
   "kds": {
     "addonsLabel": "ایڈ آنز",
@@ -2876,7 +2878,8 @@
       "settings": "ترتیبات",
       "integrations": "انٹیگریشنز",
       "system": "سسٹم",
-      "support": "معاونت"
+      "support": "معاونت",
+      "production": "پیداوار"
     },
     "capabilities": {
       "tablesView": "میزیں دیکھیں",
@@ -2944,7 +2947,10 @@
       "support": "معاونت سے رابطہ کریں اور تشخیصی معلومات دیکھیں",
       "inventoryManage": "سامان اور ترکیبات منظم کریں",
       "orderItemPriceOverride": "آرڈر آئٹم کی قیمتیں تبدیل کریں",
-      "offlineMode": "آف لائن موڈ آن یا آف کریں"
+      "offlineMode": "آف لائن موڈ آن یا آف کریں",
+      "productionView": "پیداوار دیکھیں",
+      "productionExecute": "پیداوار شروع اور مکمل کریں",
+      "productionManage": "پیداوار کا انتظام کریں"
     },
     "editorSubtitle": "کردار کی طے شدہ ترتیبات ترتیب دیں یا ایک ملازم کے لیے استثنیٰ کریں۔ تبدیلیاں اس کے اگلے عمل پر لاگو ہوں گی۔",
     "roleDefaultsTab": "کردار کی طے شدہ ترتیبات",

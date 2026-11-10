@@ -570,7 +570,9 @@
     "unitCost": "Custo unitário",
     "totalBatchCost": "Custo total do lote",
     "recipeCost": "Custo da receita",
-    "costUnknown": "Custo desconhecido"
+    "costUnknown": "Custo desconhecido",
+    "productionIssue": "Consumo na produção",
+    "productionOutput": "Resultado da produção"
   },
   "kds": {
     "addonsLabel": "Adicionais",
@@ -2876,7 +2878,8 @@
       "settings": "Configurações",
       "integrations": "Integrações",
       "system": "Sistema",
-      "support": "Suporte"
+      "support": "Suporte",
+      "production": "Produção"
     },
     "capabilities": {
       "tablesView": "Ver mesas",
@@ -2944,7 +2947,10 @@
       "support": "Contatar o suporte e ver diagnósticos",
       "inventoryManage": "Gerenciar insumos e receitas",
       "orderItemPriceOverride": "Alterar preços dos itens do pedido",
-      "offlineMode": "Ativar ou desativar o modo offline"
+      "offlineMode": "Ativar ou desativar o modo offline",
+      "productionView": "Ver produção",
+      "productionExecute": "Iniciar e concluir produção",
+      "productionManage": "Gerir produção"
     },
     "editorSubtitle": "Configure os padrões da função ou crie uma exceção para um funcionário. As alterações se aplicam na próxima ação dele.",
     "roleDefaultsTab": "Padrões da função",

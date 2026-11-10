@@ -570,7 +570,9 @@
     "unitCost": "Costo unitario",
     "totalBatchCost": "Costo totale del lotto",
     "recipeCost": "Costo della ricetta",
-    "costUnknown": "Costo sconosciuto"
+    "costUnknown": "Costo sconosciuto",
+    "productionIssue": "Consumo di produzione",
+    "productionOutput": "Risultato della produzione"
   },
   "kds": {
     "addonsLabel": "Extra",
@@ -2876,7 +2878,8 @@
       "settings": "Impostazioni",
       "integrations": "Integrazioni",
       "system": "Sistema",
-      "support": "Assistenza"
+      "support": "Assistenza",
+      "production": "Produzione"
     },
     "capabilities": {
       "tablesView": "Visualizza i tavoli",
@@ -2944,7 +2947,10 @@
       "serverApp": "Usa l'Server App indipendente",
       "support": "Contatta l'assistenza e visualizza le diagnostiche",
       "orderItemPriceOverride": "Modificare i prezzi degli articoli dell’ordine",
-      "offlineMode": "Attiva o disattiva la modalità offline"
+      "offlineMode": "Attiva o disattiva la modalità offline",
+      "productionView": "Visualizza la produzione",
+      "productionExecute": "Avvia e completa la produzione",
+      "productionManage": "Gestisci la produzione"
     },
     "editorSubtitle": "Configura le impostazioni predefinite del ruolo o crea un'eccezione per un membro dello staff. Le modifiche si applicano alla prossima azione.",
     "roleDefaultsTab": "Impostazioni ruolo",

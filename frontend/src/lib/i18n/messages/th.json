@@ -570,7 +570,9 @@
     "unitCost": "ต้นทุนต่อหน่วย",
     "totalBatchCost": "ต้นทุนรวมของล็อต",
     "recipeCost": "ต้นทุนสูตร",
-    "costUnknown": "ไม่ทราบต้นทุน"
+    "costUnknown": "ไม่ทราบต้นทุน",
+    "productionIssue": "วัตถุดิบที่ใช้ในการผลิต",
+    "productionOutput": "ผลผลิตจากการผลิต"
   },
   "kds": {
     "addonsLabel": "ตัวเลือกเพิ่ม",
@@ -2876,7 +2878,8 @@
       "settings": "การตั้งค่า",
       "integrations": "การเชื่อมต่อ",
       "system": "ระบบ",
-      "support": "ฝ่ายช่วยเหลือ"
+      "support": "ฝ่ายช่วยเหลือ",
+      "production": "การผลิต"
     },
     "capabilities": {
       "tablesView": "ดูตาราง",
@@ -2944,7 +2947,10 @@
       "support": "ติดต่อฝ่ายช่วยเหลือและดูข้อมูลวินิจฉัย",
       "inventoryManage": "จัดการวัสดุและสูตรส่วนผสม",
       "orderItemPriceOverride": "เปลี่ยนราคาสินค้าในออเดอร์",
-      "offlineMode": "เปิดหรือปิดโหมดออฟไลน์"
+      "offlineMode": "เปิดหรือปิดโหมดออฟไลน์",
+      "productionView": "ดูการผลิต",
+      "productionExecute": "เริ่มและเสร็จสิ้นการผลิต",
+      "productionManage": "จัดการการผลิต"
     },
     "editorSubtitle": "กำหนดค่าเริ่มต้นของบทบาท หรือสร้างข้อยกเว้นสำหรับพนักงานหนึ่งคน การเปลี่ยนแปลงจะมีผลกับการกระทำครั้งถัดไปของเขา",
     "roleDefaultsTab": "ค่าเริ่มต้นตามบทบาท",

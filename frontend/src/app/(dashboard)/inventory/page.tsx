@@ -100,6 +100,8 @@ const movementTypeIcons: Record<string, typeof ArrowUpCircle> = {
   waste: PackageMinus,
   recipe_depletion: ArrowDownCircle,
   recipe_restore: ArrowUpCircle,
+  production_issue: ArrowDownCircle,
+  production_output: ArrowUpCircle,
 };
 
 export default function InventoryPage() {
@@ -868,7 +870,11 @@ export default function InventoryPage() {
                       ? 'recipeDepletion'
                       : m.movement_type === 'recipe_restore'
                         ? 'recipeRestore'
-                        : m.movement_type;
+                        : m.movement_type === 'production_issue'
+                          ? 'productionIssue'
+                          : m.movement_type === 'production_output'
+                            ? 'productionOutput'
+                            : m.movement_type;
                   return (
                     <tr key={m.id} className="hover:bg-muted">
                       <td className="p-4 text-sm text-muted-foreground whitespace-nowrap">
@@ -887,7 +893,9 @@ export default function InventoryPage() {
                               | 'adjustment'
                               | 'waste'
                               | 'recipeDepletion'
-                              | 'recipeRestore',
+                              | 'recipeRestore'
+                              | 'productionIssue'
+                              | 'productionOutput',
                           )}
                         </span>
                       </td>
@@ -898,13 +906,11 @@ export default function InventoryPage() {
                           {Number(m.quantity_delta) > 0 ? '+' : ''}
                           {fmtNum(Number(m.quantity_delta))} {m.unit}
                         </div>
-                        {m.movement_type === 'receive' &&
-                          m.total_cost !== null &&
-                          m.total_cost !== undefined && (
-                            <div className="text-xs text-muted-foreground">
-                              {fmt(Number(m.total_cost))}
-                            </div>
-                          )}
+                        {m.total_cost !== null && m.total_cost !== undefined && (
+                          <div className="text-xs text-muted-foreground">
+                            {fmt(Number(m.total_cost))}
+                          </div>
+                        )}
                       </td>
                       <td className="p-4 text-end text-sm text-muted-foreground whitespace-nowrap">
                         {fmtNum(Number(m.stock_after))} {m.unit}

@@ -31,8 +31,9 @@ const {
   createProductionOrder,
   startProductionOrder,
   completeProductionOrder,
+  cancelProductionOrder,
+  abandonProductionOrder,
   getProductionOrder,
-  ProductionServiceError,
 } = require('../main/services/production');
 
 function expectError(fn: () => unknown, code: string, label: string) {
@@ -249,6 +250,105 @@ function main() {
   );
   db.exec('DROP TRIGGER force_production_movement_failure');
 
+  const pendingTerminalOrder = createProductionOrder(db, {
+    recipeId: rollbackRecipe.id,
+    plannedQuantity: 100,
+    idempotencyKey: 'sauce-batch-cancelled',
+    actorUserId: actor,
+  }) as any;
+  const cancelled = cancelProductionOrder(db, pendingTerminalOrder.id, {
+    actorUserId: actor,
+    reason: 'Schedule changed',
+    expectedVersion: pendingTerminalOrder.version,
+  }) as any;
+  assertEqual(cancelled.status, 'cancelled', 'queued order can be cancelled');
+  assertEqual(
+    db
+      .prepare(
+        'SELECT COUNT(*) AS count FROM supply_movements WHERE reference_type = ? AND reference_id = ?',
+      )
+      .get('production_order', pendingTerminalOrder.id).count,
+    0,
+    'queued cancellation creates no inventory movements',
+  );
+  assertEqual(
+    cancelProductionOrder(db, pendingTerminalOrder.id, {
+      actorUserId: actor,
+      reason: 'Schedule changed',
+      expectedVersion: pendingTerminalOrder.version,
+    }).status,
+    'cancelled',
+    'queued cancellation retry is idempotent',
+  );
+  expectError(
+    () => startProductionOrder(db, pendingTerminalOrder.id, actor, cancelled.version),
+    'state_terminal',
+    'cancelled order cannot be started',
+  );
+
+  const abandonOrder = createProductionOrder(db, {
+    recipeId: rollbackRecipe.id,
+    plannedQuantity: 100,
+    idempotencyKey: 'sauce-batch-abandoned',
+    actorUserId: actor,
+  }) as any;
+  const abandonStart = startProductionOrder(
+    db,
+    abandonOrder.id,
+    actor,
+    abandonOrder.version,
+  ) as any;
+  const stockBeforeAbandon = getSupply(db, tomatillo.id).stock_quantity;
+  expectError(
+    () =>
+      abandonProductionOrder(db, abandonOrder.id, {
+        actorUserId: actor,
+        reason: '',
+        expectedVersion: abandonStart.version,
+      }),
+    'reason_invalid',
+    'abandonment requires a non-empty reason',
+  );
+  const abandoned = abandonProductionOrder(db, abandonOrder.id, {
+    actorUserId: actor,
+    reason: 'Batch contaminated',
+    expectedVersion: abandonStart.version,
+  }) as any;
+  assertEqual(abandoned.status, 'abandoned', 'in-progress order can be abandoned');
+  assertEqual(
+    getSupply(db, tomatillo.id).stock_quantity,
+    stockBeforeAbandon,
+    'abandonment does not restore issued ingredients',
+  );
+  assertEqual(
+    db
+      .prepare(
+        'SELECT COUNT(*) AS count FROM supply_movements WHERE reference_type = ? AND reference_id = ?',
+      )
+      .get('production_order', abandonOrder.id).count,
+    2,
+    'abandonment adds no output or restore movements',
+  );
+  assertEqual(
+    abandonProductionOrder(db, abandonOrder.id, {
+      actorUserId: actor,
+      reason: 'Batch contaminated',
+      expectedVersion: abandonStart.version,
+    }).status,
+    'abandoned',
+    'abandonment retry is idempotent',
+  );
+  expectError(
+    () =>
+      completeProductionOrder(db, abandonOrder.id, {
+        actorUserId: actor,
+        actualQuantity: 100,
+        expectedVersion: abandoned.version,
+      }),
+    'state_terminal',
+    'abandoned order cannot be completed',
+  );
+
   const issue = listSupplyMovements(db, { supplyId: tomatillo.id }).movements.find(
     (m: any) => m.reference_id === first.id,
   );
@@ -279,23 +379,115 @@ function main() {
   );
 
   console.log('--- Migration compatibility ---');
-  db.pragma('foreign_keys = OFF');
-  db.exec(
-    'DROP TABLE production_order_events; DROP TABLE production_orders; DROP TABLE prep_recipes;',
+  db.exec(`DELETE FROM production_order_events
+    WHERE production_order_id IN (SELECT id FROM production_orders WHERE status IN ('cancelled', 'abandoned'));
+    DELETE FROM production_orders WHERE status IN ('cancelled', 'abandoned');`);
+  const legacyMovementCount = Number(
+    db.prepare('SELECT COUNT(*) AS count FROM supply_movements').get().count,
   );
-  db.pragma('user_version = 125');
+  const legacyTomatilloStock = Number(getSupply(db, tomatillo.id).stock_quantity);
+  const legacyOrderCount = Number(
+    db.prepare('SELECT COUNT(*) AS count FROM production_orders').get().count,
+  );
+  const legacyEvents = db
+    .prepare('SELECT * FROM production_order_events ORDER BY id')
+    .all() as any[];
+  const legacyEventCount = legacyEvents.length;
+  db.pragma('foreign_keys = OFF');
+  db.exec(`
+    UPDATE supply_movements SET movement_type = 'recipe_depletion' WHERE movement_type = 'production_issue';
+    UPDATE supply_movements SET movement_type = 'adjustment' WHERE movement_type = 'production_output';
+    CREATE TABLE supply_movements_v126 (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      supply_id TEXT NOT NULL REFERENCES supplies(id),
+      quantity_delta REAL NOT NULL,
+      movement_type TEXT NOT NULL CHECK (movement_type IN ('receive', 'count', 'adjustment', 'waste', 'recipe_depletion', 'recipe_restore')),
+      unit TEXT NOT NULL CHECK (unit IN ('each', 'g', 'kg', 'ml', 'l')),
+      stock_after REAL NOT NULL,
+      reason TEXT,
+      actor_user_id TEXT NOT NULL REFERENCES users(id),
+      reference_type TEXT,
+      reference_id TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      unit_cost REAL DEFAULT NULL,
+      total_cost REAL DEFAULT NULL,
+      unit_cost_after REAL DEFAULT NULL
+    );
+    INSERT INTO supply_movements_v126 SELECT * FROM supply_movements;
+    DROP TABLE supply_movements;
+    ALTER TABLE supply_movements_v126 RENAME TO supply_movements;
+    CREATE INDEX idx_supply_movements_supply_created ON supply_movements(supply_id, created_at, id);
+    CREATE INDEX idx_supply_movements_reference ON supply_movements(reference_type, reference_id);
+    CREATE INDEX idx_supply_movements_created ON supply_movements(created_at, id);
+
+    DROP TABLE production_order_events;
+    CREATE TABLE production_orders_v126 (
+      id TEXT PRIMARY KEY,
+      prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+      output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+      idempotency_key TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL CHECK (status IN ('queued', 'in_progress', 'completed')),
+      planned_quantity REAL NOT NULL CHECK (planned_quantity > 0),
+      actual_quantity REAL CHECK (actual_quantity > 0),
+      snapshot_json TEXT NOT NULL,
+      total_input_cost REAL,
+      cost_known INTEGER NOT NULL DEFAULT 0 CHECK (cost_known IN (0, 1)),
+      version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+      created_by TEXT NOT NULL REFERENCES users(id),
+      started_by TEXT REFERENCES users(id),
+      completed_by TEXT REFERENCES users(id),
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      started_at TEXT,
+      completed_at TEXT
+    );
+    INSERT INTO production_orders_v126
+      (id, prep_recipe_id, output_supply_id, idempotency_key, status, planned_quantity, actual_quantity,
+       snapshot_json, total_input_cost, cost_known, version, created_by, started_by, completed_by,
+       created_at, started_at, completed_at)
+    SELECT id, prep_recipe_id, output_supply_id, idempotency_key, status, planned_quantity, actual_quantity,
+       snapshot_json, total_input_cost, cost_known, version, created_by, started_by, completed_by,
+       created_at, started_at, completed_at
+    FROM production_orders WHERE status IN ('queued', 'in_progress', 'completed');
+    DROP TABLE production_orders;
+    ALTER TABLE production_orders_v126 RENAME TO production_orders;
+    CREATE INDEX idx_production_orders_status_created ON production_orders(status, created_at);
+    CREATE TABLE production_order_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+      action TEXT NOT NULL CHECK (action IN ('created', 'started', 'completed')),
+      actor_user_id TEXT NOT NULL REFERENCES users(id),
+      details_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(production_order_id, action)
+    );
+  `);
+  const restoreLegacyEvent = db.prepare(`INSERT INTO production_order_events
+    (id, production_order_id, action, actor_user_id, details_json, created_at) VALUES (?, ?, ?, ?, ?, ?)`);
+  for (const event of legacyEvents) {
+    if (['created', 'started', 'completed'].includes(event.action)) {
+      restoreLegacyEvent.run(
+        event.id,
+        event.production_order_id,
+        event.action,
+        event.actor_user_id,
+        event.details_json,
+        event.created_at,
+      );
+    }
+  }
+  db.pragma('user_version = 126');
   db.pragma('foreign_keys = ON');
   closeDatabase();
   initDatabase();
   const upgradedDb = getDatabase();
   assertEqual(
     upgradedDb.pragma('user_version', { simple: true }),
-    126,
-    'v125 temporary database upgrades to v126',
+    127,
+    'v126 temporary database upgrades to v127',
   );
   assertEqual(
     getSupply(upgradedDb, tomatillo.id).stock_quantity,
-    300,
+    legacyTomatilloStock,
     'v126 migration preserves existing supply stock',
   );
   assertEqual(
@@ -305,12 +497,38 @@ function main() {
       )
       .get().count,
     3,
-    'v126 creates only the additive production tables',
+    'v127 retains all production tables',
   );
   assertEqual(
     upgradedDb.pragma('foreign_key_check').length,
     0,
     'upgraded temporary database has no foreign key violations',
+  );
+  assertEqual(
+    Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM supply_movements').get().count),
+    legacyMovementCount,
+    'v127 preserves every v126 supply movement',
+  );
+  assertEqual(
+    Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM production_orders').get().count),
+    legacyOrderCount,
+    'v127 preserves v126 production orders and snapshots',
+  );
+  assertEqual(
+    Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM production_order_events').get().count),
+    legacyEventCount,
+    'v127 preserves all events for v126 terminal-compatible orders',
+  );
+  const movementCheck = String(
+    (
+      upgradedDb
+        .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'supply_movements'")
+        .get() as { sql: string }
+    ).sql,
+  );
+  assert(
+    movementCheck.includes('production_issue') && movementCheck.includes('production_output'),
+    'v127 movement constraint includes production types',
   );
 
   const results = getResults();

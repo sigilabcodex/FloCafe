@@ -570,7 +570,9 @@
     "unitCost": "Giá vốn đơn vị",
     "totalBatchCost": "Tổng chi phí lô hàng",
     "recipeCost": "Giá vốn công thức",
-    "costUnknown": "Chưa rõ giá vốn"
+    "costUnknown": "Chưa rõ giá vốn",
+    "productionIssue": "Tiêu hao sản xuất",
+    "productionOutput": "Sản lượng sản xuất"
   },
   "kds": {
     "addonsLabel": "Tuỳ chọn",
@@ -2876,7 +2878,8 @@
       "settings": "Cài đặt",
       "integrations": "Tích hợp",
       "system": "Hệ thống",
-      "support": "Hỗ trợ"
+      "support": "Hỗ trợ",
+      "production": "Sản xuất"
     },
     "capabilities": {
       "tablesView": "Xem bàn",
@@ -2944,7 +2947,10 @@
       "support": "Liên hệ hỗ trợ và xem chẩn đoán",
       "inventoryManage": "Quản lý vật tư và công thức",
       "orderItemPriceOverride": "Đổi giá món trong đơn hàng",
-      "offlineMode": "Bật hoặc tắt chế độ ngoại tuyến"
+      "offlineMode": "Bật hoặc tắt chế độ ngoại tuyến",
+      "productionView": "Xem sản xuất",
+      "productionExecute": "Bắt đầu và hoàn tất sản xuất",
+      "productionManage": "Quản lý sản xuất"
     },
     "editorSubtitle": "Cấu hình mặc định theo vai trò hoặc tạo ngoại lệ cho một nhân viên. Thay đổi sẽ áp dụng từ hành động tiếp theo của họ.",
     "roleDefaultsTab": "Mặc định vai trò",

@@ -570,7 +570,9 @@
     "unitCost": "Biaya per unit",
     "totalBatchCost": "Total biaya batch",
     "recipeCost": "Biaya resep",
-    "costUnknown": "Biaya belum diketahui"
+    "costUnknown": "Biaya belum diketahui",
+    "productionIssue": "Pemakaian produksi",
+    "productionOutput": "Hasil produksi"
   },
   "kds": {
     "addonsLabel": "Tambahan",
@@ -2876,7 +2878,8 @@
       "settings": "Pengaturan",
       "integrations": "Integrasi",
       "system": "Sistem",
-      "support": "Dukungan"
+      "support": "Dukungan",
+      "production": "Produksi"
     },
     "capabilities": {
       "tablesView": "Lihat meja",
@@ -2944,7 +2947,10 @@
       "serverApp": "Menggunakan Aplikasi Server mandiri",
       "support": "Menghubungi dukungan dan melihat diagnostik",
       "orderItemPriceOverride": "Mengubah harga item pesanan",
-      "offlineMode": "Aktifkan atau nonaktifkan mode offline"
+      "offlineMode": "Aktifkan atau nonaktifkan mode offline",
+      "productionView": "Lihat produksi",
+      "productionExecute": "Mulai dan selesaikan produksi",
+      "productionManage": "Kelola produksi"
     },
     "editorSubtitle": "Konfigurasikan default peran atau buat pengecualian untuk satu staf. Perubahan berlaku pada tindakan berikutnya.",
     "roleDefaultsTab": "Default peran",

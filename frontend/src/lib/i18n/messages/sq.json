@@ -570,7 +570,9 @@
     "unitCost": "Kosto për njësi",
     "totalBatchCost": "Kosto totale e partisë",
     "recipeCost": "Kosto e recetës",
-    "costUnknown": "Kosto e panjohur"
+    "costUnknown": "Kosto e panjohur",
+    "productionIssue": "Konsum prodhimi",
+    "productionOutput": "Prodhimi i përfunduar"
   },
   "kds": {
     "addonsLabel": "Shtesat",
@@ -2876,7 +2878,8 @@
       "settings": "Cilësimet",
       "integrations": "Integrimet",
       "system": "Sistemi",
-      "support": "Mbështetje"
+      "support": "Mbështetje",
+      "production": "Prodhim"
     },
     "capabilities": {
       "tablesView": "Shiko tavat",
@@ -2944,7 +2947,10 @@
       "support": "Kontaktoni me mbështetjen dhe shikoni diagnostikimin",
       "inventoryManage": "Menaxhoni furnizimet dhe recetat",
       "orderItemPriceOverride": "Ndrysho çmimet e artikujve të porosisë",
-      "offlineMode": "Ndez ose fik modalitetin pa internet"
+      "offlineMode": "Ndez ose fik modalitetin pa internet",
+      "productionView": "Shiko prodhimin",
+      "productionExecute": "Nis dhe përfundo prodhimin",
+      "productionManage": "Menaxho prodhimin"
     },
     "editorSubtitle": "Konfiguroni vlerat e parazgjedhura të rolit ose bëni një përjashtim për një staf. Ndryshimet zbatohen në veprimin e tij të ardhshëm.",
     "roleDefaultsTab": "Vlerat e parazgjedhura të rolit",

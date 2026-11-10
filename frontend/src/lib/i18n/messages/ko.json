@@ -570,7 +570,9 @@
     "unitCost": "단위 원가",
     "totalBatchCost": "배치 총원가",
     "recipeCost": "레시피 원가",
-    "costUnknown": "원가 미지정"
+    "costUnknown": "원가 미지정",
+    "productionIssue": "생산 사용량",
+    "productionOutput": "생산 산출량"
   },
   "kds": {
     "addonsLabel": "추가 메뉴",
@@ -2876,7 +2878,8 @@
       "settings": "설정",
       "integrations": "연동",
       "system": "시스템",
-      "support": "지원"
+      "support": "지원",
+      "production": "생산"
     },
     "capabilities": {
       "tablesView": "테이블 보기",
@@ -2944,7 +2947,10 @@
       "serverApp": "독립형 서버 앱(Server App) 사용",
       "support": "지원팀 문의 및 진단 정보 보기",
       "orderItemPriceOverride": "주문 품목 가격 변경",
-      "offlineMode": "오프라인 모드 켜기 또는 끄기"
+      "offlineMode": "오프라인 모드 켜기 또는 끄기",
+      "productionView": "생산 조회",
+      "productionExecute": "생산 시작 및 완료",
+      "productionManage": "생산 관리"
     },
     "editorSubtitle": "역할 기본값을 구성하거나 특정 직원에 대한 예외를 만드세요. 변경 사항은 다음 작업부터 적용됩니다.",
     "roleDefaultsTab": "역할 기본값",

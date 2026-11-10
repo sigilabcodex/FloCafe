@@ -570,7 +570,9 @@
     "unitCost": "Gharama kwa kipimo",
     "totalBatchCost": "Jumla ya gharama ya fungu",
     "recipeCost": "Gharama ya mapishi",
-    "costUnknown": "Gharama haijulikani"
+    "costUnknown": "Gharama haijulikani",
+    "productionIssue": "Matumizi ya uzalishaji",
+    "productionOutput": "Matokeo ya uzalishaji"
   },
   "kds": {
     "addonsLabel": "Viongezeo",
@@ -2876,7 +2878,8 @@
       "settings": "Mipangilio",
       "integrations": "Miunganisho",
       "system": "Mfumo",
-      "support": "Usaidizi"
+      "support": "Usaidizi",
+      "production": "Uzalishaji"
     },
     "capabilities": {
       "tablesView": "Tazama meza",
@@ -2944,7 +2947,10 @@
       "support": "Wasiliana na usaidizi na utazame uchunguzi",
       "inventoryManage": "Simamia malighafi na mapishi",
       "orderItemPriceOverride": "Badilisha bei za bidhaa za oda",
-      "offlineMode": "Washa au uzime Hali ya nje ya mtandao"
+      "offlineMode": "Washa au uzime Hali ya nje ya mtandao",
+      "productionView": "Tazama uzalishaji",
+      "productionExecute": "Anza na ukamilishe uzalishaji",
+      "productionManage": "Dhibiti uzalishaji"
     },
     "editorSubtitle": "Sanidi chaguomsingi za majukumu au weka ubaguzi kwa mfanyakazi mmoja. Mabadiliko yanatumika kwa hatua yake inayofuata.",
     "roleDefaultsTab": "Chaguomsingi za jukumu",

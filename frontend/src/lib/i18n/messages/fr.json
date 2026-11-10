@@ -570,7 +570,9 @@
     "unitCost": "Coût unitaire",
     "totalBatchCost": "Coût total du lot",
     "recipeCost": "Coût de la recette",
-    "costUnknown": "Coût inconnu"
+    "costUnknown": "Coût inconnu",
+    "productionIssue": "Consommation de production",
+    "productionOutput": "Sortie de production"
   },
   "kds": {
     "addonsLabel": "Options",
@@ -2876,7 +2878,8 @@
       "settings": "Paramètres",
       "integrations": "Intégrations",
       "system": "Système",
-      "support": "Assistance"
+      "support": "Assistance",
+      "production": "Fabrication"
     },
     "capabilities": {
       "tablesView": "Consulter les tables",
@@ -2944,7 +2947,10 @@
       "support": "Contacter l’assistance et afficher les diagnostics",
       "inventoryManage": "Gérer les approvisionnements et les recettes",
       "orderItemPriceOverride": "Modifier les prix des articles de commande",
-      "offlineMode": "Activer ou désactiver le mode hors ligne"
+      "offlineMode": "Activer ou désactiver le mode hors ligne",
+      "productionView": "Voir la production",
+      "productionExecute": "Démarrer et terminer la production",
+      "productionManage": "Gérer la production"
     },
     "editorSubtitle": "Configurez les permissions par défaut d'un rôle ou créez une exception pour un membre du personnel. Les modifications s'appliquent à sa prochaine action.",
     "roleDefaultsTab": "Permissions du rôle",

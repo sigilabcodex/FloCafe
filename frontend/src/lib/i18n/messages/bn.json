@@ -570,7 +570,9 @@
     "unitCost": "একক খরচ",
     "totalBatchCost": "মোট ব্যাচ খরচ",
     "recipeCost": "রেসিপি খরচ",
-    "costUnknown": "খরচ অজানা"
+    "costUnknown": "খরচ অজানা",
+    "productionIssue": "উৎপাদনে ব্যবহার",
+    "productionOutput": "উৎপাদিত পরিমাণ"
   },
   "kds": {
     "addonsLabel": "অ্যাড-অন",
@@ -2876,7 +2878,8 @@
       "settings": "সেটিংস",
       "integrations": "ইন্টিগ্রেশন",
       "system": "সিস্টেম",
-      "support": "সমর্থন"
+      "support": "সমর্থন",
+      "production": "উৎপাদন"
     },
     "capabilities": {
       "tablesView": "টেবিল দেখুন",
@@ -2944,7 +2947,10 @@
       "support": "সহায়তার সাথে যোগাযোগ করুন এবং ডায়াগনস্টিক দেখুন",
       "inventoryManage": "সরবরাহ এবং রেসিপি পরিচালনা করুন",
       "orderItemPriceOverride": "অর্ডার আইটেমের দাম পরিবর্তন করুন",
-      "offlineMode": "অফলাইন মোড চালু বা বন্ধ করুন"
+      "offlineMode": "অফলাইন মোড চালু বা বন্ধ করুন",
+      "productionView": "উৎপাদন দেখুন",
+      "productionExecute": "উৎপাদন শুরু ও সম্পন্ন করুন",
+      "productionManage": "উৎপাদন পরিচালনা করুন"
     },
     "editorSubtitle": "ভূমিকার ডিফল্ট সেটিংস কনফিগার করুন বা একজন স্টাফের জন্য ব্যতিক্রম তৈরি করুন। পরিবর্তনগুলো তার পরবর্তী কাজে প্রযোজ্য হবে।",
     "roleDefaultsTab": "ভূমিকার ডিফল্ট",

@@ -570,7 +570,9 @@
     "unitCost": "Eenheidskost",
     "totalBatchCost": "Totale partijkost",
     "recipeCost": "Receptkost",
-    "costUnknown": "Kostprijs onbekend"
+    "costUnknown": "Kostprijs onbekend",
+    "productionIssue": "Productieverbruik",
+    "productionOutput": "Productieopbrengst"
   },
   "kds": {
     "addonsLabel": "Add-ons",
@@ -2876,7 +2878,8 @@
       "settings": "Instellingen",
       "integrations": "Integraties",
       "system": "Systeem",
-      "support": "Ondersteuning"
+      "support": "Ondersteuning",
+      "production": "Productie"
     },
     "capabilities": {
       "tablesView": "Tafels bekijken",
@@ -2944,7 +2947,10 @@
       "support": "Neem contact op met ondersteuning en bekijk de diagnostiek",
       "inventoryManage": "Voorraadartikelen en recepten beheren",
       "orderItemPriceOverride": "Prijzen van bestelde artikelen aanpassen",
-      "offlineMode": "Offlinemodus aan- of uitzetten"
+      "offlineMode": "Offlinemodus aan- of uitzetten",
+      "productionView": "Productie bekijken",
+      "productionExecute": "Productie starten en afronden",
+      "productionManage": "Productie beheren"
     },
     "editorSubtitle": "Standaardinstellingen per rol configureren of een uitzondering maken voor één medewerker. Wijzigingen gelden vanaf diens volgende actie.",
     "roleDefaultsTab": "Rolstandaarden",

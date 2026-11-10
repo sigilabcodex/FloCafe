@@ -570,7 +570,9 @@
     "unitCost": "प्रति एकक खर्च",
     "totalBatchCost": "एकूण बॅच खर्च",
     "recipeCost": "रेसिपी खर्च",
-    "costUnknown": "खर्च अज्ञात"
+    "costUnknown": "खर्च अज्ञात",
+    "productionIssue": "उत्पादन वापर",
+    "productionOutput": "उत्पादन निष्पत्ती"
   },
   "kds": {
     "addonsLabel": "ॲड-ऑन्स",
@@ -2876,7 +2878,8 @@
       "settings": "सेटिंग्ज",
       "integrations": "इंटिग्रेशन्स",
       "system": "सिस्टम",
-      "support": "सपोर्ट"
+      "support": "सपोर्ट",
+      "production": "उत्पादन"
     },
     "capabilities": {
       "tablesView": "टेबल्स पहा",
@@ -2944,7 +2947,10 @@
       "support": "सपोर्टशी संपर्क साधा आणि डायग्नोस्टिक्स पहा",
       "inventoryManage": "साहित्य आणि रेसिपी व्यवस्थापित करा",
       "orderItemPriceOverride": "ऑर्डर आयटमच्या किमती ओव्हरराइड करा",
-      "offlineMode": "ऑफलाइन मोड चालू किंवा बंद करा"
+      "offlineMode": "ऑफलाइन मोड चालू किंवा बंद करा",
+      "productionView": "उत्पादन पहा",
+      "productionExecute": "उत्पादन सुरू करा आणि पूर्ण करा",
+      "productionManage": "उत्पादन व्यवस्थापित करा"
     },
     "editorSubtitle": "भूमिका डीफॉल्ट कॉन्फिगर करा किंवा एका कर्मचाऱ्यासाठी अपवाद करा. बदल त्यांच्या पुढील कृतीवर लागू होतील.",
     "roleDefaultsTab": "भूमिका डीफॉल्ट",
