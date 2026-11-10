@@ -420,6 +420,10 @@ function main() {
     CREATE INDEX idx_supply_movements_reference ON supply_movements(reference_type, reference_id);
     CREATE INDEX idx_supply_movements_created ON supply_movements(created_at, id);
 
+    DROP TABLE production_step_events;
+    DROP TABLE production_order_steps;
+    DROP TABLE production_process_steps;
+    DROP TABLE production_process_versions;
     DROP TABLE production_order_events;
     CREATE TABLE production_orders_v126 (
       id TEXT PRIMARY KEY,
@@ -482,8 +486,8 @@ function main() {
   const upgradedDb = getDatabase();
   assertEqual(
     upgradedDb.pragma('user_version', { simple: true }),
-    127,
-    'v126 temporary database upgrades to v127',
+    128,
+    'v126 temporary database upgrades through v128',
   );
   assertEqual(
     getSupply(upgradedDb, tomatillo.id).stock_quantity,
@@ -497,7 +501,7 @@ function main() {
       )
       .get().count,
     3,
-    'v127 retains all production tables',
+    'v128 retains all production tables',
   );
   assertEqual(
     upgradedDb.pragma('foreign_key_check').length,
@@ -507,17 +511,17 @@ function main() {
   assertEqual(
     Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM supply_movements').get().count),
     legacyMovementCount,
-    'v127 preserves every v126 supply movement',
+    'v128 preserves every v126 supply movement',
   );
   assertEqual(
     Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM production_orders').get().count),
     legacyOrderCount,
-    'v127 preserves v126 production orders and snapshots',
+    'v128 preserves v126 production orders and snapshots',
   );
   assertEqual(
     Number(upgradedDb.prepare('SELECT COUNT(*) AS count FROM production_order_events').get().count),
     legacyEventCount,
-    'v127 preserves all events for v126 terminal-compatible orders',
+    'v128 preserves all events for v126 terminal-compatible orders',
   );
   const movementCheck = String(
     (
@@ -528,7 +532,7 @@ function main() {
   );
   assert(
     movementCheck.includes('production_issue') && movementCheck.includes('production_output'),
-    'v127 movement constraint includes production types',
+    'v128 movement constraint includes production types',
   );
 
   const results = getResults();

@@ -10542,6 +10542,105 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       }
     },
   },
+  {
+    version: 128,
+    name: 'add_versioned_production_processes',
+    up: () => {
+      db.exec(`
+        CREATE TABLE production_process_versions (
+          id TEXT PRIMARY KEY,
+          prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+          version INTEGER NOT NULL CHECK (version > 0),
+          name TEXT NOT NULL,
+          is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(prep_recipe_id, version)
+        );
+        CREATE UNIQUE INDEX idx_production_process_one_active
+          ON production_process_versions(prep_recipe_id) WHERE is_active = 1;
+        CREATE INDEX idx_production_process_versions_recipe
+          ON production_process_versions(prep_recipe_id, version DESC);
+
+        CREATE TABLE production_process_steps (
+          id TEXT PRIMARY KEY,
+          process_version_id TEXT NOT NULL REFERENCES production_process_versions(id),
+          step_key TEXT NOT NULL,
+          position INTEGER NOT NULL CHECK (position >= 0),
+          name TEXT NOT NULL,
+          instructions TEXT,
+          step_type TEXT NOT NULL CHECK (step_type IN ('operation', 'wait', 'check')),
+          planned_duration_minutes REAL CHECK (planned_duration_minutes IS NULL OR planned_duration_minutes >= 0),
+          dependencies_json TEXT NOT NULL DEFAULT '[]',
+          is_optional INTEGER NOT NULL DEFAULT 0 CHECK (is_optional IN (0, 1)),
+          suggested_role TEXT CHECK (suggested_role IS NULL OR suggested_role IN ('owner', 'manager', 'cashier', 'server', 'chef')),
+          suggested_responsible TEXT,
+          resource_label TEXT,
+          verification_prompt TEXT,
+          UNIQUE(process_version_id, step_key),
+          UNIQUE(process_version_id, position)
+        );
+        CREATE INDEX idx_production_process_steps_order
+          ON production_process_steps(process_version_id, position);
+
+        CREATE TABLE production_order_steps (
+          id TEXT PRIMARY KEY,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          source_step_id TEXT REFERENCES production_process_steps(id),
+          step_key TEXT NOT NULL,
+          position INTEGER NOT NULL CHECK (position >= 0),
+          name TEXT NOT NULL,
+          instructions TEXT,
+          step_type TEXT NOT NULL CHECK (step_type IN ('operation', 'wait', 'check')),
+          planned_duration_minutes REAL CHECK (planned_duration_minutes IS NULL OR planned_duration_minutes >= 0),
+          dependencies_json TEXT NOT NULL DEFAULT '[]',
+          is_optional INTEGER NOT NULL DEFAULT 0 CHECK (is_optional IN (0, 1)),
+          suggested_role TEXT CHECK (suggested_role IS NULL OR suggested_role IN ('owner', 'manager', 'cashier', 'server', 'chef')),
+          suggested_responsible TEXT,
+          resource_label TEXT,
+          verification_prompt TEXT,
+          status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'skipped', 'blocked')),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          started_by TEXT REFERENCES users(id),
+          completed_by TEXT REFERENCES users(id),
+          started_at TEXT,
+          completed_at TEXT,
+          actual_duration_seconds INTEGER CHECK (actual_duration_seconds IS NULL OR actual_duration_seconds >= 0),
+          verification_result TEXT,
+          terminal_reason TEXT,
+          UNIQUE(production_order_id, step_key),
+          UNIQUE(production_order_id, position)
+        );
+        CREATE INDEX idx_production_order_steps_order
+          ON production_order_steps(production_order_id, position);
+        CREATE INDEX idx_production_order_steps_status
+          ON production_order_steps(status, production_order_id);
+
+        CREATE TABLE production_step_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          production_order_step_id TEXT NOT NULL REFERENCES production_order_steps(id),
+          action TEXT NOT NULL CHECK (action IN ('started', 'completed', 'skipped', 'blocked', 'resumed')),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          request_json TEXT NOT NULL DEFAULT '{}',
+          details_json TEXT NOT NULL DEFAULT '{}',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE INDEX idx_production_step_events_order
+          ON production_step_events(production_order_id, id);
+        CREATE INDEX idx_production_step_events_step
+          ON production_step_events(production_order_step_id, id);
+
+        ALTER TABLE production_orders ADD COLUMN process_version_id TEXT
+          REFERENCES production_process_versions(id);
+      `);
+      const foreignKeyViolations = (db.pragma('foreign_key_check') as unknown[]).length;
+      if (foreignKeyViolations > 0) {
+        throw new Error(`v128 created ${foreignKeyViolations} foreign key violation(s)`);
+      }
+    },
+  },
 ];
 
 export function backfillWhatsAppMessageAttempts(

@@ -101,6 +101,29 @@ fixtureDb
   .run(isoOrder.lastInsertRowid);
 fixtureDb.close();
 
+function removeV128ProductionProcessSchema(db: any) {
+  const tableNames = new Set(
+    (
+      db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]
+    ).map((row) => row.name),
+  );
+  if (!tableNames.has('production_process_versions')) return;
+  db.pragma('foreign_keys = OFF');
+  db.exec(`
+    DROP TABLE production_step_events;
+    DROP TABLE production_order_steps;
+    DROP TABLE production_process_steps;
+    DROP TABLE production_process_versions;
+  `);
+  const orderColumns = db.prepare('PRAGMA table_info(production_orders)').all() as {
+    name: string;
+  }[];
+  if (orderColumns.some((column) => column.name === 'process_version_id')) {
+    db.exec('ALTER TABLE production_orders DROP COLUMN process_version_id');
+  }
+  db.pragma('foreign_keys = ON');
+}
+
 const mockApp = {
   isPackaged: true,
   getPath: (_name: string) => testDir,
@@ -724,6 +747,7 @@ function main() {
     preservedAt,
   );
   db.prepare("UPDATE settings SET value = 'true' WHERE key = 'split_checks_enabled'").run();
+  removeV128ProductionProcessSchema(db);
   db.pragma('user_version = 37');
   closeDatabase();
   initDatabase();
@@ -757,6 +781,7 @@ function main() {
   getDatabase()
     .prepare(`UPDATE settings SET value = 'false' WHERE key = 'diagnostics_consent'`)
     .run();
+  removeV128ProductionProcessSchema(getDatabase());
   getDatabase().pragma('user_version = 46');
   closeDatabase();
   initDatabase();
@@ -803,6 +828,7 @@ function main() {
     .prepare('UPDATE orders SET expected_payment_method = ? WHERE id = ?')
     .run('Store Credit', isoOrder.lastInsertRowid);
   preIdentity.exec('ALTER TABLE orders DROP COLUMN expected_payment_method_id');
+  removeV128ProductionProcessSchema(preIdentity);
   preIdentity.pragma('user_version = 105');
   assert.ok(
     !(preIdentity.prepare('PRAGMA table_info(orders)').all() as { name: string }[]).some(
@@ -936,6 +962,7 @@ function main() {
   `)
     .run();
   const preUpgradeShiftId = Number(preUpgradeOpenShift.lastInsertRowid);
+  removeV128ProductionProcessSchema(prePerStaffDb);
   prePerStaffDb.pragma('user_version = 119');
   closeDatabase();
 
@@ -1028,6 +1055,7 @@ function main() {
     .run();
   const preOutboundId1 = Number(preOutbound1.lastInsertRowid);
   const preOutboundId2 = Number(preOutbound2.lastInsertRowid);
+  removeV128ProductionProcessSchema(preAttemptsDb);
   preAttemptsDb.pragma('user_version = 120');
   closeDatabase();
 
@@ -1084,8 +1112,7 @@ function main() {
     122,
     'the add_whatsapp_daily_sales_and_day_close_dispatch migration is v122',
   );
-  initDatabase();
-  const preV122Db = getDatabase();
+  const preV122Db = buildIdealSchemaDb(121);
   // Simulate a v121 database before v122 widened kind CHECK and added cash_closure_id.
   preV122Db.exec(`
     DROP TABLE IF EXISTS whatsapp_message_attempts;
@@ -1145,7 +1172,8 @@ function main() {
     `)
     .run(preV122MsgId);
   preV122Db.pragma('user_version = 121');
-  closeDatabase();
+  fs.writeFileSync(upgradeDbPath, preV122Db.serialize());
+  preV122Db.close();
 
   initDatabase();
   const postV122Db = getDatabase();

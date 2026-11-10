@@ -8,13 +8,20 @@ import {
   completeProductionOrder,
   createPrepRecipeVersion,
   createProductionOrder,
+  createProductionProcessVersion,
   getProductionOrder,
+  getProductionProcessVersion,
   listPrepRecipeVersions,
   listProductionOrderEvents,
   listProductionOrderMovements,
+  listProductionOrderSteps,
   listProductionOrders,
+  listProductionProcessVersions,
+  listProductionStepEvents,
   startProductionOrder,
+  transitionProductionOrderStep,
   type ProductionOrderStatus,
+  type ProductionStepAction,
 } from '../services/production';
 import type { SupplyUnit } from '../services/units';
 
@@ -71,6 +78,59 @@ router.get(
     try {
       res.json({
         recipes: listPrepRecipeVersions(getDatabase(), getId(req.params.supplyId, 'supply_id')),
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+router.get(
+  '/recipes/:recipeId/process-versions',
+  requirePermission('production.view'),
+  (req: Request, res: Response) => {
+    try {
+      res.json({
+        process_versions: listProductionProcessVersions(
+          getDatabase(),
+          getId(req.params.recipeId, 'recipe_id'),
+        ),
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+router.post(
+  '/recipes/:recipeId/process-versions',
+  requirePermission('production.manage'),
+  (req: Request, res: Response) => {
+    try {
+      const body = req.body || {};
+      const processVersion = createProductionProcessVersion(getDatabase(), {
+        recipeId: getId(req.params.recipeId, 'recipe_id'),
+        name: body.name,
+        steps: body.steps,
+        actorUserId: actorId(req),
+      });
+      res.status(201).json({ process_version: processVersion });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+router.get(
+  '/process-versions/:processVersionId',
+  requirePermission('production.view'),
+  (req: Request, res: Response) => {
+    try {
+      res.json({
+        process_version: getProductionProcessVersion(
+          getDatabase(),
+          getId(req.params.processVersionId, 'process_version_id'),
+        ),
       });
     } catch (error) {
       sendError(res, error);
@@ -158,6 +218,108 @@ router.post('/orders', requirePermission('production.execute'), (req: Request, r
     sendError(res, error);
   }
 });
+
+router.get(
+  '/orders/:orderId/steps/:stepId/events',
+  requirePermission('production.view'),
+  (req: Request, res: Response) => {
+    try {
+      res.json({
+        events: listProductionStepEvents(
+          getDatabase(),
+          getId(req.params.orderId, 'order_id'),
+          getId(req.params.stepId, 'step_id'),
+        ),
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+router.get(
+  '/orders/:orderId/steps',
+  requirePermission('production.view'),
+  (req: Request, res: Response) => {
+    try {
+      res.json({
+        steps: listProductionOrderSteps(getDatabase(), getId(req.params.orderId, 'order_id')),
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+router.get(
+  '/orders/:orderId/step-events',
+  requirePermission('production.view'),
+  (req: Request, res: Response) => {
+    try {
+      const stepId =
+        req.query.step_id === undefined ? undefined : getId(req.query.step_id, 'step_id');
+      res.json({
+        events: listProductionStepEvents(
+          getDatabase(),
+          getId(req.params.orderId, 'order_id'),
+          stepId,
+        ),
+      });
+    } catch (error) {
+      sendError(res, error);
+    }
+  },
+);
+
+function stageTransition(action: ProductionStepAction) {
+  return (req: Request, res: Response) => {
+    try {
+      const body = req.body || {};
+      const step = transitionProductionOrderStep(
+        getDatabase(),
+        getId(req.params.orderId, 'order_id'),
+        getId(req.params.stepId, 'step_id'),
+        {
+          action,
+          actorUserId: actorId(req),
+          expectedVersion: expectedVersion(body.expected_version),
+          idempotencyKey: getId(body.idempotency_key, 'idempotency_key'),
+          reason: body.reason,
+          verificationResult: body.verification_result,
+        },
+      );
+      res.json({ step });
+    } catch (error) {
+      sendError(res, error);
+    }
+  };
+}
+
+router.post(
+  '/orders/:orderId/steps/:stepId/start',
+  requirePermission('production.execute'),
+  stageTransition('start'),
+);
+router.post(
+  '/orders/:orderId/steps/:stepId/complete',
+  requirePermission('production.execute'),
+  stageTransition('complete'),
+);
+router.post(
+  '/orders/:orderId/steps/:stepId/skip',
+  requirePermission('production.execute'),
+  stageTransition('skip'),
+);
+router.post(
+  '/orders/:orderId/steps/:stepId/block',
+  requirePermission('production.execute'),
+  stageTransition('block'),
+);
+router.post(
+  '/orders/:orderId/steps/:stepId/resume',
+  requirePermission('production.execute'),
+  stageTransition('resume'),
+);
 
 router.get(
   '/orders/:orderId/events',

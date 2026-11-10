@@ -135,6 +135,51 @@ async function main() {
       body: { yield_quantity: 1, components: [null] },
     });
     assertEqual(malformedRecipe.status, 400, 'malformed recipe components are rejected');
+    const chefProcessManage = await api(
+      baseUrl,
+      `/api/production/recipes/${recipe.id}/process-versions`,
+      { method: 'POST', headers: chefHeaders, body: {} },
+    );
+    assertEqual(chefProcessManage.status, 403, 'chef cannot manage process template versions');
+    const processResponse = await api(
+      baseUrl,
+      `/api/production/recipes/${recipe.id}/process-versions`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: {
+          name: 'Salsa preparation (test)',
+          steps: [
+            { step_key: 'mix', name: 'Mix', type: 'operation' },
+            {
+              step_key: 'rest',
+              name: 'Rest',
+              type: 'wait',
+              dependencies: ['mix'],
+              planned_duration_minutes: 5,
+            },
+            {
+              step_key: 'verify',
+              name: 'Verify',
+              type: 'check',
+              dependencies: ['rest'],
+              verification_prompt: 'Check color',
+            },
+          ],
+        },
+      },
+    );
+    assertEqual(processResponse.status, 201, 'owner creates a process template version');
+    const processVersions = await api(
+      baseUrl,
+      `/api/production/recipes/${recipe.id}/process-versions`,
+      { headers: owner.authHeader },
+    );
+    assertEqual(
+      processVersions.data.process_versions.length,
+      1,
+      'recipe process versions are queryable',
+    );
 
     const invalidStatus = await api(baseUrl, '/api/production/orders?status=unknown', {
       headers: owner.authHeader,
@@ -167,10 +212,131 @@ async function main() {
     assertEqual(getSupply(db, tomatillo.id).stock_quantity, 800, 'start consumes 2200 g tomatillo');
     assertEqual(getSupply(db, onion.id).stock_quantity, 150, 'start consumes 100 g onion');
 
+    const orderStepsResponse = await api(baseUrl, `/api/production/orders/${order.id}/steps`, {
+      headers: owner.authHeader,
+    });
+    assertEqual(orderStepsResponse.status, 200, 'order stage snapshots are queryable');
+    const stageRows = orderStepsResponse.data.steps;
+    assertEqual(stageRows.length, 3, 'production order snapshots three configured stages');
+    const cashierStage = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[0].id}/start`,
+      {
+        method: 'POST',
+        headers: cashierHeaders,
+        body: { expected_version: 0, idempotency_key: 'cashier-stage-denied' },
+      },
+    );
+    assertEqual(cashierStage.status, 403, 'cashier cannot execute production stages');
+    const stageMovementCount = db
+      .prepare('SELECT COUNT(*) AS count FROM supply_movements')
+      .get().count;
+    const restBeforeMix = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[1].id}/start`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: 0, idempotency_key: 'rest-too-early' },
+      },
+    );
+    assertEqual(restBeforeMix.status, 409, 'stage dependency prevents out-of-order execution');
+    const mixStart = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[0].id}/start`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: 0, idempotency_key: 'api-mix-start' },
+      },
+    );
+    assertEqual(mixStart.status, 200, 'operator starts a production stage');
+    const mixReplay = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[0].id}/start`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: 0, idempotency_key: 'api-mix-start' },
+      },
+    );
+    assertEqual(mixReplay.data.step.replayed, true, 'stage start retry is idempotent');
+    const mixComplete = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[0].id}/complete`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: mixStart.data.step.version, idempotency_key: 'api-mix-complete' },
+      },
+    );
+    assertEqual(mixComplete.status, 200, 'operation stage completes over the API');
+    const restStart = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[1].id}/start`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: 0, idempotency_key: 'api-rest-start' },
+      },
+    );
+    const restComplete = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[1].id}/complete`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: {
+          expected_version: restStart.data.step.version,
+          idempotency_key: 'api-rest-complete',
+        },
+      },
+    );
+    assertEqual(restComplete.status, 200, 'manual wait stage completes over the API');
+    const verifyStart = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[2].id}/start`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: { expected_version: 0, idempotency_key: 'api-verify-start' },
+      },
+    );
+    const verifyComplete = await api(
+      baseUrl,
+      `/api/production/orders/${order.id}/steps/${stageRows[2].id}/complete`,
+      {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: {
+          expected_version: verifyStart.data.step.version,
+          idempotency_key: 'api-verify-complete',
+          verification_result: 'Color passed',
+        },
+      },
+    );
+    assertEqual(verifyComplete.status, 200, 'check stage stores its verification result');
+    assertEqual(
+      db.prepare('SELECT COUNT(*) AS count FROM supply_movements').get().count,
+      stageMovementCount,
+      'stage execution creates no stock movements',
+    );
+    const stepEvents = await api(baseUrl, `/api/production/orders/${order.id}/step-events`, {
+      headers: owner.authHeader,
+    });
+    assertEqual(
+      stepEvents.data.events.length,
+      6,
+      'stage transitions are recorded as auditable events',
+    );
+    const freshOrder = await api(baseUrl, `/api/production/orders/${order.id}`, {
+      headers: owner.authHeader,
+    });
+
     const completion = await api(baseUrl, `/api/production/orders/${order.id}/complete`, {
       method: 'POST',
       headers: owner.authHeader,
-      body: { expected_version: start.data.order.version, actual_quantity: 1800 },
+      body: { expected_version: freshOrder.data.order.version, actual_quantity: 1800 },
     });
     assertEqual(completion.status, 200, 'production order completes with actual yield');
     assertEqual(

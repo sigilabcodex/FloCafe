@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto';
 import Decimal from 'decimal.js';
+import { ROLE_KEYS, type Role } from '../../shared/role-permissions';
 import { getDatabase, now } from '../db';
 import {
   applySupplyStockChange,
@@ -34,6 +35,23 @@ export interface PrepComponentInput {
   unit: SupplyUnit;
 }
 
+export type ProductionStepType = 'operation' | 'wait' | 'check';
+export type ProductionStepStatus = 'pending' | 'in_progress' | 'completed' | 'skipped' | 'blocked';
+
+export interface ProductionProcessStepInput {
+  stepKey: string;
+  name: string;
+  instructions?: string | null;
+  type: ProductionStepType;
+  plannedDurationMinutes?: number | null;
+  dependencies?: string[];
+  optional?: boolean;
+  suggestedRole?: Role | null;
+  suggestedResponsible?: string | null;
+  resource?: string | null;
+  verificationPrompt?: string | null;
+}
+
 interface SnapshotComponent {
   supply_id: string;
   quantity: number;
@@ -47,6 +65,7 @@ interface ProductionOrderRow {
   prep_recipe_id: string;
   output_supply_id: string;
   idempotency_key: string;
+  process_version_id: string | null;
   status: ProductionOrderStatus;
   planned_quantity: number;
   actual_quantity: number | null;
@@ -193,6 +212,275 @@ export function listPrepRecipeVersions(db: Db, outputSupplyId?: string) {
   }));
 }
 
+function boundedText(
+  value: unknown,
+  field: string,
+  maxLength: number,
+  required = false,
+): string | null {
+  if (value === undefined || value === null || value === '') {
+    if (required)
+      throw new ProductionServiceError(400, `${field} is required`, 'process_field_invalid');
+    return null;
+  }
+  if (typeof value !== 'string' || value.trim().length === 0 || value.trim().length > maxLength) {
+    throw new ProductionServiceError(
+      400,
+      `${field} must be a non-empty string of at most ${maxLength} characters`,
+      'process_field_invalid',
+    );
+  }
+  return value.trim();
+}
+
+function normalizeProcessSteps(
+  input: unknown,
+): Array<ProductionProcessStepInput & { dependencies: string[] }> {
+  if (!Array.isArray(input) || input.length === 0 || input.length > 100) {
+    throw new ProductionServiceError(
+      400,
+      'steps must contain between 1 and 100 entries',
+      'process_steps_invalid',
+    );
+  }
+  const keys = new Set<string>();
+  const steps = input.map((value, position) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}] must be an object`,
+        'process_step_invalid',
+      );
+    }
+    const raw = value as Record<string, unknown>;
+    const stepKey = boundedText(raw.step_key, `steps[${position}].step_key`, 64, true)!;
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/.test(stepKey) || keys.has(stepKey)) {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}].step_key must be unique and use letters, numbers, _ or -`,
+        'process_step_key_invalid',
+      );
+    }
+    keys.add(stepKey);
+    const name = boundedText(raw.name, `steps[${position}].name`, 120, true)!;
+    const type = raw.type;
+    if (type !== 'operation' && type !== 'wait' && type !== 'check') {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}].type is invalid`,
+        'process_step_type_invalid',
+      );
+    }
+    let plannedDurationMinutes: number | null = null;
+    if (raw.planned_duration_minutes !== undefined && raw.planned_duration_minutes !== null) {
+      if (
+        typeof raw.planned_duration_minutes !== 'number' ||
+        !Number.isFinite(raw.planned_duration_minutes) ||
+        raw.planned_duration_minutes < 0 ||
+        raw.planned_duration_minutes > 10080
+      ) {
+        throw new ProductionServiceError(
+          400,
+          `steps[${position}].planned_duration_minutes must be between 0 and 10080`,
+          'process_duration_invalid',
+        );
+      }
+      plannedDurationMinutes = raw.planned_duration_minutes;
+    }
+    const dependencies = raw.dependencies === undefined ? [] : raw.dependencies;
+    if (
+      !Array.isArray(dependencies) ||
+      dependencies.some((dependency) => typeof dependency !== 'string') ||
+      new Set(dependencies).size !== dependencies.length
+    ) {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}].dependencies must be a list of unique step keys`,
+        'process_dependencies_invalid',
+      );
+    }
+    if (raw.optional !== undefined && typeof raw.optional !== 'boolean') {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}].optional must be boolean`,
+        'process_step_invalid',
+      );
+    }
+    const suggestedRole = raw.suggested_role;
+    if (
+      suggestedRole !== undefined &&
+      suggestedRole !== null &&
+      !ROLE_KEYS.includes(suggestedRole as Role)
+    ) {
+      throw new ProductionServiceError(
+        400,
+        `steps[${position}].suggested_role is invalid`,
+        'process_role_invalid',
+      );
+    }
+    return {
+      stepKey,
+      name,
+      instructions: boundedText(raw.instructions, `steps[${position}].instructions`, 2000),
+      type: type as ProductionStepType,
+      plannedDurationMinutes,
+      dependencies: dependencies as string[],
+      optional: raw.optional === true,
+      suggestedRole: (suggestedRole as Role | null | undefined) ?? null,
+      suggestedResponsible: boundedText(
+        raw.suggested_responsible,
+        `steps[${position}].suggested_responsible`,
+        120,
+      ),
+      resource: boundedText(raw.resource, `steps[${position}].resource`, 120),
+      verificationPrompt: boundedText(
+        raw.verification_prompt,
+        `steps[${position}].verification_prompt`,
+        500,
+      ),
+    };
+  });
+  const byKey = new Map(steps.map((step) => [step.stepKey, step]));
+  for (const step of steps) {
+    for (const dependency of step.dependencies) {
+      if (!byKey.has(dependency) || dependency === step.stepKey) {
+        throw new ProductionServiceError(
+          400,
+          `Step ${step.stepKey} has an unknown or self dependency: ${dependency}`,
+          'process_dependency_missing',
+        );
+      }
+    }
+  }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (key: string): void => {
+    if (visiting.has(key)) {
+      throw new ProductionServiceError(
+        400,
+        'Process dependencies must not contain cycles',
+        'process_dependency_cycle',
+      );
+    }
+    if (visited.has(key)) return;
+    visiting.add(key);
+    for (const dependency of byKey.get(key)!.dependencies) visit(dependency);
+    visiting.delete(key);
+    visited.add(key);
+  };
+  for (const step of steps) visit(step.stepKey);
+  return steps;
+}
+
+function normalizeProcessVersionName(value: unknown): string {
+  return boundedText(value, 'name', 120, true)!;
+}
+
+export function createProductionProcessVersion(
+  db: Db,
+  input: { recipeId: string; name: string; steps: unknown; actorUserId: string },
+) {
+  const recipeId = boundedText(input.recipeId, 'recipe_id', 128, true)!;
+  const name = normalizeProcessVersionName(input.name);
+  const actorUserId = boundedText(input.actorUserId, 'actor_user_id', 128, true)!;
+  const steps = normalizeProcessSteps(input.steps);
+  return db
+    .transaction(() => {
+      const recipe = db
+        .prepare('SELECT id FROM prep_recipes WHERE id = ? AND is_active = 1')
+        .get(recipeId) as { id: string } | undefined;
+      if (!recipe)
+        throw new ProductionServiceError(
+          404,
+          'Active preparation recipe not found',
+          'recipe_missing',
+        );
+      const current = db
+        .prepare(
+          'SELECT COALESCE(MAX(version), 0) AS version FROM production_process_versions WHERE prep_recipe_id = ?',
+        )
+        .get(recipeId) as { version: number };
+      db.prepare(
+        'UPDATE production_process_versions SET is_active = 0 WHERE prep_recipe_id = ? AND is_active = 1',
+      ).run(recipeId);
+      const processVersionId = id('process');
+      db.prepare(`INSERT INTO production_process_versions
+      (id, prep_recipe_id, version, name, is_active, created_by, created_at)
+      VALUES (?, ?, ?, ?, 1, ?, ?)`).run(
+        processVersionId,
+        recipeId,
+        current.version + 1,
+        name,
+        actorUserId,
+        now(),
+      );
+      const insertStep = db.prepare(`INSERT INTO production_process_steps
+      (id, process_version_id, step_key, position, name, instructions, step_type,
+       planned_duration_minutes, dependencies_json, is_optional, suggested_role,
+       suggested_responsible, resource_label, verification_prompt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      steps.forEach((step, position) =>
+        insertStep.run(
+          id('pstep'),
+          processVersionId,
+          step.stepKey,
+          position,
+          step.name,
+          step.instructions,
+          step.type,
+          step.plannedDurationMinutes,
+          JSON.stringify(step.dependencies),
+          step.optional ? 1 : 0,
+          step.suggestedRole,
+          step.suggestedResponsible,
+          step.resource,
+          step.verificationPrompt,
+        ),
+      );
+      return getProductionProcessVersion(db, processVersionId);
+    })
+    .immediate();
+}
+
+export function getProductionProcessVersion(db: Db, processVersionId: string) {
+  const process = db
+    .prepare('SELECT * FROM production_process_versions WHERE id = ?')
+    .get(processVersionId) as Record<string, unknown> | undefined;
+  if (!process)
+    throw new ProductionServiceError(
+      404,
+      'Production process version not found',
+      'process_missing',
+    );
+  const steps = db
+    .prepare(
+      'SELECT * FROM production_process_steps WHERE process_version_id = ? ORDER BY position',
+    )
+    .all(processVersionId) as Array<Record<string, unknown>>;
+  return {
+    ...process,
+    steps: steps.map((step) => ({
+      ...step,
+      dependencies: JSON.parse(String(step.dependencies_json)),
+    })),
+  };
+}
+
+export function listProductionProcessVersions(db: Db, recipeId?: string) {
+  const rows = recipeId
+    ? db
+        .prepare(
+          'SELECT * FROM production_process_versions WHERE prep_recipe_id = ? ORDER BY version DESC',
+        )
+        .all(recipeId)
+    : db
+        .prepare('SELECT * FROM production_process_versions ORDER BY prep_recipe_id, version DESC')
+        .all();
+  return (rows as Array<Record<string, unknown>>).map((row) =>
+    getProductionProcessVersion(db, String(row.id)),
+  );
+}
+
 export function createProductionOrder(
   db: Db,
   input: { recipeId: string; plannedQuantity: number; idempotencyKey: string; actorUserId: string },
@@ -245,13 +533,17 @@ export function createProductionOrder(
         unit_cost: null,
         line_cost: null,
       }));
+      const activeProcess = db
+        .prepare(`SELECT id FROM production_process_versions
+          WHERE prep_recipe_id = ? AND is_active = 1 ORDER BY version DESC LIMIT 1`)
+        .get(recipe.id) as { id: string } | undefined;
       const orderId = id('prod');
       const timestamp = now();
       db.prepare(`
       INSERT INTO production_orders
         (id, prep_recipe_id, output_supply_id, idempotency_key, status, planned_quantity,
-         snapshot_json, created_by, created_at)
-      VALUES (?, ?, ?, ?, 'queued', ?, ?, ?, ?)
+         snapshot_json, created_by, created_at, process_version_id)
+      VALUES (?, ?, ?, ?, 'queued', ?, ?, ?, ?, ?)
     `).run(
         orderId,
         recipe.id,
@@ -261,7 +553,39 @@ export function createProductionOrder(
         JSON.stringify(components),
         input.actorUserId,
         timestamp,
+        activeProcess?.id ?? null,
       );
+      if (activeProcess) {
+        const templateSteps = db
+          .prepare(
+            'SELECT * FROM production_process_steps WHERE process_version_id = ? ORDER BY position',
+          )
+          .all(activeProcess.id) as Array<Record<string, unknown>>;
+        const insertStep = db.prepare(`INSERT INTO production_order_steps
+          (id, production_order_id, source_step_id, step_key, position, name, instructions,
+           step_type, planned_duration_minutes, dependencies_json, is_optional, suggested_role,
+           suggested_responsible, resource_label, verification_prompt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+        for (const step of templateSteps) {
+          insertStep.run(
+            id('ostep'),
+            orderId,
+            step.id,
+            step.step_key,
+            step.position,
+            step.name,
+            step.instructions,
+            step.step_type,
+            step.planned_duration_minutes,
+            step.dependencies_json,
+            step.is_optional,
+            step.suggested_role,
+            step.suggested_responsible,
+            step.resource_label,
+            step.verification_prompt,
+          );
+        }
+      }
       db.prepare(`INSERT INTO production_order_events (production_order_id, action, actor_user_id, created_at)
       VALUES (?, 'created', ?, ?)`).run(orderId, input.actorUserId, timestamp);
       return decodeOrder(orderById(db, orderId));
@@ -404,6 +728,7 @@ export function completeProductionOrder(
           'Production order state or version changed',
           'version_conflict',
         );
+      assertProductionStepsReadyForCompletion(db, order);
       const snapshot = JSON.parse(order.snapshot_json) as SnapshotComponent[];
       const costKnown =
         snapshot.length > 0 && snapshot.every((component) => component.line_cost !== null);
@@ -500,6 +825,346 @@ export function listProductionOrderEvents(db: Db, orderId: string) {
   return db
     .prepare('SELECT * FROM production_order_events WHERE production_order_id = ? ORDER BY id')
     .all(orderId);
+}
+
+function stepById(db: Db, orderId: string, stepId: string) {
+  const row = db
+    .prepare('SELECT * FROM production_order_steps WHERE production_order_id = ? AND id = ?')
+    .get(orderId, stepId) as Record<string, unknown> | undefined;
+  if (!row)
+    throw new ProductionServiceError(404, 'Production order step not found', 'step_missing');
+  return row;
+}
+
+function decodeStep(row: Record<string, unknown>) {
+  return {
+    ...row,
+    dependencies: JSON.parse(String(row.dependencies_json || '[]')) as string[],
+    is_optional: Boolean(row.is_optional),
+  };
+}
+
+export function listProductionOrderSteps(db: Db, orderId: string) {
+  orderById(db, orderId);
+  const rows = db
+    .prepare('SELECT * FROM production_order_steps WHERE production_order_id = ? ORDER BY position')
+    .all(orderId) as Array<Record<string, unknown>>;
+  return rows.map(decodeStep);
+}
+
+export function listProductionStepEvents(db: Db, orderId: string, stepId?: string) {
+  orderById(db, orderId);
+  if (stepId) stepById(db, orderId, stepId);
+  const rows = stepId
+    ? db
+        .prepare(
+          'SELECT * FROM production_step_events WHERE production_order_id = ? AND production_order_step_id = ? ORDER BY id',
+        )
+        .all(orderId, stepId)
+    : db
+        .prepare('SELECT * FROM production_step_events WHERE production_order_id = ? ORDER BY id')
+        .all(orderId);
+  return rows;
+}
+
+function assertStepDependenciesComplete(db: Db, orderId: string, step: Record<string, unknown>) {
+  const dependencies = JSON.parse(String(step.dependencies_json || '[]')) as string[];
+  if (dependencies.length === 0) return;
+  const rows = db
+    .prepare(`SELECT step_key, status FROM production_order_steps
+      WHERE production_order_id = ? AND step_key IN (${dependencies.map(() => '?').join(',')})`)
+    .all(orderId, ...dependencies) as Array<{ step_key: string; status: ProductionStepStatus }>;
+  const byKey = new Map(rows.map((row) => [row.step_key, row.status]));
+  const incomplete = dependencies.filter((key) => {
+    const status = byKey.get(key);
+    return status !== 'completed' && status !== 'skipped';
+  });
+  if (incomplete.length > 0) {
+    throw new ProductionServiceError(
+      409,
+      `Production step dependencies are incomplete: ${incomplete.join(', ')}`,
+      'step_dependencies_incomplete',
+    );
+  }
+}
+
+function assertProductionStepsReadyForCompletion(db: Db, order: ProductionOrderRow) {
+  if (!order.process_version_id) return;
+  const steps = db
+    .prepare(
+      'SELECT step_key, status, is_optional FROM production_order_steps WHERE production_order_id = ?',
+    )
+    .all(order.id) as Array<{
+    step_key: string;
+    status: ProductionStepStatus;
+    is_optional: number;
+  }>;
+  if (steps.length === 0) {
+    throw new ProductionServiceError(
+      409,
+      'Production process snapshot is missing steps',
+      'process_snapshot_missing',
+    );
+  }
+  const unfinishedRequired = steps.filter(
+    (step) => !step.is_optional && step.status !== 'completed',
+  );
+  if (unfinishedRequired.length > 0) {
+    throw new ProductionServiceError(
+      409,
+      `Required production steps are unfinished: ${unfinishedRequired.map((step) => step.step_key).join(', ')}`,
+      'required_steps_incomplete',
+    );
+  }
+  const activeOptional = steps.filter(
+    (step) => step.is_optional && (step.status === 'in_progress' || step.status === 'blocked'),
+  );
+  if (activeOptional.length > 0) {
+    throw new ProductionServiceError(
+      409,
+      `Optional production steps need resolution: ${activeOptional.map((step) => step.step_key).join(', ')}`,
+      'optional_steps_unresolved',
+    );
+  }
+}
+
+export type ProductionStepAction = 'start' | 'complete' | 'skip' | 'block' | 'resume';
+
+export function transitionProductionOrderStep(
+  db: Db,
+  orderId: string,
+  stepId: string,
+  input: {
+    action: ProductionStepAction;
+    actorUserId: string;
+    expectedVersion: number;
+    idempotencyKey: string;
+    reason?: string;
+    verificationResult?: string;
+  },
+) {
+  const actorUserId = boundedText(input.actorUserId, 'actor_user_id', 128, true)!;
+  const idempotencyKey = boundedText(input.idempotencyKey, 'idempotency_key', 128, true)!;
+  if (!Number.isSafeInteger(input.expectedVersion) || input.expectedVersion < 0) {
+    throw new ProductionServiceError(
+      400,
+      'expected_version must be a non-negative integer',
+      'version_invalid',
+    );
+  }
+  const reason = input.reason === undefined ? null : boundedText(input.reason, 'reason', 500, true);
+  if ((input.action === 'skip' || input.action === 'block') && !reason) {
+    throw new ProductionServiceError(
+      400,
+      'A reason is required for this stage action',
+      'reason_invalid',
+    );
+  }
+  const verificationResult =
+    input.verificationResult === undefined
+      ? null
+      : boundedText(input.verificationResult, 'verification_result', 1000, true);
+  const requestJson = JSON.stringify({ reason, verification_result: verificationResult });
+  return db
+    .transaction(() => {
+      const priorEvent = db
+        .prepare(`SELECT production_order_id, production_order_step_id, action, request_json
+        FROM production_step_events WHERE idempotency_key = ?`)
+        .get(idempotencyKey) as
+        | {
+            production_order_id: string;
+            production_order_step_id: string;
+            action: string;
+            request_json: string;
+          }
+        | undefined;
+      if (priorEvent) {
+        const actionByInput: Record<ProductionStepAction, string> = {
+          start: 'started',
+          complete: 'completed',
+          skip: 'skipped',
+          block: 'blocked',
+          resume: 'resumed',
+        };
+        if (
+          priorEvent.production_order_id !== orderId ||
+          priorEvent.production_order_step_id !== stepId ||
+          priorEvent.action !== actionByInput[input.action]
+        ) {
+          throw new ProductionServiceError(
+            409,
+            'Idempotency key was used for another stage action',
+            'step_idempotency_conflict',
+          );
+        }
+        if (priorEvent.request_json !== requestJson) {
+          throw new ProductionServiceError(
+            409,
+            'Idempotency key was reused with different stage data',
+            'step_idempotency_conflict',
+          );
+        }
+        return { ...decodeStep(stepById(db, orderId, stepId)), replayed: true };
+      }
+
+      const order = orderById(db, orderId);
+      if (order.status !== 'in_progress') {
+        throw new ProductionServiceError(
+          409,
+          'Stages can only change on an in-progress production order',
+          'state_conflict',
+        );
+      }
+      const step = stepById(db, orderId, stepId);
+      if (Number(step.version) !== input.expectedVersion) {
+        throw new ProductionServiceError(
+          409,
+          'Production step version changed',
+          'step_version_conflict',
+        );
+      }
+      const oldStatus = String(step.status) as ProductionStepStatus;
+      const timestamp = now();
+      let newStatus: ProductionStepStatus;
+      let startedAt = step.started_at ? String(step.started_at) : null;
+      let completedAt: string | null = null;
+      let actualDuration: number | null = null;
+      let startedBy: string | null = step.started_by ? String(step.started_by) : null;
+      let completedBy: string | null = null;
+      let terminalReason: string | null = null;
+      let storedVerification: string | null = null;
+
+      switch (input.action) {
+        case 'start':
+          if (oldStatus !== 'pending')
+            throw new ProductionServiceError(
+              409,
+              'Only pending steps can start',
+              'step_state_conflict',
+            );
+          assertStepDependenciesComplete(db, orderId, step);
+          newStatus = 'in_progress';
+          startedAt = timestamp;
+          startedBy = actorUserId;
+          break;
+        case 'complete':
+          if (oldStatus !== 'in_progress')
+            throw new ProductionServiceError(
+              409,
+              'Only in-progress steps can complete',
+              'step_state_conflict',
+            );
+          assertStepDependenciesComplete(db, orderId, step);
+          if (step.step_type === 'check' && !verificationResult) {
+            throw new ProductionServiceError(
+              400,
+              'A verification result is required for check steps',
+              'verification_required',
+            );
+          }
+          newStatus = 'completed';
+          completedAt = timestamp;
+          completedBy = actorUserId;
+          storedVerification = verificationResult;
+          actualDuration = startedAt
+            ? Math.max(0, Math.round((Date.parse(timestamp) - Date.parse(startedAt)) / 1000))
+            : null;
+          break;
+        case 'skip':
+          if (!step.is_optional)
+            throw new ProductionServiceError(
+              409,
+              'Only optional steps can be skipped',
+              'step_not_optional',
+            );
+          if (oldStatus !== 'pending' && oldStatus !== 'in_progress' && oldStatus !== 'blocked') {
+            throw new ProductionServiceError(
+              409,
+              'Step cannot be skipped from its current state',
+              'step_state_conflict',
+            );
+          }
+          assertStepDependenciesComplete(db, orderId, step);
+          newStatus = 'skipped';
+          completedAt = timestamp;
+          completedBy = actorUserId;
+          actualDuration = startedAt
+            ? Math.max(0, Math.round((Date.parse(timestamp) - Date.parse(startedAt)) / 1000))
+            : null;
+          terminalReason = reason;
+          break;
+        case 'block':
+          if (oldStatus !== 'pending' && oldStatus !== 'in_progress') {
+            throw new ProductionServiceError(
+              409,
+              'Step cannot be blocked from its current state',
+              'step_state_conflict',
+            );
+          }
+          newStatus = 'blocked';
+          terminalReason = reason;
+          break;
+        case 'resume':
+          if (oldStatus !== 'blocked')
+            throw new ProductionServiceError(
+              409,
+              'Only blocked steps can resume',
+              'step_state_conflict',
+            );
+          assertStepDependenciesComplete(db, orderId, step);
+          newStatus = 'in_progress';
+          startedAt = startedAt || timestamp;
+          startedBy = startedBy || actorUserId;
+          terminalReason = null;
+          break;
+      }
+
+      db.prepare(`UPDATE production_order_steps SET status = ?, version = version + 1,
+      started_by = ?, completed_by = ?, started_at = ?, completed_at = ?,
+      actual_duration_seconds = ?, verification_result = COALESCE(?, verification_result),
+      terminal_reason = ? WHERE id = ?`).run(
+        newStatus,
+        startedBy,
+        completedBy,
+        startedAt,
+        completedAt,
+        actualDuration,
+        storedVerification,
+        terminalReason,
+        stepId,
+      );
+      db.prepare('UPDATE production_orders SET version = version + 1 WHERE id = ?').run(orderId);
+      const eventAction =
+        input.action === 'start'
+          ? 'started'
+          : input.action === 'complete'
+            ? 'completed'
+            : input.action === 'skip'
+              ? 'skipped'
+              : input.action === 'block'
+                ? 'blocked'
+                : 'resumed';
+      const details = JSON.stringify({
+        from: oldStatus,
+        to: newStatus,
+        reason,
+        verification_result: verificationResult,
+      });
+      db.prepare(`INSERT INTO production_step_events
+      (production_order_id, production_order_step_id, action, actor_user_id, idempotency_key, request_json, details_json, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
+        orderId,
+        stepId,
+        eventAction,
+        actorUserId,
+        idempotencyKey,
+        requestJson,
+        details,
+        timestamp,
+      );
+      return { ...decodeStep(stepById(db, orderId, stepId)), replayed: false };
+    })
+    .immediate();
 }
 
 export function listProductionOrderMovements(db: Db, orderId: string) {
