@@ -88,6 +88,20 @@ Contributor guidance for Kalali's operator goals and fork-specific development w
 | [inventory-production.md](kalali/inventory-production.md) | Production and inventory contracts, movements, costs, and migration rules. |
 | [development-workflow.md](kalali/development-workflow.md) | Branching, testing, migrations, and upstream contributions. |
 
+## Product
+
+These pages define Kalali product requirements and planned capability work. They are product
+direction, not claims about behavior supported by FloCafe. Verify implementation status against
+the linked code and tests before changing a capability.
+
+| Page | Subject |
+| --- | --- |
+| [roadmap.md](product/roadmap.md) | Opening MVP and capability roadmap, dependencies, acceptance criteria, and first tasks. |
+| [skoss-requirements.md](product/requirements/skoss-requirements.md) | Traceable requirements recovered from SKOSS and SKOSSina sources. |
+| [kalali-workflows.md](product/requirements/kalali-workflows.md) | Concrete bakery and cafe scenarios for validating the product requirements. |
+| [implementation-status.md](product/implementation-status.md) | Verified FloCafe upstream and Kalali fork capability status. |
+| [open-questions.md](product/discovery/open-questions.md) | Business and operating decisions that remain unresolved. |
+
 ## Architecture decisions
 
 Choices made once, with consequences that outlive the change. Each records the alternative that
