@@ -118,11 +118,59 @@ validation.
 
 **Actors:** purchaser and inventory owner.
 
-1. Record supplier and quotation/price context for an input.
-2. If purchasing is in scope, record ordered and received quantities separately.
-3. Reconcile received quantity into inventory with unit, date, supplier and source cost.
-4. Preserve historical purchase evidence when a future quote changes.
+1. Create a shopping list manually or review a suggestion derived from agreed inventory needs.
+2. Capture a quote or observed shelf price against the supply, supplier, brand and purchasable
+   presentation, with quantity, date, currency and price context.
+3. Convert the presentation quantity to the supply's base unit for comparison while retaining the
+   entered package and conversion context.
+4. Mark a selected offer as a confirmed purchase without changing on-hand stock.
+5. Record full or partial physical receipt against the purchase line; link each received quantity to
+   one supply movement and current-cost update.
+6. Compare historical prices by date, supply, supplier, brand and presentation. Correct a mistaken
+   observation with an attributable revision that preserves the original.
 
-**Acceptance:** quoted, ordered, received and on-hand quantities cannot be confused; ledger and
-cost evidence are attributable and historical. FloCafe supply inventory does not by itself prove
-that a purchase-order/quotation workflow exists. Scope remains open.
+**Acceptance:** quoted, observed, confirmed, received and on-hand states remain distinct. Quotes,
+observations and lists create no stock movements. A receipt updates stock only by the physically
+received amount, links to its purchase line and updates WAC once. Historical prices normalize to
+the base unit without erasing package identity; corrections preserve original value and actor/time.
+The repository currently implements supply receive movements and WAC, but not this purchasing
+workflow. See the stable requirements and criteria below.
+
+## KWF-09: Capture prices offline and synchronize later
+
+**Actors:** purchaser using a phone or tablet; inventory owner reviewing synchronized records.
+
+1. Capture a price observation while disconnected from the FloCafe server.
+2. Keep the pending record on the device across app restart and show whether it is pending, synced,
+   or needs operator action.
+3. When an authorized LAN, VPN/Tailscale or approved remote route is available, synchronize the
+   record under the signed-in actor.
+4. Retry after interruption without creating a duplicate. Preserve rejected or conflicting data
+   for review rather than silently dropping or overwriting it.
+5. Protect local records at rest and provide an explicit recovery/retention path for a lost, shared,
+   or replaced device.
+
+**Acceptance:** capture requires no direct server connection; sync is authenticated and idempotent;
+pending data survives restart; errors remain visible and actionable; local data is protected under
+an operator-approved device policy. No offline sync client or local-outbox contract is established
+in FloCafe today.
+
+## Stable requirements and acceptance criteria
+
+IDs in this table are stable references for roadmap, design and later tests. Acceptance IDs name
+observable outcomes; they do not approve a schema or claim implementation.
+
+| Requirement | Need | Acceptance criterion |
+| --- | --- | --- |
+| KPR-01 | Create purchase lists manually or from inventory needs. | KAC-01: A manual list is editable; a generated suggestion shows its source and inputs. Neither list type reserves or changes stock. |
+| KPR-02 | Capture supplier prices quickly on a phone or tablet without a live server connection. | KAC-02: A user can enter and save an observation in airplane mode, restart the client, and still see the pending entry. |
+| KPR-03 | Securely synchronize pending captures over LAN, VPN/Tailscale or an explicitly approved remote route. | KAC-03: Sync requires current authorization, attributes the actor, and safely retries the same client record without duplicate server records. |
+| KPR-04 | Record the input, brand, supplier, presentation, quantity, date, price and currency context. | KAC-04: A saved observation retains every entered identity and package detail; an unknown identity can be resolved without losing the capture. |
+| KPR-05 | Distinguish quote, observed price, confirmed purchase and physical receipt. | KAC-05: State transitions are visible and auditable; only physical receipt changes on-hand quantity. |
+| KPR-06 | Compare prices after conversion to the supply base unit. | KAC-06: Equivalent presentations display comparable per-base-unit prices and retain the original entered amount/unit and conversion basis. |
+| KPR-07 | Preserve price history and trace corrections. | KAC-07: A correction records author, time, reason and prior value; it does not silently replace historical evidence. |
+| KPR-08 | Compare historical prices by date, supply, supplier, brand and presentation. | KAC-08: Each requested filter narrows the same normalized observations without combining distinct suppliers or package identities. |
+| KPR-09 | Connect confirmed purchases to physical receipts and current supply cost. | KAC-09: Full/partial receipts link to purchase lines and create only the received stock movement; retries cannot double-receive or double-update WAC. |
+| KPR-10 | Protect local pending data and handle sync failures. | KAC-10: Pending entries survive ordinary restarts, are encrypted/protected per approved device policy, expose actionable failures, and have a defined lost-device/retention response. |
+
+The stages that refine these requirements are C1-C6 in the [roadmap](../roadmap.md#offline-purchase-lists-and-supplier-price-history).

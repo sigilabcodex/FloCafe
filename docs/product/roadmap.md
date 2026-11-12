@@ -64,8 +64,57 @@ This stage connects the operational backbone beyond opening:
    adjusting planned values.
 6. Record the minimum handoff context for the next authorized operator.
 7. Add recurring internal tasks only after schedule, ownership and exception rules are agreed.
-8. Add supplier, quote, receiving and cost flows only to the depth Kalali validates.
+8. Advance the separate offline purchasing and price-history track below after its operating rules
+   are validated.
 9. Report planned versus actual production, stock consumption, remaining demand and handoff risks.
+
+## Offline purchase lists and supplier-price history
+
+This is a proposed Kalali capability, not an implemented FloCafe flow. Current supplies already
+provide a canonical base unit, signed `supply_movements`, receive movements, purchase-cost
+normalization and weighted-average cost (WAC). A priced receive updates the supply balance and
+current WAC. It does not record a supplier, brand, package/presentation, quote, or separate price
+observation. `main/services/receipt.ts` renders customer receipts; it is not goods receiving. There
+is no purchase-list, purchase-order, supplier, or offline price-sync service in this checkout.
+
+Reuse `main/services/supplies.ts` and `main/services/units.ts` for actual received quantities,
+base-unit conversion, the stock ledger and WAC. Keep shopping-list demand and price evidence outside
+that ledger: a quote or shelf-price observation must not move stock or update current WAC. A
+confirmed purchase is still distinct from physical receipt; only the received quantity, linked to
+the confirmed purchase line, may create the existing `receive` movement and update WAC. Preserve
+the price evidence as historical evidence, and represent corrections by a traceable superseding
+record rather than silently editing the observation.
+
+Conceptually, the missing records are: supplier/brand identities and purchasable presentations;
+manual or suggested list lines; a price-observation history with source/state and correction audit;
+confirmed purchase lines; physical receipt details linked to ledger movements; and protected local
+pending captures with sync outcomes. These are domain concepts for discovery, not proposed table or
+API names. `supply_movements` stores the received quantity, optional normalized unit/total cost,
+resulting WAC, actor, generic reference and timestamp, but does not itself establish those
+relationships or the quote/observation history.
+
+SKOSS documents a lightweight supplier/raw-material/price foundation (SKR-06), treats full offline
+sync as future work (SKR-16), and defers full procurement (SKR-18). This Kalali request deliberately
+explores beyond that deferred SKOSS scope. Reuse the needs, not SKOSS persistence or API designs.
+The Kalali Catalog Maestro V4.3 was not found in this checkout; no entity mapping or import
+contract is inferred from it. Review that source before fixing canonical supply, supplier, brand,
+or presentation identities.
+
+### Stages and priorities
+
+| Stage | Priority | Scope and exit criteria | Depends on |
+| --- | --- | --- | --- |
+| C1 - Operating rules | P0 | Operators approve list sources, price states, receipt boundaries, roles, correction policy, network paths and local-device protection. Record examples for quotes, observed prices, confirmed purchases and partial receipts. | Operator review; existing supply and cost behavior |
+| C2 - Identity and unit contract | P0 | Define how a supply, supplier, brand and purchasable presentation map to stable identities; define quantity conversions and price/currency meaning. Reconcile to Catalog Maestro V4.3 if it becomes available. Do not select tables or migrations in this stage. | C1; source catalog review |
+| C3 - Offline capture | P1 | A phone/tablet workflow captures a price observation with a stable client ID while disconnected, retains it across app restart, shows pending/error state, and synchronizes only after authenticated reconnection. Retry creates no duplicate observation. | C1-C2; device and authorization review |
+| C4 - Shopping lists | P1 | Purchasers can make a list manually or review a suggested list derived from agreed stock/demand inputs. Each suggested quantity shows its source. A list neither reserves inventory nor changes stock. | C1-C2; stock/commitment and demand rules |
+| C5 - Sync, purchase and receiving | P1 | Authorized sync is idempotent on LAN, VPN/Tailscale and any approved remote route. Quotes and observed prices remain non-stock records. A confirmed purchase can be received in full or in part; each received quantity links to its purchase line and one existing ledger movement. Retries cannot double-receive or double-update WAC. | C2-C4; permissions, sync-conflict and receipt rules |
+| C6 - Price history and comparison | P2 | Users can compare normalized observations by date, supply, supplier, brand and presentation. Corrections retain who/when/why and the prior value. Historical observations remain separate from current WAC. | C2-C5; approved retention and correction rules |
+
+C3 and C4 may proceed in parallel after C2. C5 depends on both because sync must accept captured
+observations and lists must distinguish suggested demand from an actual purchase. C6 depends on the
+identity, unit, state and correction contracts being stable. Each stage needs synthetic-data tests
+for authorization, retries, offline recovery and ledger integrity before advancing.
 
 ## Evolución
 
@@ -92,7 +141,14 @@ flowchart LR
   E --> F
   F --> G[Batch creation from accepted demand]
   G --> H[Cross-shift WIP and handoff]
-  I[Supplier and purchase scope] -. optional .-> B
+  B --> C1[C1 operating rules]
+  C1 --> C2[C2 identity and units]
+  C2 --> C3[C3 offline capture]
+  C2 --> C4[C4 shopping lists]
+  C3 --> C5[C5 sync and receiving]
+  C4 --> C5
+  C5 --> C6[C6 price history]
+  C5 -. received quantities update .-> B
   J[Operator surface review] -. informs .-> E
   K[Automation and integrations] -. future .-> G
 ```
@@ -120,7 +176,7 @@ change.
 | 7 | Specify demand-to-batch contract and retry behavior | Batch generation is explicit, idempotent, snapshot-preserving and handles changed demand | Tasks 4–5 | Contract tests covering retries, edits, cancellation and authorization | M | After task 5; independent of UI polish |
 | 8 | Define WIP versus intermediate-stock semantics | Operators can classify each example without double-counting; quantity/unit ownership is clear | Operator walkthrough; process/stock review | Scenario table and ledger reconciliation design | S | Yes; discovery |
 | 9 | Specify recurring bakery order exceptions | Series, occurrences, horizon, edit scope and duplicate prevention are agreed | Task 1; customer/order examples | Recurrence tests for retries, exceptions, time boundaries and edits | S–M | Yes; discovery |
-| 10 | Decide supplier/purchase/cost evidence depth | Distinguish quote, order, receipt, invoice and on-hand balances; preserve selected historical cost rule | Current purchasing records | Scenario review; ledger/cost integrity plan | S | Yes; discovery |
+| 10 | Complete C1 operating-rule review for offline purchasing | Operators distinguish quote, observed price, confirmed purchase, physical receipt and on-hand balance | Current purchasing records; supply/WAC review | Scenario review; ledger/cost integrity plan | S | Yes; discovery |
 
 ## Compatibility and data constraints
 
@@ -130,6 +186,10 @@ change.
 - Preserve upstream-compatible changes as focused, reusable improvements when possible; keep
   Kalali-specific workflow configuration isolated when it is not generic.
 - Treat supply balances, committed quantities, active production and WIP as distinct concepts.
+- Keep price observations and purchase lists separate from `supply_movements`; only reconciled
+  physical receipts update the stock ledger and WAC.
+- Do not treat an offline client outbox as synchronized evidence. Protect local pending records,
+  require authenticated idempotent sync, and preserve actionable failures until resolved.
 - Do not add a migration until the relevant business rules are resolved. Use forward migrations
   and test fresh and populated upgrade paths with synthetic databases.
 - Keep authorization, payment, tax, stock movement, idempotency and audit decisions backend-side.
