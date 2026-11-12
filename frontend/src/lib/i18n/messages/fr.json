@@ -590,7 +590,9 @@
     "unitCost": "Coût unitaire",
     "totalBatchCost": "Coût total du lot",
     "recipeCost": "Coût de la recette",
-    "costUnknown": "Coût inconnu"
+    "costUnknown": "Coût inconnu",
+    "productionIssue": "Consommation de production",
+    "productionOutput": "Sortie de production"
   },
   "kds": {
     "addonsLabel": "Options",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Planifiée",
     "releaseBlocked": "Envoi bloqué",
     "refundOwnerOnlyNotice": "Les approbations de remboursement par le responsable sont désactivées — le code PIN du propriétaire est requis pour approuver ce remboursement.",
-    "refundOutsideWindowNotice": "Cette commande dépasse la fenêtre d’approbation du responsable — le code PIN du propriétaire est requis pour approuver ce remboursement."
+    "refundOutsideWindowNotice": "Cette commande dépasse la fenêtre d’approbation du responsable — le code PIN du propriétaire est requis pour approuver ce remboursement.",
+    "markReady": "Marquer prêt",
+    "pickedUp": "Récupéré",
+    "markedReady": "Commande marquée comme prête",
+    "markedPickedUp": "Commande marquée comme récupérée",
+    "updateStatusFailed": "Impossible de mettre à jour le statut de la commande"
   },
   "pos": {
     "addCustomer": "Ajouter un client",
@@ -2914,7 +2921,8 @@
       "settings": "Paramètres",
       "integrations": "Intégrations",
       "system": "Système",
-      "support": "Assistance"
+      "support": "Assistance",
+      "production": "Voir la production"
     },
     "capabilities": {
       "tablesView": "Consulter les tables",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Gérer les approvisionnements et les recettes",
       "orderItemPriceOverride": "Modifier les prix des articles de commande",
       "offlineMode": "Activer ou désactiver le mode hors ligne",
-      "staffCredentialsReset": "Réinitialiser les mots de passe et codes PIN du personnel sans leurs identifiants actuels"
+      "staffCredentialsReset": "Réinitialiser les mots de passe et codes PIN du personnel sans leurs identifiants actuels",
+      "productionView": "Voir la production",
+      "productionExecute": "Démarrer et terminer la production",
+      "productionManage": "Gérer la production"
     },
     "editorSubtitle": "Configurez les permissions par défaut d'un rôle ou créez une exception pour un membre du personnel. Les modifications s'appliquent à sa prochaine action.",
     "roleDefaultsTab": "Permissions du rôle",

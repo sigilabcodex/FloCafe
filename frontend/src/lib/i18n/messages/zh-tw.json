@@ -590,7 +590,9 @@
     "unitCost": "單位成本",
     "totalBatchCost": "批次總成本",
     "recipeCost": "配方成本",
-    "costUnknown": "成本未知"
+    "costUnknown": "成本未知",
+    "productionIssue": "生產耗用",
+    "productionOutput": "生產產出"
   },
   "kds": {
     "addonsLabel": "加購",
@@ -883,7 +885,12 @@
     "releaseScheduled": "已預約",
     "releaseBlocked": "送廚受阻",
     "refundOwnerOnlyNotice": "經理退款核准已停用 — 需要店主 PIN 碼才能核准此退款。",
-    "refundOutsideWindowNotice": "此訂單已超出經理核准時限 — 需要店主 PIN 碼才能核准此退款。"
+    "refundOutsideWindowNotice": "此訂單已超出經理核准時限 — 需要店主 PIN 碼才能核准此退款。",
+    "markReady": "標記為可取餐",
+    "pickedUp": "已取餐",
+    "markedReady": "訂單已標記為可取餐",
+    "markedPickedUp": "訂單已標記為已取餐",
+    "updateStatusFailed": "更新訂單狀態失敗"
   },
   "pos": {
     "addCustomer": "新增顧客",
@@ -2914,7 +2921,8 @@
       "settings": "設定",
       "integrations": "整合",
       "system": "系統",
-      "support": "支援"
+      "support": "支援",
+      "production": "檢視生產"
     },
     "capabilities": {
       "tablesView": "檢視桌位",
@@ -2983,7 +2991,10 @@
       "support": "聯絡支援並檢視診斷",
       "orderItemPriceOverride": "修改訂單商品價格",
       "offlineMode": "開啟或關閉離線模式",
-      "staffCredentialsReset": "無需目前憑證即可重設員工密碼與 PIN"
+      "staffCredentialsReset": "無需目前憑證即可重設員工密碼與 PIN",
+      "productionView": "檢視生產",
+      "productionExecute": "開始並完成生產",
+      "productionManage": "管理生產"
     },
     "editorSubtitle": "設定角色預設值，或為單一位員工建立例外。變更會從他的下一個操作開始生效。",
     "roleDefaultsTab": "角色預設值",

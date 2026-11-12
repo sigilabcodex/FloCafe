@@ -590,7 +590,9 @@
     "unitCost": "Birim maliyet",
     "totalBatchCost": "Toplam parti maliyeti",
     "recipeCost": "Reçete maliyeti",
-    "costUnknown": "Maliyet bilinmiyor"
+    "costUnknown": "Maliyet bilinmiyor",
+    "productionIssue": "Üretim tüketimi",
+    "productionOutput": "Üretim çıktısı"
   },
   "kds": {
     "addonsLabel": "Eklentiler",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Planlı",
     "releaseBlocked": "İletim engellendi",
     "refundOwnerOnlyNotice": "Yönetici iade onayları devre dışı — bu iadeyi onaylamak için işletme sahibi PIN kodu gereklidir.",
-    "refundOutsideWindowNotice": "Bu sipariş yönetici onay süresinin dışında — bu iadeyi onaylamak için işletme sahibi PIN kodu gereklidir."
+    "refundOutsideWindowNotice": "Bu sipariş yönetici onay süresinin dışında — bu iadeyi onaylamak için işletme sahibi PIN kodu gereklidir.",
+    "markReady": "Hazır işaretle",
+    "pickedUp": "Teslim alındı",
+    "markedReady": "Sipariş hazır olarak işaretlendi",
+    "markedPickedUp": "Sipariş teslim alındı olarak işaretlendi",
+    "updateStatusFailed": "Sipariş durumu güncellenemedi"
   },
   "pos": {
     "addCustomer": "Müşteri Ekle",
@@ -2914,7 +2921,8 @@
       "settings": "Ayarlar",
       "integrations": "Entegrasyonlar",
       "system": "Sistem",
-      "support": "Destek"
+      "support": "Destek",
+      "production": "Üretimi görüntüle"
     },
     "capabilities": {
       "tablesView": "Masaları görüntüle",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Sarf malzemelerini ve tarifleri yönetme",
       "orderItemPriceOverride": "Sipariş ürün fiyatlarını değiştir",
       "offlineMode": "Çevrimdışı modu aç veya kapat",
-      "staffCredentialsReset": "Personel şifrelerini ve PIN kodlarını mevcut bilgileri olmadan sıfırlama"
+      "staffCredentialsReset": "Personel şifrelerini ve PIN kodlarını mevcut bilgileri olmadan sıfırlama",
+      "productionView": "Üretimi görüntüle",
+      "productionExecute": "Üretimi başlat ve tamamla",
+      "productionManage": "Üretimi yönet"
     },
     "editorSubtitle": "Rol varsayılanlarını yapılandırın veya tek bir personel için istisna oluşturun. Değişiklikler bir sonraki işlemlerinde geçerli olur.",
     "roleDefaultsTab": "Rol varsayılanları",

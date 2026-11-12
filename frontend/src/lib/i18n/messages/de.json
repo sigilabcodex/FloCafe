@@ -590,7 +590,9 @@
     "unitCost": "Stückkosten",
     "totalBatchCost": "Gesamte Chargenkosten",
     "recipeCost": "Rezeptkosten",
-    "costUnknown": "Kosten unbekannt"
+    "costUnknown": "Kosten unbekannt",
+    "productionIssue": "Produktionsverbrauch",
+    "productionOutput": "Produktionsertrag"
   },
   "kds": {
     "addonsLabel": "Zusätze",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Geplant",
     "releaseBlocked": "Freigabe blockiert",
     "refundOwnerOnlyNotice": "Rückerstattungsgenehmigungen durch Manager sind deaktiviert — zur Genehmigung dieser Rückerstattung ist eine Inhaber-PIN erforderlich.",
-    "refundOutsideWindowNotice": "Diese Bestellung liegt außerhalb des Genehmigungszeitfensters für Manager — zur Genehmigung dieser Rückerstattung ist eine Inhaber-PIN erforderlich."
+    "refundOutsideWindowNotice": "Diese Bestellung liegt außerhalb des Genehmigungszeitfensters für Manager — zur Genehmigung dieser Rückerstattung ist eine Inhaber-PIN erforderlich.",
+    "markReady": "Als bereit markieren",
+    "pickedUp": "Abgeholt",
+    "markedReady": "Bestellung als bereit markiert",
+    "markedPickedUp": "Bestellung als abgeholt markiert",
+    "updateStatusFailed": "Bestellstatus konnte nicht aktualisiert werden"
   },
   "pos": {
     "addCustomer": "Kunde hinzufügen",
@@ -2914,7 +2921,8 @@
       "settings": "Einstellungen",
       "integrations": "Integrationen",
       "system": "System",
-      "support": "Support"
+      "support": "Support",
+      "production": "Produktion anzeigen"
     },
     "capabilities": {
       "tablesView": "Tische ansehen",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Vorräte und Rezepte verwalten",
       "orderItemPriceOverride": "Preise von Bestellartikeln ändern",
       "offlineMode": "Offline-Modus ein- oder ausschalten",
-      "staffCredentialsReset": "Passwörter und PINs von Mitarbeitenden ohne aktuelle Zugangsdaten zurücksetzen"
+      "staffCredentialsReset": "Passwörter und PINs von Mitarbeitenden ohne aktuelle Zugangsdaten zurücksetzen",
+      "productionView": "Produktion anzeigen",
+      "productionExecute": "Produktion starten und abschließen",
+      "productionManage": "Produktion verwalten"
     },
     "editorSubtitle": "Konfigurieren Sie Rollenvorgaben oder legen Sie eine Ausnahme für ein Teammitglied fest. Änderungen gelten ab der nächsten Aktion.",
     "roleDefaultsTab": "Rollenvorgaben",

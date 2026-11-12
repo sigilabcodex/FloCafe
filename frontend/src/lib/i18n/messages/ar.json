@@ -590,7 +590,9 @@
     "unitCost": "تكلفة الوحدة",
     "totalBatchCost": "إجمالي تكلفة الدفعة",
     "recipeCost": "تكلفة الوصفة",
-    "costUnknown": "التكلفة غير معروفة"
+    "costUnknown": "التكلفة غير معروفة",
+    "productionIssue": "استهلاك الإنتاج",
+    "productionOutput": "ناتج الإنتاج"
   },
   "kds": {
     "addonsLabel": "الإضافات",
@@ -883,7 +885,12 @@
     "releaseScheduled": "مجدول",
     "releaseBlocked": "الإرسال متوقف",
     "refundOwnerOnlyNotice": "موافقات استرداد المدير معطلة — يلزم رمز PIN للمالك للموافقة على هذا الاسترداد.",
-    "refundOutsideWindowNotice": "هذا الطلب خارج نافذة موافقة المدير — يلزم رمز PIN للمالك للموافقة على هذا الاسترداد."
+    "refundOutsideWindowNotice": "هذا الطلب خارج نافذة موافقة المدير — يلزم رمز PIN للمالك للموافقة على هذا الاسترداد.",
+    "markReady": "تحديد كجاهز",
+    "pickedUp": "تم الاستلام",
+    "markedReady": "تم تحديد الطلب كجاهز",
+    "markedPickedUp": "تم تحديد الطلب كمستلم",
+    "updateStatusFailed": "تعذر تحديث حالة الطلب"
   },
   "pos": {
     "addCustomer": "إضافة عميل",
@@ -2914,7 +2921,8 @@
       "settings": "الإعدادات",
       "integrations": "عمليات الدمج",
       "system": "النظام",
-      "support": "الدعم"
+      "support": "الدعم",
+      "production": "عرض الإنتاج"
     },
     "capabilities": {
       "tablesView": "عرض الطاولات",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "إدارة المواد والوصفات",
       "orderItemPriceOverride": "تغيير أسعار أصناف الطلب",
       "offlineMode": "تشغيل وضع عدم الاتصال أو إيقافه",
-      "staffCredentialsReset": "إعادة تعيين كلمات مرور الموظفين ورموز PIN دون بياناتهم الحالية"
+      "staffCredentialsReset": "إعادة تعيين كلمات مرور الموظفين ورموز PIN دون بياناتهم الحالية",
+      "productionView": "عرض الإنتاج",
+      "productionExecute": "بدء الإنتاج وإكماله",
+      "productionManage": "إدارة الإنتاج"
     },
     "editorSubtitle": "قم بتكوين إعدادات الأدوار الافتراضية أو أنشئ استثناءً لموظف واحد. يتم تطبيق التغييرات على إجراءاته التالية.",
     "roleDefaultsTab": "إعدادات الدور",

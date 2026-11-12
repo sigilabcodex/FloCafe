@@ -201,6 +201,14 @@ async function run(): Promise<void> {
       .prepare("UPDATE _flo_meta SET value = ? WHERE key = 'schema_version'")
       .run(String(olderVersion));
     olderDb.pragma(`user_version = ${olderVersion}`);
+    olderDb.pragma('foreign_keys = OFF');
+    olderDb.exec(`
+      DROP TABLE production_step_events;
+      DROP TABLE production_order_steps;
+      DROP TABLE production_process_steps;
+      DROP TABLE production_process_versions;
+      ALTER TABLE production_orders DROP COLUMN process_version_id;
+    `);
     olderDb.close();
   }
   messageBoxCalls.length = 0;

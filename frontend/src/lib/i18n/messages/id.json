@@ -590,7 +590,9 @@
     "unitCost": "Biaya per unit",
     "totalBatchCost": "Total biaya batch",
     "recipeCost": "Biaya resep",
-    "costUnknown": "Biaya belum diketahui"
+    "costUnknown": "Biaya belum diketahui",
+    "productionIssue": "Pemakaian produksi",
+    "productionOutput": "Hasil produksi"
   },
   "kds": {
     "addonsLabel": "Tambahan",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Terjadwal",
     "releaseBlocked": "Rilis tertahan",
     "refundOwnerOnlyNotice": "Persetujuan pengembalian dana oleh manajer dinonaktifkan — PIN pemilik diperlukan untuk menyetujui pengembalian dana ini.",
-    "refundOutsideWindowNotice": "Pesanan ini berada di luar batas waktu persetujuan manajer — PIN pemilik diperlukan untuk menyetujui pengembalian dana ini."
+    "refundOutsideWindowNotice": "Pesanan ini berada di luar batas waktu persetujuan manajer — PIN pemilik diperlukan untuk menyetujui pengembalian dana ini.",
+    "markReady": "Tandai siap",
+    "pickedUp": "Sudah diambil",
+    "markedReady": "Pesanan ditandai siap",
+    "markedPickedUp": "Pesanan ditandai sudah diambil",
+    "updateStatusFailed": "Gagal memperbarui status pesanan"
   },
   "pos": {
     "addCustomer": "Tambah Pelanggan",
@@ -2914,7 +2921,8 @@
       "settings": "Pengaturan",
       "integrations": "Integrasi",
       "system": "Sistem",
-      "support": "Dukungan"
+      "support": "Dukungan",
+      "production": "Lihat produksi"
     },
     "capabilities": {
       "tablesView": "Lihat meja",
@@ -2983,7 +2991,10 @@
       "support": "Menghubungi dukungan dan melihat diagnostik",
       "orderItemPriceOverride": "Mengubah harga item pesanan",
       "offlineMode": "Aktifkan atau nonaktifkan mode offline",
-      "staffCredentialsReset": "Atur ulang kata sandi dan PIN staf tanpa kredensial saat ini"
+      "staffCredentialsReset": "Atur ulang kata sandi dan PIN staf tanpa kredensial saat ini",
+      "productionView": "Lihat produksi",
+      "productionExecute": "Mulai dan selesaikan produksi",
+      "productionManage": "Kelola produksi"
     },
     "editorSubtitle": "Konfigurasikan default peran atau buat pengecualian untuk satu staf. Perubahan berlaku pada tindakan berikutnya.",
     "roleDefaultsTab": "Default peran",

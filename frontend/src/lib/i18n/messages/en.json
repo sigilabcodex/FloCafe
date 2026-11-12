@@ -590,7 +590,9 @@
     "unitCost": "Unit cost",
     "totalBatchCost": "Total batch cost",
     "recipeCost": "Recipe cost",
-    "costUnknown": "Cost unknown"
+    "costUnknown": "Cost unknown",
+    "productionIssue": "Production issue",
+    "productionOutput": "Production output"
   },
   "kds": {
     "addonsLabel": "Add-ons",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Scheduled",
     "releaseBlocked": "Release blocked",
     "refundOwnerOnlyNotice": "Manager refund approvals are disabled — an owner PIN is required to approve this refund.",
-    "refundOutsideWindowNotice": "This order is outside the manager approval window — an owner PIN is required to approve this refund."
+    "refundOutsideWindowNotice": "This order is outside the manager approval window — an owner PIN is required to approve this refund.",
+    "markReady": "Mark Ready",
+    "pickedUp": "Picked Up",
+    "markedReady": "Order marked ready",
+    "markedPickedUp": "Order marked picked up",
+    "updateStatusFailed": "Failed to update order status"
   },
   "pos": {
     "addCustomer": "Add Customer",
@@ -2914,7 +2921,8 @@
       "settings": "Settings",
       "integrations": "Integrations",
       "system": "System",
-      "support": "Support"
+      "support": "Support",
+      "production": "Production"
     },
     "capabilities": {
       "tablesView": "View tables",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Manage supplies and recipes",
       "orderItemPriceOverride": "Override order item prices",
       "offlineMode": "Turn Offline mode on or off",
-      "staffCredentialsReset": "Reset staff passwords and PINs without their current credentials"
+      "staffCredentialsReset": "Reset staff passwords and PINs without their current credentials",
+      "productionView": "View production",
+      "productionExecute": "Start and complete production",
+      "productionManage": "Manage production"
     },
     "editorSubtitle": "Configure role defaults or make an exception for one staff member. Changes apply to their next action.",
     "roleDefaultsTab": "Role defaults",

@@ -590,7 +590,9 @@
     "unitCost": "فی یونٹ لاگت",
     "totalBatchCost": "کل کھیپ کی لاگت",
     "recipeCost": "ترکیب کی لاگت",
-    "costUnknown": "لاگت نامعلوم"
+    "costUnknown": "لاگت نامعلوم",
+    "productionIssue": "پیداواری استعمال",
+    "productionOutput": "پیداواری پیداوار"
   },
   "kds": {
     "addonsLabel": "ایڈ آنز",
@@ -883,7 +885,12 @@
     "releaseScheduled": "شیڈول شدہ",
     "releaseBlocked": "اجرا مسدود",
     "refundOwnerOnlyNotice": "مینیجر کی جانب سے رقم واپسی کی منظوری غیر فعال ہے — اس واپسی کی منظوری کے لیے مالک کا پن درکار ہے۔",
-    "refundOutsideWindowNotice": "یہ آرڈر مینیجر کی منظوری کے وقت سے باہر ہے — اس واپسی کی منظوری کے لیے مالک کا پن درکار ہے۔"
+    "refundOutsideWindowNotice": "یہ آرڈر مینیجر کی منظوری کے وقت سے باہر ہے — اس واپسی کی منظوری کے لیے مالک کا پن درکار ہے۔",
+    "markReady": "تیار نشان زد کریں",
+    "pickedUp": "وصول کر لیا گیا",
+    "markedReady": "آرڈر کو تیار نشان زد کر دیا گیا",
+    "markedPickedUp": "آرڈر کو وصول شدہ نشان زد کر دیا گیا",
+    "updateStatusFailed": "آرڈر کی حالت اپ ڈیٹ نہیں ہو سکی"
   },
   "pos": {
     "addCustomer": "گاہک شامل کریں",
@@ -2914,7 +2921,8 @@
       "settings": "ترتیبات",
       "integrations": "انٹیگریشنز",
       "system": "سسٹم",
-      "support": "معاونت"
+      "support": "معاونت",
+      "production": "پیداوار دیکھیں"
     },
     "capabilities": {
       "tablesView": "میزیں دیکھیں",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "سامان اور ترکیبات منظم کریں",
       "orderItemPriceOverride": "آرڈر آئٹم کی قیمتیں تبدیل کریں",
       "offlineMode": "آف لائن موڈ آن یا آف کریں",
-      "staffCredentialsReset": "عملے کے موجودہ اسناد کے بغیر ان کے پاس ورڈ اور پن ری سیٹ کریں"
+      "staffCredentialsReset": "عملے کے موجودہ اسناد کے بغیر ان کے پاس ورڈ اور پن ری سیٹ کریں",
+      "productionView": "پیداوار دیکھیں",
+      "productionExecute": "پیداوار شروع اور مکمل کریں",
+      "productionManage": "پیداوار کا انتظام کریں"
     },
     "editorSubtitle": "کردار کی طے شدہ ترتیبات ترتیب دیں یا ایک ملازم کے لیے استثنیٰ کریں۔ تبدیلیاں اس کے اگلے عمل پر لاگو ہوں گی۔",
     "roleDefaultsTab": "کردار کی طے شدہ ترتیبات",

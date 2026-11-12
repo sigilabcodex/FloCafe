@@ -590,7 +590,9 @@
     "unitCost": "단위 원가",
     "totalBatchCost": "배치 총원가",
     "recipeCost": "레시피 원가",
-    "costUnknown": "원가 미지정"
+    "costUnknown": "원가 미지정",
+    "productionIssue": "생산 사용량",
+    "productionOutput": "생산 산출량"
   },
   "kds": {
     "addonsLabel": "추가 메뉴",
@@ -883,7 +885,12 @@
     "releaseScheduled": "예약됨",
     "releaseBlocked": "전송 보류",
     "refundOwnerOnlyNotice": "매니저 환불 승인이 비활성화되어 있습니다 — 이 환불을 승인하려면 점주 PIN이 필요합니다.",
-    "refundOutsideWindowNotice": "이 주문은 매니저 승인 가능 시간을 지났습니다 — 이 환불을 승인하려면 점주 PIN이 필요합니다."
+    "refundOutsideWindowNotice": "이 주문은 매니저 승인 가능 시간을 지났습니다 — 이 환불을 승인하려면 점주 PIN이 필요합니다.",
+    "markReady": "준비 완료 표시",
+    "pickedUp": "수령 완료",
+    "markedReady": "주문이 준비 완료로 표시되었습니다",
+    "markedPickedUp": "주문이 수령 완료로 표시되었습니다",
+    "updateStatusFailed": "주문 상태를 업데이트하지 못했습니다"
   },
   "pos": {
     "addCustomer": "고객 추가",
@@ -2914,7 +2921,8 @@
       "settings": "설정",
       "integrations": "연동",
       "system": "시스템",
-      "support": "지원"
+      "support": "지원",
+      "production": "생산 조회"
     },
     "capabilities": {
       "tablesView": "테이블 보기",
@@ -2983,7 +2991,10 @@
       "support": "지원팀 문의 및 진단 정보 보기",
       "orderItemPriceOverride": "주문 품목 가격 변경",
       "offlineMode": "오프라인 모드 켜기 또는 끄기",
-      "staffCredentialsReset": "현재 자격 증명 없이 직원 비밀번호 및 PIN 재설정"
+      "staffCredentialsReset": "현재 자격 증명 없이 직원 비밀번호 및 PIN 재설정",
+      "productionView": "생산 조회",
+      "productionExecute": "생산 시작 및 완료",
+      "productionManage": "생산 관리"
     },
     "editorSubtitle": "역할 기본값을 구성하거나 특정 직원에 대한 예외를 만드세요. 변경 사항은 다음 작업부터 적용됩니다.",
     "roleDefaultsTab": "역할 기본값",

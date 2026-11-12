@@ -8,6 +8,7 @@ export type PermissionArea =
   | 'customers'
   | 'menu'
   | 'inventory'
+  | 'production'
   | 'kitchen'
   | 'reports'
   | 'staff'
@@ -355,6 +356,27 @@ export const PERMISSION_DEFINITIONS = [
   {
     id: 'supplies.manage',
     area: 'inventory',
+    defaultRoles: OWNER_MANAGER,
+    configurable: true,
+    risk: 'sensitive',
+  },
+  {
+    id: 'production.view',
+    area: 'production',
+    defaultRoles: KITCHEN,
+    configurable: true,
+    risk: 'standard',
+  },
+  {
+    id: 'production.execute',
+    area: 'production',
+    defaultRoles: KITCHEN,
+    configurable: true,
+    risk: 'sensitive',
+  },
+  {
+    id: 'production.manage',
+    area: 'production',
     defaultRoles: OWNER_MANAGER,
     configurable: true,
     risk: 'sensitive',

@@ -590,7 +590,9 @@
     "unitCost": "ਇਕਾਈ ਲਾਗਤ",
     "totalBatchCost": "ਕੁੱਲ ਬੈਚ ਲਾਗਤ",
     "recipeCost": "ਰੈਸਿਪੀ ਲਾਗਤ",
-    "costUnknown": "ਲਾਗਤ ਅਣਜਾਣ"
+    "costUnknown": "ਲਾਗਤ ਅਣਜਾਣ",
+    "productionIssue": "ਉਤਪਾਦਨ ਦੀ ਖਪਤ",
+    "productionOutput": "ਉਤਪਾਦਨ ਦਾ ਨਤੀਜਾ"
   },
   "kds": {
     "addonsLabel": "ਐਡ-ਆਨ",
@@ -883,7 +885,12 @@
     "releaseScheduled": "ਨਿਰਧਾਰਤ",
     "releaseBlocked": "ਰਿਲੀਜ਼ ਰੋਕੀ ਗਈ",
     "refundOwnerOnlyNotice": "ਮੈਨੇਜਰ ਰਿਫੰਡ ਮਨਜ਼ੂਰੀਆਂ ਬੰਦ ਹਨ — ਇਸ ਰਿਫੰਡ ਨੂੰ ਮਨਜ਼ੂਰ ਕਰਨ ਲਈ ਮਾਲਕ ਦੇ ਪਿੰਨ ਦੀ ਲੋੜ ਹੈ।",
-    "refundOutsideWindowNotice": "ਇਹ ਆਰਡਰ ਮੈਨੇਜਰ ਦੀ ਮਨਜ਼ੂਰੀ ਸਮਾਂ-ਸੀਮਾ ਤੋਂ ਬਾਹਰ ਹੈ — ਇਸ ਰਿਫੰਡ ਨੂੰ ਮਨਜ਼ੂਰ ਕਰਨ ਲਈ ਮਾਲਕ ਦੇ ਪਿੰਨ ਦੀ ਲੋੜ ਹੈ।"
+    "refundOutsideWindowNotice": "ਇਹ ਆਰਡਰ ਮੈਨੇਜਰ ਦੀ ਮਨਜ਼ੂਰੀ ਸਮਾਂ-ਸੀਮਾ ਤੋਂ ਬਾਹਰ ਹੈ — ਇਸ ਰਿਫੰਡ ਨੂੰ ਮਨਜ਼ੂਰ ਕਰਨ ਲਈ ਮਾਲਕ ਦੇ ਪਿੰਨ ਦੀ ਲੋੜ ਹੈ।",
+    "markReady": "ਤਿਆਰ ਵਜੋਂ ਚਿੰਨ੍ਹਿਤ ਕਰੋ",
+    "pickedUp": "ਚੁੱਕ ਲਿਆ ਗਿਆ",
+    "markedReady": "ਆਰਡਰ ਤਿਆਰ ਵਜੋਂ ਚਿੰਨ੍ਹਿਤ ਕੀਤਾ ਗਿਆ",
+    "markedPickedUp": "ਆਰਡਰ ਚੁੱਕਿਆ ਗਿਆ ਵਜੋਂ ਚਿੰਨ੍ਹਿਤ ਕੀਤਾ ਗਿਆ",
+    "updateStatusFailed": "ਆਰਡਰ ਸਥਿਤੀ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ"
   },
   "pos": {
     "addCustomer": "ਗਾਹਕ ਜੋੜੋ",
@@ -2914,7 +2921,8 @@
       "settings": "ਸੈਟਿੰਗਾਂ",
       "integrations": "ਏਕੀਕਰਣ",
       "system": "ਸਿਸਟਮ",
-      "support": "ਸਹਾਇਤਾ"
+      "support": "ਸਹਾਇਤਾ",
+      "production": "ਉਤਪਾਦਨ ਵੇਖੋ"
     },
     "capabilities": {
       "tablesView": "ਟੇਬਲ ਦੇਖੋ",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "ਸਪਲਾਈ ਅਤੇ ਰੈਸਿਪੀਆਂ ਪ੍ਰਬੰਧਿਤ ਕਰੋ",
       "orderItemPriceOverride": "ਆਰਡਰ ਆਈਟਮ ਦੀਆਂ ਕੀਮਤਾਂ ਬਦਲੋ",
       "offlineMode": "ਆਫਲਾਈਨ ਮੋਡ ਚਾਲੂ ਜਾਂ ਬੰਦ ਕਰੋ",
-      "staffCredentialsReset": "ਮੌਜੂਦਾ ਜਾਣਕਾਰੀ ਤੋਂ ਬਿਨਾਂ ਸਟਾਫ ਦੇ ਪਾਸਵਰਡ ਅਤੇ ਪਿੰਨ ਰੀਸੈੱਟ ਕਰੋ"
+      "staffCredentialsReset": "ਮੌਜੂਦਾ ਜਾਣਕਾਰੀ ਤੋਂ ਬਿਨਾਂ ਸਟਾਫ ਦੇ ਪਾਸਵਰਡ ਅਤੇ ਪਿੰਨ ਰੀਸੈੱਟ ਕਰੋ",
+      "productionView": "ਉਤਪਾਦਨ ਵੇਖੋ",
+      "productionExecute": "ਉਤਪਾਦਨ ਸ਼ੁਰੂ ਅਤੇ ਪੂਰਾ ਕਰੋ",
+      "productionManage": "ਉਤਪਾਦਨ ਪ੍ਰਬੰਧਿਤ ਕਰੋ"
     },
     "editorSubtitle": "ਭੂਮਿਕਾ ਦੀਆਂ ਡਿਫੌਲਟ ਸੈਟਿੰਗਾਂ ਕੌਂਫਿਗਰ ਕਰੋ ਜਾਂ ਕਿਸੇ ਇੱਕ ਸਟਾਫ ਮੈਂਬਰ ਲਈ ਛੋਟ ਬਣਾਓ। ਬਦਲਾਅ ਉਹਨਾਂ ਦੀ ਅਗਲੀ ਕਾਰਵਾਈ ਉੱਤੇ ਲਾਗੂ ਹੁੰਦੇ ਹਨ।",
     "roleDefaultsTab": "ਭੂਮਿਕਾ ਡਿਫੌਲਟ",

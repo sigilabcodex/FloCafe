@@ -42,7 +42,9 @@ export type SupplyMovementType =
   | 'adjustment'
   | 'waste'
   | 'recipe_depletion'
-  | 'recipe_restore';
+  | 'recipe_restore'
+  | 'production_issue'
+  | 'production_output';
 export type SupplyServiceDiagnosticCode =
   | 'recipe_linked'
   | 'name_required'

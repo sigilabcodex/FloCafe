@@ -590,7 +590,9 @@
     "unitCost": "Farashin kowane ɗaya",
     "totalBatchCost": "Jimillar farashin haɗi",
     "recipeCost": "Farashin tsarin girki",
-    "costUnknown": "Ba a san farashin samarwa ba"
+    "costUnknown": "Ba a san farashin samarwa ba",
+    "productionIssue": "Amfani wajen samarwa",
+    "productionOutput": "Abin da aka samar"
   },
   "kds": {
     "addonsLabel": "Ƙarin Abubuwa",
@@ -883,7 +885,12 @@
     "releaseScheduled": "An tsara lokaci",
     "releaseBlocked": "An dakatar da turawa",
     "refundOwnerOnlyNotice": "An kashe amincewar mayar da kuɗi na manaja — ana buƙatar PIN na mai shago don amincewa da wannan mayar da kuɗi.",
-    "refundOutsideWindowNotice": "Wannan odar ta wuce lokacin amincewar manaja — ana buƙatar PIN na mai shago don amincewa da wannan mayar da kuɗi."
+    "refundOutsideWindowNotice": "Wannan odar ta wuce lokacin amincewar manaja — ana buƙatar PIN na mai shago don amincewa da wannan mayar da kuɗi.",
+    "markReady": "Alama a shirye",
+    "pickedUp": "An karɓa",
+    "markedReady": "An yi wa oda alama a shirye",
+    "markedPickedUp": "An yi wa oda alama an karɓa",
+    "updateStatusFailed": "An kasa sabunta matsayin oda"
   },
   "pos": {
     "addCustomer": "Ƙara Abokin Ciniki",
@@ -2914,7 +2921,8 @@
       "settings": "Saituna",
       "integrations": "Haɗin kai",
       "system": "Tsari",
-      "support": "Tallafi"
+      "support": "Tallafi",
+      "production": "Duba samarwa"
     },
     "capabilities": {
       "tablesView": "Duba tebura",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Sarrafa kayan aiki da girke-girke",
       "orderItemPriceOverride": "Sauya farashin kayan oda",
       "offlineMode": "Kunna ko kashe Yanayin ba a kan layi ba",
-      "staffCredentialsReset": "Sake saita kalmomin sirri da PIN na ma’aikata ba tare da bayanan su na yanzu ba"
+      "staffCredentialsReset": "Sake saita kalmomin sirri da PIN na ma’aikata ba tare da bayanan su na yanzu ba",
+      "productionView": "Duba samarwa",
+      "productionExecute": "Fara kuma kammala samarwa",
+      "productionManage": "Sarrafa samarwa"
     },
     "editorSubtitle": "Saita izinin asali na matsayi ko yi keɓancewa ga ma'aikaci ɗaya. Sauye-sauye suna aiki a matakinsu na gaba.",
     "roleDefaultsTab": "Asalin matsayi",

@@ -590,7 +590,9 @@
     "unitCost": "هزینه هر واحد",
     "totalBatchCost": "هزینه کل محموله",
     "recipeCost": "هزینه دستور تهیه",
-    "costUnknown": "هزینه نامشخص"
+    "costUnknown": "هزینه نامشخص",
+    "productionIssue": "مصرف تولید",
+    "productionOutput": "محصول تولید"
   },
   "kds": {
     "addonsLabel": "افزودنی‌ها",
@@ -883,7 +885,12 @@
     "releaseScheduled": "زمان‌بندی‌شده",
     "releaseBlocked": "ارسال مسدود",
     "refundOwnerOnlyNotice": "تأیید استرداد توسط مدیر غیرفعال است — برای تأیید این استرداد به پین مالک نیاز است.",
-    "refundOutsideWindowNotice": "این سفارش خارج از بازه زمانی تأیید مدیر است — برای تأیید این استرداد به پین مالک نیاز است."
+    "refundOutsideWindowNotice": "این سفارش خارج از بازه زمانی تأیید مدیر است — برای تأیید این استرداد به پین مالک نیاز است.",
+    "markReady": "علامت‌گذاری به‌عنوان آماده",
+    "pickedUp": "تحویل گرفته شد",
+    "markedReady": "سفارش به‌عنوان آماده علامت‌گذاری شد",
+    "markedPickedUp": "سفارش به‌عنوان تحویل‌گرفته‌شده علامت‌گذاری شد",
+    "updateStatusFailed": "به‌روزرسانی وضعیت سفارش انجام نشد"
   },
   "pos": {
     "addCustomer": "افزودن مشتری",
@@ -2914,7 +2921,8 @@
       "settings": "تنظیمات",
       "integrations": "یکپارچه‌سازی‌ها",
       "system": "سیستم",
-      "support": "پشتیبانی"
+      "support": "پشتیبانی",
+      "production": "مشاهده تولید"
     },
     "capabilities": {
       "tablesView": "مشاهده میزها",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "مدیریت مواد اولیه و دستورها",
       "orderItemPriceOverride": "تغییر قیمت آیتم‌های سفارش",
       "offlineMode": "روشن یا خاموش کردن حالت آفلاین",
-      "staffCredentialsReset": "بازنشانی گذرواژه و پین کارکنان بدون نیاز به اطلاعات فعلی آن‌ها"
+      "staffCredentialsReset": "بازنشانی گذرواژه و پین کارکنان بدون نیاز به اطلاعات فعلی آن‌ها",
+      "productionView": "مشاهده تولید",
+      "productionExecute": "شروع و تکمیل تولید",
+      "productionManage": "مدیریت تولید"
     },
     "editorSubtitle": "پیش‌فرض‌های نقش را پیکربندی کنید یا برای یک کارمند استثنا ایجاد کنید. تغییرات در اقدام بعدی او اعمال می‌شود.",
     "roleDefaultsTab": "پیش‌فرض‌های نقش",

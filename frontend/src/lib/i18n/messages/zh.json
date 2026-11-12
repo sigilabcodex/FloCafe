@@ -590,7 +590,9 @@
     "unitCost": "单位成本",
     "totalBatchCost": "批次总成本",
     "recipeCost": "配方成本",
-    "costUnknown": "成本未知"
+    "costUnknown": "成本未知",
+    "productionIssue": "生产耗用",
+    "productionOutput": "生产产出"
   },
   "kds": {
     "addonsLabel": "加购",
@@ -883,7 +885,12 @@
     "releaseScheduled": "已预约",
     "releaseBlocked": "送厨受阻",
     "refundOwnerOnlyNotice": "经理退款审批已禁用 — 需要店主 PIN 码才能批准此退款。",
-    "refundOutsideWindowNotice": "此订单已超出经理审批时限 — 需要店主 PIN 码才能批准此退款。"
+    "refundOutsideWindowNotice": "此订单已超出经理审批时限 — 需要店主 PIN 码才能批准此退款。",
+    "markReady": "标记为可取餐",
+    "pickedUp": "已取餐",
+    "markedReady": "订单已标记为可取餐",
+    "markedPickedUp": "订单已标记为已取餐",
+    "updateStatusFailed": "更新订单状态失败"
   },
   "pos": {
     "addCustomer": "添加顾客",
@@ -2914,7 +2921,8 @@
       "settings": "设置",
       "integrations": "集成",
       "system": "系统",
-      "support": "支持"
+      "support": "支持",
+      "production": "查看生产"
     },
     "capabilities": {
       "tablesView": "查看桌位",
@@ -2983,7 +2991,10 @@
       "support": "联系支持并查看诊断",
       "orderItemPriceOverride": "修改订单商品价格",
       "offlineMode": "开启或关闭离线模式",
-      "staffCredentialsReset": "无需当前凭据即可重置员工密码和 PIN"
+      "staffCredentialsReset": "无需当前凭据即可重置员工密码和 PIN",
+      "productionView": "查看生产",
+      "productionExecute": "开始并完成生产",
+      "productionManage": "管理生产"
     },
     "editorSubtitle": "配置角色默认权限，或为某位员工设置例外。更改将在其下次操作时生效。",
     "roleDefaultsTab": "角色默认值",

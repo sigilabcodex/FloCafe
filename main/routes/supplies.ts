@@ -30,6 +30,8 @@ const ALL_MOVEMENT_TYPES: SupplyMovementType[] = [
   'waste',
   'recipe_depletion',
   'recipe_restore',
+  'production_issue',
+  'production_output',
 ];
 
 function sendError(res: Response, error: unknown): void {

@@ -590,7 +590,9 @@
     "unitCost": "Gharama kwa kipimo",
     "totalBatchCost": "Jumla ya gharama ya fungu",
     "recipeCost": "Gharama ya mapishi",
-    "costUnknown": "Gharama haijulikani"
+    "costUnknown": "Gharama haijulikani",
+    "productionIssue": "Matumizi ya uzalishaji",
+    "productionOutput": "Matokeo ya uzalishaji"
   },
   "kds": {
     "addonsLabel": "Viongezeo",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Imepangwa",
     "releaseBlocked": "Utumaji umezuiwa",
     "refundOwnerOnlyNotice": "Uidhinishaji wa kurejesha pesa kwa meneja umezimwa — PIN ya mmiliki inahitajika ili kuidhinisha urejeshaji huu.",
-    "refundOutsideWindowNotice": "Oda hii iko nje ya muda wa uidhinishaji wa meneja — PIN ya mmiliki inahitajika ili kuidhinisha urejeshaji huu."
+    "refundOutsideWindowNotice": "Oda hii iko nje ya muda wa uidhinishaji wa meneja — PIN ya mmiliki inahitajika ili kuidhinisha urejeshaji huu.",
+    "markReady": "Weka tayari",
+    "pickedUp": "Imechukuliwa",
+    "markedReady": "Oda imewekwa alama kuwa tayari",
+    "markedPickedUp": "Oda imewekwa alama kuwa imechukuliwa",
+    "updateStatusFailed": "Imeshindwa kusasisha hali ya oda"
   },
   "pos": {
     "addCustomer": "Ongeza Mteja",
@@ -2914,7 +2921,8 @@
       "settings": "Mipangilio",
       "integrations": "Miunganisho",
       "system": "Mfumo",
-      "support": "Usaidizi"
+      "support": "Usaidizi",
+      "production": "Tazama uzalishaji"
     },
     "capabilities": {
       "tablesView": "Tazama meza",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Simamia malighafi na mapishi",
       "orderItemPriceOverride": "Badilisha bei za bidhaa za oda",
       "offlineMode": "Washa au uzime Hali ya nje ya mtandao",
-      "staffCredentialsReset": "Weka upya manenosiri na PIN za wafanyakazi bila vitambulisho vyao vya sasa"
+      "staffCredentialsReset": "Weka upya manenosiri na PIN za wafanyakazi bila vitambulisho vyao vya sasa",
+      "productionView": "Tazama uzalishaji",
+      "productionExecute": "Anza na ukamilishe uzalishaji",
+      "productionManage": "Dhibiti uzalishaji"
     },
     "editorSubtitle": "Sanidi chaguomsingi za majukumu au weka ubaguzi kwa mfanyakazi mmoja. Mabadiliko yanatumika kwa hatua yake inayofuata.",
     "roleDefaultsTab": "Chaguomsingi za jukumu",

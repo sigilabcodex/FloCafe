@@ -110,6 +110,20 @@ function copyAndStamp(sourcePath: string, destinationPath: string, schemaVersion
   backupDb.close();
 }
 
+function copyAsV127(sourcePath: string, destinationPath: string): void {
+  copyAndStamp(sourcePath, destinationPath, 127);
+  const backupDb = new Database(destinationPath);
+  backupDb.pragma('foreign_keys = OFF');
+  backupDb.exec(`
+    DROP TABLE production_step_events;
+    DROP TABLE production_order_steps;
+    DROP TABLE production_process_steps;
+    DROP TABLE production_process_versions;
+    ALTER TABLE production_orders DROP COLUMN process_version_id;
+  `);
+  backupDb.close();
+}
+
 async function run() {
   console.log('Testing production database restore safety...');
   initDatabase();
@@ -433,7 +447,7 @@ async function run() {
     // An older-schema (data-only) restore must not abort because the live database has a
     // kitchen station, or a station assignment, that the backup never knew about.
     const liveOnlyStationBackup = path.join(testDir, 'older-without-live-station.db');
-    copyAndStamp(sameSchemaBackup, liveOnlyStationBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, liveOnlyStationBackup);
     getDatabase()
       .prepare(
         `INSERT OR REPLACE INTO kitchen_stations (id, name, category_ids, is_active, created_at, updated_at)
@@ -468,10 +482,10 @@ async function run() {
 
     // Make the backup appear to be an older schema while retaining real linked data.
     const olderBackup = path.join(testDir, 'older-schema.db');
-    copyAndStamp(sameSchemaBackup, olderBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, olderBackup);
 
     const inconsistentLedgerBackup = path.join(testDir, 'inconsistent-ledger.db');
-    copyAndStamp(sameSchemaBackup, inconsistentLedgerBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, inconsistentLedgerBackup);
     const inconsistentLedgerDb = new Database(inconsistentLedgerBackup);
     inconsistentLedgerDb
       .prepare('UPDATE products SET stock_quantity = ? WHERE id = ?')
@@ -556,7 +570,7 @@ async function run() {
         0,
       );
     const partialRestoreBackup = path.join(testDir, 'partial-ledger-restore.db');
-    copyAndStamp(sameSchemaBackup, partialRestoreBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, partialRestoreBackup);
     const partialRestoreDb = new Database(partialRestoreBackup);
     partialRestoreDb.pragma('foreign_keys = OFF');
     partialRestoreDb.exec('DROP TABLE products');
@@ -593,7 +607,7 @@ async function run() {
       .run(5, 'restore-product');
 
     const staleLedgerBackup = path.join(testDir, 'stale-ledger.db');
-    copyAndStamp(sameSchemaBackup, staleLedgerBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, staleLedgerBackup);
     const staleLedgerDb = new Database(staleLedgerBackup);
     staleLedgerDb.pragma('foreign_keys = OFF');
     staleLedgerDb.exec('DROP TABLE inventory_movements');
@@ -624,7 +638,7 @@ async function run() {
     );
 
     const legacyPreLedgerBackup = path.join(testDir, 'legacy-pre-ledger.db');
-    copyAndStamp(sameSchemaBackup, legacyPreLedgerBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, legacyPreLedgerBackup);
     const legacyPreLedgerDb = new Database(legacyPreLedgerBackup);
     legacyPreLedgerDb.pragma('foreign_keys = OFF');
     legacyPreLedgerDb
@@ -678,7 +692,7 @@ async function run() {
 
     // A failed restore must roll back and leave the connection reusable.
     const invalidBackup = path.join(testDir, 'invalid-fk-backup.db');
-    copyAndStamp(sameSchemaBackup, invalidBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, invalidBackup);
     const invalidDb = new Database(invalidBackup);
     invalidDb.pragma('foreign_keys = OFF');
     invalidDb.prepare('DELETE FROM categories WHERE id = ?').run('restore-category');
@@ -786,7 +800,7 @@ async function run() {
     // An older-version backup that migrates forward to currentVersion and has additive
     // schema drift from an earlier skipped migration is repaired after forward migration.
     const driftedOlderBackup = path.join(testDir, 'drifted-older-schema.db');
-    copyAndStamp(sameSchemaBackup, driftedOlderBackup, currentVersion - 1);
+    copyAsV127(sameSchemaBackup, driftedOlderBackup);
     const driftedOlderDb = new Database(driftedOlderBackup);
     driftedOlderDb.pragma('foreign_keys = OFF');
     driftedOlderDb.exec(
@@ -1142,7 +1156,7 @@ async function run() {
 
       // 2. Data-only restore (supported mismatched version): exactly 1 staged snapshot (no duplicate), cleaned up on return
       const olderVariantBackup = path.join(testDir, 'older-variant-schema.db');
-      copyAndStamp(variantBackup, olderVariantBackup, currentVersion - 1);
+      copyAsV127(variantBackup, olderVariantBackup);
       const mismatchStart = trackedRestoreDirs.length;
       const mismatchResult = restoreBackup(olderVariantBackup, false);
       assert.equal(mismatchResult.success, true, 'mismatched-version data-only restore succeeds');
@@ -1270,8 +1284,8 @@ async function run() {
     initDatabase();
     assert.equal(
       getCurrentSchemaVersion(),
-      125,
-      'interrupted v114 replacement recovered and migrated to v125',
+      currentVersion,
+      `interrupted v114 replacement recovered and migrated to v${currentVersion}`,
     );
     assert.equal(
       fs.existsSync(journalPath),

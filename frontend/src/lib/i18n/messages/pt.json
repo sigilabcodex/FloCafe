@@ -590,7 +590,9 @@
     "unitCost": "Custo unitário",
     "totalBatchCost": "Custo total do lote",
     "recipeCost": "Custo da receita",
-    "costUnknown": "Custo desconhecido"
+    "costUnknown": "Custo desconhecido",
+    "productionIssue": "Consumo na produção",
+    "productionOutput": "Resultado da produção"
   },
   "kds": {
     "addonsLabel": "Adicionais",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Agendado",
     "releaseBlocked": "Envio bloqueado",
     "refundOwnerOnlyNotice": "As aprovações de reembolso por gerentes estão desativadas — é necessário o PIN do proprietário para aprovar este reembolso.",
-    "refundOutsideWindowNotice": "Este pedido está fora da janela de aprovação do gerente — é necessário o PIN do proprietário para aprovar este reembolso."
+    "refundOutsideWindowNotice": "Este pedido está fora da janela de aprovação do gerente — é necessário o PIN do proprietário para aprovar este reembolso.",
+    "markReady": "Marcar pronto",
+    "pickedUp": "Retirado",
+    "markedReady": "Pedido marcado como pronto",
+    "markedPickedUp": "Pedido marcado como retirado",
+    "updateStatusFailed": "Falha ao atualizar o status do pedido"
   },
   "pos": {
     "addCustomer": "Adicionar Cliente",
@@ -2914,7 +2921,8 @@
       "settings": "Configurações",
       "integrations": "Integrações",
       "system": "Sistema",
-      "support": "Suporte"
+      "support": "Suporte",
+      "production": "Ver produção"
     },
     "capabilities": {
       "tablesView": "Ver mesas",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Gerenciar insumos e receitas",
       "orderItemPriceOverride": "Alterar preços dos itens do pedido",
       "offlineMode": "Ativar ou desativar o modo offline",
-      "staffCredentialsReset": "Redefinir senhas e PINs da equipe sem as credenciais atuais"
+      "staffCredentialsReset": "Redefinir senhas e PINs da equipe sem as credenciais atuais",
+      "productionView": "Ver produção",
+      "productionExecute": "Iniciar e concluir produção",
+      "productionManage": "Gerir produção"
     },
     "editorSubtitle": "Configure os padrões da função ou crie uma exceção para um funcionário. As alterações se aplicam na próxima ação dele.",
     "roleDefaultsTab": "Padrões da função",

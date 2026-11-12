@@ -590,7 +590,9 @@
     "unitCost": "Giá vốn đơn vị",
     "totalBatchCost": "Tổng chi phí lô hàng",
     "recipeCost": "Giá vốn công thức",
-    "costUnknown": "Chưa rõ giá vốn"
+    "costUnknown": "Chưa rõ giá vốn",
+    "productionIssue": "Tiêu hao sản xuất",
+    "productionOutput": "Sản lượng sản xuất"
   },
   "kds": {
     "addonsLabel": "Tuỳ chọn",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Hẹn giờ",
     "releaseBlocked": "Chặn gửi bếp",
     "refundOwnerOnlyNotice": "Phê duyệt hoàn tiền của quản lý đã bị tắt — cần mã PIN của chủ quán để phê duyệt khoản hoàn tiền này.",
-    "refundOutsideWindowNotice": "Đơn hàng này đã quá thời hạn phê duyệt của quản lý — cần mã PIN của chủ quán để phê duyệt khoản hoàn tiền này."
+    "refundOutsideWindowNotice": "Đơn hàng này đã quá thời hạn phê duyệt của quản lý — cần mã PIN của chủ quán để phê duyệt khoản hoàn tiền này.",
+    "markReady": "Đánh dấu sẵn sàng",
+    "pickedUp": "Đã nhận món",
+    "markedReady": "Đã đánh dấu đơn hàng sẵn sàng",
+    "markedPickedUp": "Đã đánh dấu đơn hàng đã nhận",
+    "updateStatusFailed": "Không thể cập nhật trạng thái đơn hàng"
   },
   "pos": {
     "addCustomer": "Thêm khách hàng",
@@ -2914,7 +2921,8 @@
       "settings": "Cài đặt",
       "integrations": "Tích hợp",
       "system": "Hệ thống",
-      "support": "Hỗ trợ"
+      "support": "Hỗ trợ",
+      "production": "Xem sản xuất"
     },
     "capabilities": {
       "tablesView": "Xem bàn",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Quản lý vật tư và công thức",
       "orderItemPriceOverride": "Đổi giá món trong đơn hàng",
       "offlineMode": "Bật hoặc tắt chế độ ngoại tuyến",
-      "staffCredentialsReset": "Đặt lại mật khẩu và mã PIN của nhân viên mà không cần thông tin xác thực hiện tại"
+      "staffCredentialsReset": "Đặt lại mật khẩu và mã PIN của nhân viên mà không cần thông tin xác thực hiện tại",
+      "productionView": "Xem sản xuất",
+      "productionExecute": "Bắt đầu và hoàn tất sản xuất",
+      "productionManage": "Quản lý sản xuất"
     },
     "editorSubtitle": "Cấu hình mặc định theo vai trò hoặc tạo ngoại lệ cho một nhân viên. Thay đổi sẽ áp dụng từ hành động tiếp theo của họ.",
     "roleDefaultsTab": "Mặc định vai trò",

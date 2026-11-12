@@ -10381,6 +10381,304 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       }
     },
   },
+  {
+    version: 126,
+    name: 'add_production_batches',
+    up: () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS prep_recipes (
+          id TEXT PRIMARY KEY,
+          output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+          version INTEGER NOT NULL CHECK (version > 0),
+          yield_quantity REAL NOT NULL CHECK (yield_quantity > 0),
+          components_json TEXT NOT NULL,
+          is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(output_supply_id, version)
+        );
+        CREATE INDEX IF NOT EXISTS idx_prep_recipes_output_active
+          ON prep_recipes(output_supply_id, is_active, version);
+
+        CREATE TABLE IF NOT EXISTS production_orders (
+          id TEXT PRIMARY KEY,
+          prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+          output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          status TEXT NOT NULL CHECK (status IN ('queued', 'in_progress', 'completed')),
+          planned_quantity REAL NOT NULL CHECK (planned_quantity > 0),
+          actual_quantity REAL CHECK (actual_quantity > 0),
+          snapshot_json TEXT NOT NULL,
+          total_input_cost REAL,
+          cost_known INTEGER NOT NULL DEFAULT 0 CHECK (cost_known IN (0, 1)),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          started_by TEXT REFERENCES users(id),
+          completed_by TEXT REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          started_at TEXT,
+          completed_at TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_production_orders_status_created
+          ON production_orders(status, created_at);
+
+        CREATE TABLE IF NOT EXISTS production_order_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          action TEXT NOT NULL CHECK (action IN ('created', 'started', 'completed')),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          details_json TEXT NOT NULL DEFAULT '{}',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(production_order_id, action)
+        );
+      `);
+    },
+  },
+  {
+    version: 127,
+    name: 'add_production_movement_types_and_terminal_states',
+    up: () => {
+      const oldMovementCount = Number(
+        (db.prepare('SELECT COUNT(*) AS count FROM supply_movements').get() as { count: number })
+          .count,
+      );
+      db.exec(`
+        CREATE TABLE supply_movements_v127 (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          supply_id TEXT NOT NULL REFERENCES supplies(id),
+          quantity_delta REAL NOT NULL,
+          movement_type TEXT NOT NULL CHECK (movement_type IN (
+            'receive', 'count', 'adjustment', 'waste', 'recipe_depletion', 'recipe_restore',
+            'production_issue', 'production_output'
+          )),
+          unit TEXT NOT NULL CHECK (unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          stock_after REAL NOT NULL,
+          reason TEXT,
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          reference_type TEXT,
+          reference_id TEXT,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          unit_cost REAL DEFAULT NULL,
+          total_cost REAL DEFAULT NULL,
+          unit_cost_after REAL DEFAULT NULL
+        );
+        INSERT INTO supply_movements_v127 (
+          id, supply_id, quantity_delta, movement_type, unit, stock_after, reason,
+          actor_user_id, reference_type, reference_id, created_at,
+          unit_cost, total_cost, unit_cost_after
+        )
+        SELECT
+          id, supply_id, quantity_delta, movement_type, unit, stock_after, reason,
+          actor_user_id, reference_type, reference_id, created_at,
+          unit_cost, total_cost, unit_cost_after
+        FROM supply_movements;
+        DROP TABLE supply_movements;
+        ALTER TABLE supply_movements_v127 RENAME TO supply_movements;
+        CREATE INDEX idx_supply_movements_supply_created
+          ON supply_movements(supply_id, created_at, id);
+        CREATE INDEX idx_supply_movements_reference
+          ON supply_movements(reference_type, reference_id);
+        CREATE INDEX idx_supply_movements_created
+          ON supply_movements(created_at, id);
+      `);
+      const newMovementCount = Number(
+        (db.prepare('SELECT COUNT(*) AS count FROM supply_movements').get() as { count: number })
+          .count,
+      );
+      if (newMovementCount !== oldMovementCount) {
+        throw new Error(
+          `v127 supply movement row count changed (${oldMovementCount} → ${newMovementCount})`,
+        );
+      }
+
+      const oldEvents = db.prepare('SELECT * FROM production_order_events ORDER BY id').all() as {
+        id: number;
+        production_order_id: string;
+        action: string;
+        actor_user_id: string;
+        details_json: string;
+        created_at: string;
+      }[];
+      db.exec(`
+        DROP TABLE production_order_events;
+        CREATE TABLE production_orders_v127 (
+          id TEXT PRIMARY KEY,
+          prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+          output_supply_id TEXT NOT NULL REFERENCES supplies(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          status TEXT NOT NULL CHECK (status IN ('queued', 'in_progress', 'completed', 'cancelled', 'abandoned')),
+          planned_quantity REAL NOT NULL CHECK (planned_quantity > 0),
+          actual_quantity REAL CHECK (actual_quantity > 0),
+          snapshot_json TEXT NOT NULL,
+          total_input_cost REAL,
+          cost_known INTEGER NOT NULL DEFAULT 0 CHECK (cost_known IN (0, 1)),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          started_by TEXT REFERENCES users(id),
+          completed_by TEXT REFERENCES users(id),
+          cancelled_by TEXT REFERENCES users(id),
+          abandoned_by TEXT REFERENCES users(id),
+          terminal_reason TEXT,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          started_at TEXT,
+          completed_at TEXT,
+          cancelled_at TEXT,
+          abandoned_at TEXT
+        );
+        INSERT INTO production_orders_v127 (
+          id, prep_recipe_id, output_supply_id, idempotency_key, status, planned_quantity,
+          actual_quantity, snapshot_json, total_input_cost, cost_known, version,
+          created_by, started_by, completed_by, created_at, started_at, completed_at
+        )
+        SELECT
+          id, prep_recipe_id, output_supply_id, idempotency_key, status, planned_quantity,
+          actual_quantity, snapshot_json, total_input_cost, cost_known, version,
+          created_by, started_by, completed_by, created_at, started_at, completed_at
+        FROM production_orders;
+        DROP TABLE production_orders;
+        ALTER TABLE production_orders_v127 RENAME TO production_orders;
+        CREATE INDEX idx_production_orders_status_created
+          ON production_orders(status, created_at);
+        CREATE TABLE production_order_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          action TEXT NOT NULL CHECK (action IN ('created', 'started', 'completed', 'cancelled', 'abandoned')),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          details_json TEXT NOT NULL DEFAULT '{}',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(production_order_id, action)
+        );
+      `);
+      const insertEvent = db.prepare(`INSERT INTO production_order_events
+        (id, production_order_id, action, actor_user_id, details_json, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)`);
+      for (const event of oldEvents) {
+        insertEvent.run(
+          event.id,
+          event.production_order_id,
+          event.action,
+          event.actor_user_id,
+          event.details_json,
+          event.created_at,
+        );
+      }
+      const restoredEvents = Number(
+        (
+          db.prepare('SELECT COUNT(*) AS count FROM production_order_events').get() as {
+            count: number;
+          }
+        ).count,
+      );
+      if (restoredEvents !== oldEvents.length) {
+        throw new Error(
+          `v127 production event row count changed (${oldEvents.length} → ${restoredEvents})`,
+        );
+      }
+      const foreignKeyViolations = (db.pragma('foreign_key_check') as unknown[]).length;
+      if (foreignKeyViolations > 0) {
+        throw new Error(`v127 created ${foreignKeyViolations} foreign key violation(s)`);
+      }
+    },
+  },
+  {
+    version: 128,
+    name: 'add_versioned_production_processes',
+    up: () => {
+      db.exec(`
+        CREATE TABLE production_process_versions (
+          id TEXT PRIMARY KEY,
+          prep_recipe_id TEXT NOT NULL REFERENCES prep_recipes(id),
+          version INTEGER NOT NULL CHECK (version > 0),
+          name TEXT NOT NULL,
+          is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(prep_recipe_id, version)
+        );
+        CREATE UNIQUE INDEX idx_production_process_one_active
+          ON production_process_versions(prep_recipe_id) WHERE is_active = 1;
+        CREATE INDEX idx_production_process_versions_recipe
+          ON production_process_versions(prep_recipe_id, version DESC);
+
+        CREATE TABLE production_process_steps (
+          id TEXT PRIMARY KEY,
+          process_version_id TEXT NOT NULL REFERENCES production_process_versions(id),
+          step_key TEXT NOT NULL,
+          position INTEGER NOT NULL CHECK (position >= 0),
+          name TEXT NOT NULL,
+          instructions TEXT,
+          step_type TEXT NOT NULL CHECK (step_type IN ('operation', 'wait', 'check')),
+          planned_duration_minutes REAL CHECK (planned_duration_minutes IS NULL OR planned_duration_minutes >= 0),
+          dependencies_json TEXT NOT NULL DEFAULT '[]',
+          is_optional INTEGER NOT NULL DEFAULT 0 CHECK (is_optional IN (0, 1)),
+          suggested_role TEXT CHECK (suggested_role IS NULL OR suggested_role IN ('owner', 'manager', 'cashier', 'server', 'chef')),
+          suggested_responsible TEXT,
+          resource_label TEXT,
+          verification_prompt TEXT,
+          UNIQUE(process_version_id, step_key),
+          UNIQUE(process_version_id, position)
+        );
+        CREATE INDEX idx_production_process_steps_order
+          ON production_process_steps(process_version_id, position);
+
+        CREATE TABLE production_order_steps (
+          id TEXT PRIMARY KEY,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          source_step_id TEXT REFERENCES production_process_steps(id),
+          step_key TEXT NOT NULL,
+          position INTEGER NOT NULL CHECK (position >= 0),
+          name TEXT NOT NULL,
+          instructions TEXT,
+          step_type TEXT NOT NULL CHECK (step_type IN ('operation', 'wait', 'check')),
+          planned_duration_minutes REAL CHECK (planned_duration_minutes IS NULL OR planned_duration_minutes >= 0),
+          dependencies_json TEXT NOT NULL DEFAULT '[]',
+          is_optional INTEGER NOT NULL DEFAULT 0 CHECK (is_optional IN (0, 1)),
+          suggested_role TEXT CHECK (suggested_role IS NULL OR suggested_role IN ('owner', 'manager', 'cashier', 'server', 'chef')),
+          suggested_responsible TEXT,
+          resource_label TEXT,
+          verification_prompt TEXT,
+          status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'skipped', 'blocked')),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          started_by TEXT REFERENCES users(id),
+          completed_by TEXT REFERENCES users(id),
+          started_at TEXT,
+          completed_at TEXT,
+          actual_duration_seconds INTEGER CHECK (actual_duration_seconds IS NULL OR actual_duration_seconds >= 0),
+          verification_result TEXT,
+          terminal_reason TEXT,
+          UNIQUE(production_order_id, step_key),
+          UNIQUE(production_order_id, position)
+        );
+        CREATE INDEX idx_production_order_steps_order
+          ON production_order_steps(production_order_id, position);
+        CREATE INDEX idx_production_order_steps_status
+          ON production_order_steps(status, production_order_id);
+
+        CREATE TABLE production_step_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          production_order_id TEXT NOT NULL REFERENCES production_orders(id),
+          production_order_step_id TEXT NOT NULL REFERENCES production_order_steps(id),
+          action TEXT NOT NULL CHECK (action IN ('started', 'completed', 'skipped', 'blocked', 'resumed')),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          request_json TEXT NOT NULL DEFAULT '{}',
+          details_json TEXT NOT NULL DEFAULT '{}',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE INDEX idx_production_step_events_order
+          ON production_step_events(production_order_id, id);
+        CREATE INDEX idx_production_step_events_step
+          ON production_step_events(production_order_step_id, id);
+
+        ALTER TABLE production_orders ADD COLUMN process_version_id TEXT
+          REFERENCES production_process_versions(id);
+      `);
+      const foreignKeyViolations = (db.pragma('foreign_key_check') as unknown[]).length;
+      if (foreignKeyViolations > 0) {
+        throw new Error(`v128 created ${foreignKeyViolations} foreign key violation(s)`);
+      }
+    },
+  },
 ];
 
 export function backfillWhatsAppMessageAttempts(

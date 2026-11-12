@@ -590,7 +590,9 @@
     "unitCost": "Costo unitario",
     "totalBatchCost": "Costo totale del lotto",
     "recipeCost": "Costo della ricetta",
-    "costUnknown": "Costo sconosciuto"
+    "costUnknown": "Costo sconosciuto",
+    "productionIssue": "Consumo di produzione",
+    "productionOutput": "Risultato della produzione"
   },
   "kds": {
     "addonsLabel": "Extra",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Programmato",
     "releaseBlocked": "Invio bloccato",
     "refundOwnerOnlyNotice": "Le approvazioni dei rimborsi da parte del responsabile sono disabilitate — è richiesto il PIN del titolare per approvare questo rimborso.",
-    "refundOutsideWindowNotice": "Questo ordine è fuori dalla finestra di approvazione del responsabile — è richiesto il PIN del titolare per approvare questo rimborso."
+    "refundOutsideWindowNotice": "Questo ordine è fuori dalla finestra di approvazione del responsabile — è richiesto il PIN del titolare per approvare questo rimborso.",
+    "markReady": "Segna pronto",
+    "pickedUp": "Ritirato",
+    "markedReady": "Ordine segnato come pronto",
+    "markedPickedUp": "Ordine segnato come ritirato",
+    "updateStatusFailed": "Impossibile aggiornare lo stato dell’ordine"
   },
   "pos": {
     "addCustomer": "Aggiungi cliente",
@@ -2914,7 +2921,8 @@
       "settings": "Impostazioni",
       "integrations": "Integrazioni",
       "system": "Sistema",
-      "support": "Assistenza"
+      "support": "Assistenza",
+      "production": "Visualizza la produzione"
     },
     "capabilities": {
       "tablesView": "Visualizza i tavoli",
@@ -2983,7 +2991,10 @@
       "support": "Contatta l'assistenza e visualizza le diagnostiche",
       "orderItemPriceOverride": "Modificare i prezzi degli articoli dell’ordine",
       "offlineMode": "Attiva o disattiva la modalità offline",
-      "staffCredentialsReset": "Reimposta password e PIN del personale senza le credenziali attuali"
+      "staffCredentialsReset": "Reimposta password e PIN del personale senza le credenziali attuali",
+      "productionView": "Visualizza la produzione",
+      "productionExecute": "Avvia e completa la produzione",
+      "productionManage": "Gestisci la produzione"
     },
     "editorSubtitle": "Configura le impostazioni predefinite del ruolo o crea un'eccezione per un membro dello staff. Le modifiche si applicano alla prossima azione.",
     "roleDefaultsTab": "Impostazioni ruolo",

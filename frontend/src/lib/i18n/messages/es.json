@@ -590,7 +590,9 @@
     "unitCost": "Costo unitario",
     "totalBatchCost": "Costo total del lote",
     "recipeCost": "Costo de la receta",
-    "costUnknown": "Costo desconocido"
+    "costUnknown": "Costo desconocido",
+    "productionIssue": "Consumo en producción",
+    "productionOutput": "Salida de producción"
   },
   "kds": {
     "addonsLabel": "Adicionales",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Programado",
     "releaseBlocked": "Envío bloqueado",
     "refundOwnerOnlyNotice": "Las aprobaciones de reembolso de gerentes están desactivadas — se requiere el PIN de un propietario para aprobar este reembolso.",
-    "refundOutsideWindowNotice": "Este pedido está fuera de la ventana de aprobación del gerente — se requiere el PIN de un propietario para aprobar este reembolso."
+    "refundOutsideWindowNotice": "Este pedido está fuera de la ventana de aprobación del gerente — se requiere el PIN de un propietario para aprobar este reembolso.",
+    "markReady": "Marcar listo",
+    "pickedUp": "Recogido",
+    "markedReady": "Pedido marcado como listo",
+    "markedPickedUp": "Pedido marcado como recogido",
+    "updateStatusFailed": "No se pudo actualizar el estado del pedido"
   },
   "pos": {
     "addCustomer": "Agregar Cliente",
@@ -2914,7 +2921,8 @@
       "settings": "Configuración",
       "integrations": "Integraciones",
       "system": "Sistema",
-      "support": "Soporte"
+      "support": "Soporte",
+      "production": "Ver producción"
     },
     "capabilities": {
       "tablesView": "Ver mesas",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Gestionar insumos y recetas",
       "orderItemPriceOverride": "Cambiar precios de artículos del pedido",
       "offlineMode": "Activar o desactivar el modo sin conexión",
-      "staffCredentialsReset": "Restablecer contraseñas y PIN del personal sin sus credenciales actuales"
+      "staffCredentialsReset": "Restablecer contraseñas y PIN del personal sin sus credenciales actuales",
+      "productionView": "Ver producción",
+      "productionExecute": "Operar producción",
+      "productionManage": "Administrar producción"
     },
     "editorSubtitle": "Configura los valores predeterminados de los roles o crea una excepción para un miembro del personal. Los cambios se aplican en su próxima acción.",
     "roleDefaultsTab": "Valores del rol",

@@ -590,7 +590,9 @@
     "unitCost": "Kosto për njësi",
     "totalBatchCost": "Kosto totale e partisë",
     "recipeCost": "Kosto e recetës",
-    "costUnknown": "Kosto e panjohur"
+    "costUnknown": "Kosto e panjohur",
+    "productionIssue": "Konsum prodhimi",
+    "productionOutput": "Prodhimi i përfunduar"
   },
   "kds": {
     "addonsLabel": "Shtesat",
@@ -883,7 +885,12 @@
     "releaseScheduled": "E planifikuar",
     "releaseBlocked": "Dërgimi i bllokuar",
     "refundOwnerOnlyNotice": "Miratimet e rimbursimit nga menaxheri janë të çaktivizuara — kërkohet PIN-i i pronarit për të miratuar këtë rimbursim.",
-    "refundOutsideWindowNotice": "Kjo porosi është jashtë afatit të miratimit të menaxherit — kërkohet PIN-i i pronarit për të miratuar këtë rimbursim."
+    "refundOutsideWindowNotice": "Kjo porosi është jashtë afatit të miratimit të menaxherit — kërkohet PIN-i i pronarit për të miratuar këtë rimbursim.",
+    "markReady": "Shëno gati",
+    "pickedUp": "Tërhequr",
+    "markedReady": "Porosia u shënua gati",
+    "markedPickedUp": "Porosia u shënua e tërhequr",
+    "updateStatusFailed": "Përditësimi i statusit të porosisë dështoi"
   },
   "pos": {
     "addCustomer": "Shto klient",
@@ -2914,7 +2921,8 @@
       "settings": "Cilësimet",
       "integrations": "Integrimet",
       "system": "Sistemi",
-      "support": "Mbështetje"
+      "support": "Mbështetje",
+      "production": "Shiko prodhimin"
     },
     "capabilities": {
       "tablesView": "Shiko tavat",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Menaxhoni furnizimet dhe recetat",
       "orderItemPriceOverride": "Ndrysho çmimet e artikujve të porosisë",
       "offlineMode": "Ndez ose fik modalitetin pa internet",
-      "staffCredentialsReset": "Rivendosni fjalëkalimet dhe PIN-et e stafit pa kredencialet aktuale"
+      "staffCredentialsReset": "Rivendosni fjalëkalimet dhe PIN-et e stafit pa kredencialet aktuale",
+      "productionView": "Shiko prodhimin",
+      "productionExecute": "Nis dhe përfundo prodhimin",
+      "productionManage": "Menaxho prodhimin"
     },
     "editorSubtitle": "Konfiguroni vlerat e parazgjedhura të rolit ose bëni një përjashtim për një staf. Ndryshimet zbatohen në veprimin e tij të ardhshëm.",
     "roleDefaultsTab": "Vlerat e parazgjedhura të rolit",

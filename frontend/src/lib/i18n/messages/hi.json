@@ -590,7 +590,9 @@
     "unitCost": "इकाई लागत",
     "totalBatchCost": "कुल बैच लागत",
     "recipeCost": "रेसिपी लागत",
-    "costUnknown": "लागत अज्ञात"
+    "costUnknown": "लागत अज्ञात",
+    "productionIssue": "उत्पादन खपत",
+    "productionOutput": "उत्पादन आउटपुट"
   },
   "kds": {
     "addonsLabel": "ऐड-ऑन",
@@ -883,7 +885,12 @@
     "releaseScheduled": "शेड्यूल किया गया",
     "releaseBlocked": "रिलीज़ रुका",
     "refundOwnerOnlyNotice": "प्रबंधक रिफंड स्वीकृतियां अक्षम हैं — इस रिफंड को स्वीकृत करने के लिए मालिक के पिन की आवश्यकता है।",
-    "refundOutsideWindowNotice": "यह ऑर्डर प्रबंधक की स्वीकृति समय-सीमा से बाहर है — इस रिफंड को स्वीकृत करने के लिए मालिक के पिन की आवश्यकता है।"
+    "refundOutsideWindowNotice": "यह ऑर्डर प्रबंधक की स्वीकृति समय-सीमा से बाहर है — इस रिफंड को स्वीकृत करने के लिए मालिक के पिन की आवश्यकता है।",
+    "markReady": "तैयार चिह्नित करें",
+    "pickedUp": "पिक अप हो गया",
+    "markedReady": "ऑर्डर तैयार के रूप में चिह्नित किया गया",
+    "markedPickedUp": "ऑर्डर पिक अप के रूप में चिह्नित किया गया",
+    "updateStatusFailed": "ऑर्डर स्थिति अपडेट करने में विफल"
   },
   "pos": {
     "addCustomer": "ग्राहक जोड़ें",
@@ -2914,7 +2921,8 @@
       "settings": "सेटिंग्स",
       "integrations": "एकीकरण",
       "system": "सिस्टम",
-      "support": "समर्थन"
+      "support": "समर्थन",
+      "production": "उत्पादन देखें"
     },
     "capabilities": {
       "tablesView": "टेबल देखें",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "आपूर्ति और व्यंजनों का प्रबंधन करें",
       "orderItemPriceOverride": "ऑर्डर आइटम की कीमत बदलें",
       "offlineMode": "ऑफ़लाइन मोड चालू या बंद करें",
-      "staffCredentialsReset": "वर्तमान क्रेडेंशियल के बिना स्टाफ पासवर्ड और पिन रीसेट करें"
+      "staffCredentialsReset": "वर्तमान क्रेडेंशियल के बिना स्टाफ पासवर्ड और पिन रीसेट करें",
+      "productionView": "उत्पादन देखें",
+      "productionExecute": "उत्पादन शुरू और पूरा करें",
+      "productionManage": "उत्पादन प्रबंधित करें"
     },
     "editorSubtitle": "भूमिका की डिफ़ॉल्ट सेटिंग्स कॉन्फ़िगर करें या एक कर्मचारी के लिए अपवाद बनाएँ। बदलाव उनके अगले कार्य पर लागू होंगे।",
     "roleDefaultsTab": "भूमिका डिफ़ॉल्ट",

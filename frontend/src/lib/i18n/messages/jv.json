@@ -590,7 +590,9 @@
     "unitCost": "Ragad per unit",
     "totalBatchCost": "Gunggung ragad batch",
     "recipeCost": "Ragad resep",
-    "costUnknown": "Ragad durung dingerteni"
+    "costUnknown": "Ragad durung dingerteni",
+    "productionIssue": "Panggunaan produksi",
+    "productionOutput": "Asil produksi"
   },
   "kds": {
     "addonsLabel": "Imbuhan",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Dijadwalake",
     "releaseBlocked": "Wetokake katahan",
     "refundOwnerOnlyNotice": "Persetujuan bali dhuwit dening manajer dipateni — butuh PIN sing duwe toko kanggo nyetujoni bali dhuwit iki.",
-    "refundOutsideWindowNotice": "Pesanan iki wis liwat wektu persetujuan manajer — butuh PIN sing duwe toko kanggo nyetujoni bali dhuwit iki."
+    "refundOutsideWindowNotice": "Pesanan iki wis liwat wektu persetujuan manajer — butuh PIN sing duwe toko kanggo nyetujoni bali dhuwit iki.",
+    "markReady": "Tandhani siap",
+    "pickedUp": "Wis dijupuk",
+    "markedReady": "Pesenan ditandhani siap",
+    "markedPickedUp": "Pesenan ditandhani wis dijupuk",
+    "updateStatusFailed": "Gagal nganyari status pesenan"
   },
   "pos": {
     "addCustomer": "Tambah Pelanggan",
@@ -2914,7 +2921,8 @@
       "settings": "Pangaturan",
       "integrations": "Integrasi",
       "system": "Sistem",
-      "support": "Pitulungan"
+      "support": "Pitulungan",
+      "production": "Deleng produksi"
     },
     "capabilities": {
       "tablesView": "Deleng meja",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Atur pasokan",
       "orderItemPriceOverride": "Ngowahi rega item pesenan",
       "offlineMode": "Uripake utawa pateni mode offline",
-      "staffCredentialsReset": "Ngatur maneh tembung sandi lan kode PIN karyawan tanpa kredensial saiki"
+      "staffCredentialsReset": "Ngatur maneh tembung sandi lan kode PIN karyawan tanpa kredensial saiki",
+      "productionView": "Deleng produksi",
+      "productionExecute": "Miwiti lan ngrampungake produksi",
+      "productionManage": "Atur produksi"
     },
     "editorSubtitle": "Konfigurasi default peran utawa gawe pambebasan kanggo siji staf. Owah-owahan lumaku ing tumindak sabanjure.",
     "roleDefaultsTab": "Default peran",

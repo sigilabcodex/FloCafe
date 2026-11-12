@@ -590,7 +590,9 @@
     "unitCost": "Eenheidskost",
     "totalBatchCost": "Totale partijkost",
     "recipeCost": "Receptkost",
-    "costUnknown": "Kostprijs onbekend"
+    "costUnknown": "Kostprijs onbekend",
+    "productionIssue": "Productieverbruik",
+    "productionOutput": "Productieopbrengst"
   },
   "kds": {
     "addonsLabel": "Add-ons",
@@ -883,7 +885,12 @@
     "releaseScheduled": "Ingepland",
     "releaseBlocked": "Vrijgave geblokkeerd",
     "refundOwnerOnlyNotice": "Terugbetalingsgoedkeuringen door managers zijn uitgeschakeld — een pincode van de eigenaar is vereist om deze terugbetaling goed te keuren.",
-    "refundOutsideWindowNotice": "Deze bestelling valt buiten het goedkeuringsvenster voor managers — een pincode van de eigenaar is vereist om deze terugbetaling goed te keuren."
+    "refundOutsideWindowNotice": "Deze bestelling valt buiten het goedkeuringsvenster voor managers — een pincode van de eigenaar is vereist om deze terugbetaling goed te keuren.",
+    "markReady": "Markeer als klaar",
+    "pickedUp": "Opgehaald",
+    "markedReady": "Bestelling gemarkeerd als klaar",
+    "markedPickedUp": "Bestelling gemarkeerd als opgehaald",
+    "updateStatusFailed": "Bestelstatus bijwerken mislukt"
   },
   "pos": {
     "addCustomer": "Klant toevoegen",
@@ -2914,7 +2921,8 @@
       "settings": "Instellingen",
       "integrations": "Integraties",
       "system": "Systeem",
-      "support": "Ondersteuning"
+      "support": "Ondersteuning",
+      "production": "Productie bekijken"
     },
     "capabilities": {
       "tablesView": "Tafels bekijken",
@@ -2983,7 +2991,10 @@
       "inventoryManage": "Voorraadartikelen en recepten beheren",
       "orderItemPriceOverride": "Prijzen van bestelde artikelen aanpassen",
       "offlineMode": "Offlinemodus aan- of uitzetten",
-      "staffCredentialsReset": "Wachtwoorden en pincodes van medewerkers resetten zonder huidige inloggegevens"
+      "staffCredentialsReset": "Wachtwoorden en pincodes van medewerkers resetten zonder huidige inloggegevens",
+      "productionView": "Productie bekijken",
+      "productionExecute": "Productie starten en afronden",
+      "productionManage": "Productie beheren"
     },
     "editorSubtitle": "Standaardinstellingen per rol configureren of een uitzondering maken voor één medewerker. Wijzigingen gelden vanaf diens volgende actie.",
     "roleDefaultsTab": "Rolstandaarden",

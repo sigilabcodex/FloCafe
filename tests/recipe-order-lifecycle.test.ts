@@ -63,7 +63,12 @@ async function main() {
     track_inventory: false,
     stock_quantity: 0,
   });
+  seedProduct(db, 'prod-mollete-test', 'cat-rec', 'Mollete TEST', 100, {
+    track_inventory: false,
+    stock_quantity: 0,
+  });
   seedTable(db, 'tbl-rec-1', 1, 4);
+  seedTable(db, 'tbl-mollete-test', 2, 4);
 
   const beans = createSupply(db, {
     name: 'Beans',
@@ -79,6 +84,12 @@ async function main() {
     lowStockThreshold: 500,
     actorUserId: userId,
   });
+  const cheeseTest = createSupply(db, {
+    name: 'Queso gouda TEST',
+    baseUnit: 'g',
+    stockQuantity: 1000,
+    actorUserId: userId,
+  });
 
   saveRecipe(db, {
     productId: 'prod-latte',
@@ -87,6 +98,11 @@ async function main() {
       { supply_id: beans.id, quantity: 18, unit: 'g' },
       { supplyId: milkS.id, quantity: 200, unit: 'ml' },
     ],
+  });
+  saveRecipe(db, {
+    productId: 'prod-mollete-test',
+    yieldQuantity: 1,
+    items: [{ supplyId: cheeseTest.id, quantity: 35, unit: 'g' }],
   });
 
   const snap2 = buildRecipeSnapshot(db, 'prod-latte', 2);
@@ -122,6 +138,44 @@ async function main() {
   const { baseUrl, server } = await startServer(app);
 
   try {
+    console.log('\n--- Mollete TEST: sale and pending cancellation ---');
+    const molleteOrder = await api(baseUrl, '/api/orders', {
+      method: 'POST',
+      headers: authHeader,
+      body: {
+        type: 'dine_in',
+        table_id: 'tbl-mollete-test',
+        items: [{ product_id: 'prod-mollete-test', quantity: 1 }],
+      },
+    });
+    assertEqual(molleteOrder.status, 201, 'Mollete TEST sale is created');
+    const molleteItem = molleteOrder.data.order.items.find(
+      (item: any) => item.product_id === 'prod-mollete-test',
+    );
+    assertEqual(stockOf(db, cheeseTest.id), 965, 'sale depletes 35 g of gouda');
+    const issueMovement = db
+      .prepare(`SELECT * FROM supply_movements
+      WHERE supply_id = ? AND movement_type = 'recipe_depletion' AND reference_type = 'order_item' AND reference_id = ?`)
+      .get(cheeseTest.id, String(molleteItem.id));
+    assert(issueMovement, 'sale movement references the Mollete order item');
+    assertEqual(issueMovement.quantity_delta, -35, 'sale movement records -35 g');
+    const molleteItemBeforeCancel = db
+      .prepare('SELECT updated_at FROM order_items WHERE id = ?')
+      .get(molleteItem.id);
+    const molleteCancel = await api(
+      baseUrl,
+      `/api/orders/${molleteOrder.data.order.id}/items/${molleteItem.id}/cancel`,
+      { method: 'PATCH', headers: authHeader, body: {} },
+    );
+    assertEqual(molleteCancel.status, 200, 'pending Mollete item cancellation succeeds');
+    assertEqual(stockOf(db, cheeseTest.id), 1000, 'pending cancellation restores the 35 g');
+    const restoreMovement = db
+      .prepare(`SELECT * FROM supply_movements
+      WHERE supply_id = ? AND movement_type = 'recipe_restore' AND reference_type = 'order_item' AND reference_id = ?`)
+      .get(cheeseTest.id, `${molleteItem.id}:${molleteItemBeforeCancel.updated_at}`);
+    assert(restoreMovement, 'restore movement references the same Mollete order item');
+    assertEqual(restoreMovement.quantity_delta, 35, 'restore movement records +35 g');
+
     const snakeCaseRecipe = await api(baseUrl, '/api/recipes/product/prod-latte', {
       method: 'PUT',
       headers: authHeader,
