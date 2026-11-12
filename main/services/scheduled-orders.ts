@@ -22,6 +22,7 @@ import { adjustProductStock, InventoryServiceError, resolveInventoryDeduction } 
 import { resolveOrderItemVariant } from './product-variants';
 import {
   applyRecipeSnapshot,
+  assertRecipeSnapshotsSufficient,
   buildRecipeSnapshot,
   extractOrderItemCostFromSnapshot,
   RecipeServiceError,
@@ -532,6 +533,10 @@ export async function releaseScheduledOrder(
       if (activeItems.length === 0) {
         throw new ReleaseHoldError('Order has no active items to release to the kitchen.');
       }
+      const pendingRecipeDepletions: Array<{
+        snapshot: NonNullable<ReturnType<typeof buildRecipeSnapshot>>;
+        referenceId: string;
+      }> = [];
 
       const updateAddonDepletion = db.prepare(
         'UPDATE order_item_addons SET inventory_deducted_quantity = ? WHERE id = ?',
@@ -780,11 +785,9 @@ export async function releaseScheduledOrder(
               );
             }
           }
-          applyRecipeSnapshot(db, recipeSnapshot, {
-            direction: 'deplete',
-            actorUserId: effectiveActorId,
+          pendingRecipeDepletions.push({
+            snapshot: recipeSnapshot,
             referenceId: String(item.id),
-            createdAt: nowDb,
           });
         }
 
@@ -801,6 +804,18 @@ export async function releaseScheduledOrder(
           nowDb,
           item.id,
         );
+      }
+      assertRecipeSnapshotsSufficient(
+        db,
+        pendingRecipeDepletions.map((depletion) => depletion.snapshot),
+      );
+      for (const depletion of pendingRecipeDepletions) {
+        applyRecipeSnapshot(db, depletion.snapshot, {
+          direction: 'deplete',
+          actorUserId: effectiveActorId,
+          referenceId: depletion.referenceId,
+          createdAt: nowDb,
+        });
       }
     });
 

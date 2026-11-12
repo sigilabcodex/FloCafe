@@ -437,15 +437,82 @@ async function main() {
       assert.equal(stockOfProduct(db, 'prod-dough'), doughBefore - 6, 'the linked stock factor still moves its own pool');
       assert.equal(stockOfSupply(beans.id), beansBeforeLinked - 90, 'the ingredient portion scales the product recipe independently');
 
-      // A negative balance is allowed: portion scaling must not gate order taking.
+      // A sale cannot overdraw recipe supplies, including variant multipliers.
       const scarce = createSupply(db, { name: 'Portion scarce', baseUnit: 'g', stockQuantity: 5, actorUserId: owner.userId });
       db.prepare(`INSERT INTO products (id, category_id, name, price, track_inventory, stock_quantity, created_at, updated_at)
         VALUES ('prod-portion-scarce', 'cat-var-orders', 'Scarce portion', 300, 0, 0, ?, ?)`).run(now(), now());
       insertVariant(db, { id: 'var-scarce-double', product_id: 'prod-portion-scarce', name: 'Double', price: 500, recipe_multiplier: 2 });
       saveRecipe(db, { productId: 'prod-portion-scarce', yieldQuantity: 1, items: [{ supplyId: scarce.id, quantity: 18, unit: 'g' }] });
+      const scarceOrdersBefore = (db.prepare('SELECT COUNT(*) AS count FROM orders').get() as { count: number }).count;
+      const scarceMovementsBefore = supplyMovements(scarce.id, 'recipe_depletion').length;
       const scarceOrder = await createOrder({ type: 'takeaway', items: [{ product_id: 'prod-portion-scarce', variant_id: 'var-scarce-double', quantity: 1 }] });
-      assert.equal(scarceOrder.status, 201, 'a portioned sale still goes through when the ingredient runs out');
-      assert.equal(stockOfSupply(scarce.id), 5 - 36, 'the scaled amount is deducted even past zero');
+      assert.equal(scarceOrder.status, 409, 'a portioned sale is rejected when the ingredient is insufficient');
+      assert.equal(scarceOrder.data.code, 'INSUFFICIENT_SUPPLY_STOCK', 'shortage has an identifiable error code');
+      assert.match(String(scarceOrder.data.error), /Portion scarce.*36.*5/i, 'shortage reports supply, required and available quantities');
+      assert.equal(JSON.stringify(scarceOrder.data).includes(scarce.id), false, 'shortage response does not expose internal supply identifiers');
+      assert.equal(stockOfSupply(scarce.id), 5, 'rejected portioned sale leaves supply stock unchanged');
+      assert.equal((db.prepare('SELECT COUNT(*) AS count FROM orders').get() as { count: number }).count, scarceOrdersBefore, 'rejected sale rolls the order back');
+      assert.equal(supplyMovements(scarce.id, 'recipe_depletion').length, scarceMovementsBefore, 'rejected sale writes no depletion movement');
+
+      // Exact stock, fractional unit conversion, duplicate snapshot components,
+      // multiple lines, and concurrent sales all use the same protected path.
+      const exact = createSupply(db, { name: 'Exact recipe supply', baseUnit: 'g', stockQuantity: 5, actorUserId: owner.userId });
+      db.prepare(`INSERT INTO products (id, category_id, name, price, track_inventory, stock_quantity, created_at, updated_at)
+        VALUES ('prod-exact-recipe', 'cat-var-orders', 'Exact recipe', 100, 0, 0, ?, ?)`).run(now(), now());
+      saveRecipe(db, { productId: 'prod-exact-recipe', items: [{ supplyId: exact.id, quantity: 5, unit: 'g' }] });
+      const exactOrder = await createOrder({ type: 'takeaway', items: [{ product_id: 'prod-exact-recipe', quantity: 1 }] });
+      assert.equal(exactOrder.status, 201, 'consumption exactly equal to stock succeeds');
+      assert.equal(stockOfSupply(exact.id), 0, 'exact consumption leaves zero stock');
+
+      const fractional = createSupply(db, { name: 'Fractional recipe supply', baseUnit: 'kg', stockQuantity: 0.5, actorUserId: owner.userId });
+      db.prepare(`INSERT INTO products (id, category_id, name, price, track_inventory, stock_quantity, created_at, updated_at)
+        VALUES ('prod-fractional-recipe', 'cat-var-orders', 'Fractional recipe', 100, 0, 0, ?, ?)`).run(now(), now());
+      saveRecipe(db, { productId: 'prod-fractional-recipe', items: [{ supplyId: fractional.id, quantity: 250, unit: 'g' }] });
+      const fractionalOrder = await createOrder({ type: 'takeaway', items: [{ product_id: 'prod-fractional-recipe', quantity: 2 }] });
+      assert.equal(fractionalOrder.status, 201, 'fractional conversion from grams to kilograms succeeds');
+      assert.equal(stockOfSupply(fractional.id), 0, 'converted fractional consumption reaches exact zero');
+
+      const duplicateComponents = createSupply(db, { name: 'Grouped recipe supply', baseUnit: 'g', stockQuantity: 5, actorUserId: owner.userId });
+      const { applyRecipeSnapshot } = require('../main/services/recipes');
+      const { withTxn } = require('../main/db');
+      withTxn(() => applyRecipeSnapshot(db, {
+        recipe_id: 'legacy-duplicate-components', product_id: 'prod-portion', yield_quantity: 1,
+        components: [
+          { supply_id: duplicateComponents.id, supply_name: duplicateComponents.name, base_unit: 'g', quantity: 2 },
+          { supply_id: duplicateComponents.id, supply_name: duplicateComponents.name, base_unit: 'g', quantity: 3 },
+        ],
+      }, { direction: 'deplete', actorUserId: owner.userId, referenceId: 'duplicate-component-test' }));
+      assert.equal(stockOfSupply(duplicateComponents.id), 0, 'duplicate components are summed before depletion');
+      assert.deepEqual(supplyMovements(duplicateComponents.id, 'recipe_depletion'), [-5], 'grouped components produce one ledger movement');
+
+      const multiLineSupply = createSupply(db, { name: 'Multi-line recipe supply', baseUnit: 'g', stockQuantity: 5, actorUserId: owner.userId });
+      db.prepare(`INSERT INTO products (id, category_id, name, price, track_inventory, stock_quantity, created_at, updated_at)
+        VALUES ('prod-multiline-recipe', 'cat-var-orders', 'Multi-line recipe', 100, 0, 0, ?, ?)`).run(now(), now());
+      saveRecipe(db, { productId: 'prod-multiline-recipe', items: [{ supplyId: multiLineSupply.id, quantity: 3, unit: 'g' }] });
+      const beforeMultiLineOrders = (db.prepare('SELECT COUNT(*) AS count FROM orders').get() as { count: number }).count;
+      const beforeMultiLineMovements = supplyMovements(multiLineSupply.id, 'recipe_depletion').length;
+      const multiLineOrder = await createOrder({ type: 'takeaway', items: [
+        { product_id: 'prod-multiline-recipe', quantity: 1 },
+        { product_id: 'prod-multiline-recipe', quantity: 1 },
+      ] });
+      assert.equal(multiLineOrder.status, 409, 'two order lines cannot overdraw a shared supply');
+      assert.equal(multiLineOrder.data.code, 'INSUFFICIENT_SUPPLY_STOCK', 'multi-line shortage remains identifiable');
+      assert.match(String(multiLineOrder.data.error), /required 6 g, available 5 g/i, 'multi-line response reports aggregated demand');
+      assert.equal(stockOfSupply(multiLineSupply.id), 5, 'later-line failure rolls the first line depletion back');
+      assert.equal(supplyMovements(multiLineSupply.id, 'recipe_depletion').length, beforeMultiLineMovements, 'rollback removes all multi-line movements');
+      assert.equal((db.prepare('SELECT COUNT(*) AS count FROM orders').get() as { count: number }).count, beforeMultiLineOrders, 'rollback removes the incomplete multi-line order');
+
+      const concurrentSupply = createSupply(db, { name: 'Concurrent recipe supply', baseUnit: 'g', stockQuantity: 5, actorUserId: owner.userId });
+      db.prepare(`INSERT INTO products (id, category_id, name, price, track_inventory, stock_quantity, created_at, updated_at)
+        VALUES ('prod-concurrent-recipe', 'cat-var-orders', 'Concurrent recipe', 100, 0, 0, ?, ?)`).run(now(), now());
+      saveRecipe(db, { productId: 'prod-concurrent-recipe', items: [{ supplyId: concurrentSupply.id, quantity: 5, unit: 'g' }] });
+      const concurrent = await Promise.all([
+        createOrder({ type: 'takeaway', items: [{ product_id: 'prod-concurrent-recipe', quantity: 1 }] }),
+        createOrder({ type: 'takeaway', items: [{ product_id: 'prod-concurrent-recipe', quantity: 1 }] }),
+      ]);
+      assert.deepEqual(concurrent.map((result: any) => result.status).sort(), [201, 409], 'concurrent orders on the last stock permit only one sale');
+      assert.equal(stockOfSupply(concurrentSupply.id), 0, 'concurrent depletion never makes stock negative');
+      assert.deepEqual(supplyMovements(concurrentSupply.id, 'recipe_depletion'), [-5], 'only the winner records a supply movement');
 
       // A corrupt portion is refused and rolls the whole order back.
       db.prepare('UPDATE product_variants SET recipe_multiplier = ? WHERE id = ?').run(Infinity, 'var-double');

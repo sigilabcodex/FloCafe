@@ -9,6 +9,7 @@ import {
   roundQuantity,
 } from './units';
 import {
+  SupplyServiceError,
   applySupplyStockChange,
   resolveDbCurrencyFractionDigits,
   roundCurrencyCost,
@@ -454,6 +455,50 @@ export function scaleRecipeSnapshot(
   };
 }
 
+/** Check the combined supply demand for an order operation before any recipe depletion. */
+export function assertRecipeSnapshotsSufficient(
+  db: ReturnType<typeof getDatabase>,
+  snapshots: Array<RecipeSnapshot | null | undefined>,
+): void {
+  const requiredBySupply = new Map<
+    string,
+    { name: string; unit: SupplyUnit; required: number }
+  >();
+  for (const snapshot of snapshots) {
+    for (const component of snapshot?.components ?? []) {
+      const amount = roundQuantity(Math.abs(component.quantity));
+      if (amount === 0) continue;
+      const current = requiredBySupply.get(component.supply_id);
+      requiredBySupply.set(component.supply_id, {
+        name: current?.name ?? component.supply_name,
+        unit: current?.unit ?? component.base_unit,
+        required: roundQuantity((current?.required ?? 0) + amount),
+      });
+    }
+  }
+
+  for (const [supplyId, requirement] of requiredBySupply) {
+    const supply = db.prepare('SELECT id, name, stock_quantity FROM supplies WHERE id = ?').get(supplyId) as
+      | { id: string; name: string; stock_quantity: number }
+      | undefined;
+    if (!supply) throw new SupplyServiceError(404, `Supply ${supplyId} not found`);
+    const available = roundQuantity(Number(supply.stock_quantity));
+    if (requirement.required > available) {
+      throw new SupplyServiceError(
+        409,
+        `Insufficient stock for supply "${supply.name}": required ${requirement.required} ${requirement.unit}, available ${available} ${requirement.unit}.`,
+        'insufficient_stock',
+        {
+          supplyId,
+          supplyName: supply.name,
+          requiredQuantity: requirement.required,
+          availableQuantity: available,
+        },
+      );
+    }
+  }
+}
+
 export function extractOrderItemCostFromSnapshot(snapshot: RecipeSnapshot | null | undefined): {
   ingredientCost: number | null;
   ingredientCostKnown: 0 | 1;
@@ -502,9 +547,18 @@ export function applyRecipeSnapshot(
 ): void {
   const movementType = options.direction === 'deplete' ? 'recipe_depletion' : 'recipe_restore';
   const sign = options.direction === 'deplete' ? -1 : 1;
+  const grouped = new Map<string, { component: RecipeSnapshotComponent; magnitude: number }>();
   for (const component of snapshot.components) {
     const magnitude = roundQuantity(Math.abs(component.quantity));
     if (magnitude === 0) continue;
+    const existing = grouped.get(component.supply_id);
+    grouped.set(component.supply_id, {
+      component: existing?.component ?? component,
+      magnitude: roundQuantity((existing?.magnitude ?? 0) + magnitude),
+    });
+  }
+
+  for (const { component, magnitude } of grouped.values()) {
     applySupplyStockChange(db, {
       supplyId: component.supply_id,
       quantityDelta: sign * magnitude,
@@ -515,6 +569,7 @@ export function applyRecipeSnapshot(
       referenceType: 'order_item',
       referenceId: options.referenceId,
       createdAt: options.createdAt,
+      requireSufficientStock: options.direction === 'deplete',
     });
   }
 }

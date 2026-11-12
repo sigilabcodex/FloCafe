@@ -69,6 +69,7 @@ import {
 } from '../services/product-variants';
 import {
   applyRecipeSnapshot,
+  assertRecipeSnapshotsSufficient,
   buildRecipeSnapshot,
   extractOrderItemCostFromSnapshot,
   parseRecipeSnapshot,
@@ -1026,6 +1027,11 @@ function insertOrderItems(
 `);
 
   const insertedItemIds: (number | bigint)[] = [];
+  const pendingRecipeDepletions: Array<{
+    snapshot: NonNullable<ReturnType<typeof buildRecipeSnapshot>>;
+    referenceId: string;
+    createdAt: string;
+  }> = [];
   for (const item of items) {
     const product = db.prepare('SELECT * FROM products WHERE id = ?').get(item.product_id) as
       | ProductRow
@@ -1210,14 +1216,25 @@ function insertOrderItems(
       });
 
       if (recipeSnapshot) {
-        applyRecipeSnapshot(db, recipeSnapshot, {
-          direction: 'deplete',
-          actorUserId: actorUserId,
+        pendingRecipeDepletions.push({
+          snapshot: recipeSnapshot,
           referenceId: String(insertItemResult.lastInsertRowid),
           createdAt: itemCreatedAt,
         });
       }
     }
+  }
+  assertRecipeSnapshotsSufficient(
+    db,
+    pendingRecipeDepletions.map((depletion) => depletion.snapshot),
+  );
+  for (const depletion of pendingRecipeDepletions) {
+    applyRecipeSnapshot(db, depletion.snapshot, {
+      direction: 'deplete',
+      actorUserId,
+      referenceId: depletion.referenceId,
+      createdAt: depletion.createdAt,
+    });
   }
   return insertedItemIds;
 }
@@ -2415,6 +2432,7 @@ router.post(
           deduction: ReturnType<typeof resolveInventoryDeduction>;
           itemSubtotal: number;
           itemId: string;
+          recipeSnapshot: ReturnType<typeof buildRecipeSnapshot>;
         }> = [];
 
         for (let idx = 0; idx < items.length; idx++) {
@@ -2487,6 +2505,9 @@ router.post(
           itemSubtotal = Math.max(0, itemSubtotal - itemDiscount);
 
           const itemId = String(item.id || item.product_id || idx + 1);
+          const recipeSnapshot = shouldDeferRelease
+            ? null
+            : buildRecipeSnapshot(db, product.id, quantity, variant?.recipe_multiplier ?? 1);
           validatedItems.push({
             item,
             product,
@@ -2498,7 +2519,15 @@ router.post(
             deduction,
             itemSubtotal,
             itemId,
+            recipeSnapshot,
           });
+        }
+
+        if (!shouldDeferRelease) {
+          assertRecipeSnapshotsSufficient(
+            db,
+            validatedItems.map((validatedItem) => validatedItem.recipeSnapshot),
+          );
         }
 
         const itemsSubtotal = validatedItems.reduce((acc, v) => acc + v.itemSubtotal, 0);
@@ -2553,6 +2582,7 @@ router.post(
             priceOverride,
             deduction,
             itemSubtotal,
+            recipeSnapshot,
           } = validatedItems[idx];
           const taxResult = documentTaxResults[idx];
 
@@ -2573,9 +2603,6 @@ router.post(
           subtotal += itemSubtotal;
 
           const itemCreatedAt = now();
-          const recipeSnapshot = shouldDeferRelease
-            ? null
-            : buildRecipeSnapshot(db, product.id, quantity, variant?.recipe_multiplier ?? 1);
           const { ingredientCost, ingredientCostKnown } =
             extractOrderItemCostFromSnapshot(recipeSnapshot);
           const insertItemResult = insertItem.run(
@@ -2835,7 +2862,9 @@ router.post(
         ),
         ...(error.code === 'MULTI_COUNTER_DISABLED' || error.code === 'SCHEDULED_ORDERS_DISABLED'
           ? { code: error.code }
-          : {}),
+          : error.diagnosticCode === 'insufficient_stock'
+            ? { code: 'INSUFFICIENT_SUPPLY_STOCK' }
+            : {}),
       });
     }
   }),

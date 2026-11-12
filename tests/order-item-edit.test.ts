@@ -125,7 +125,7 @@ async function main() {
   db.prepare(`INSERT INTO products (id, category_id, name, price, tax_type, is_active, sort_order, created_at, updated_at)
     VALUES ('prod-other', 'cat-edit', 'Other item', 150, 'none', 1, 2, ?, ?)`).run(now(), now());
 
-  const { createSupply, getSupply } = require('../main/services/supplies');
+  const { createSupply, getSupply, recordSupplyMovement } = require('../main/services/supplies');
   const {
     saveRecipe,
     buildRecipeSnapshot,
@@ -1025,6 +1025,59 @@ async function main() {
         null,
         'new pending line keeps null recipe snapshot',
       );
+
+      // A quantity increase cannot overdraw ingredients, and restoring the
+      // old snapshot before applying the new one remains fully transactional.
+      const beansStockBeforeGuardedEdit = stockOfSupply(beans.id);
+      recordSupplyMovement(db, {
+        supplyId: beans.id,
+        movementType: 'count',
+        quantity: 30,
+        unit: 'g',
+        actorUserId: 'owner-edit',
+      });
+      const guardedEditOrder = seedOrder(db, 'SHORT-SUPPLY-EDIT', 'pending', 3, 3);
+      const guardedEditSnapshot = buildRecipeSnapshot(db, 'prod-edit', 3);
+      db.prepare('UPDATE order_items SET recipe_snapshot = ? WHERE id = ?').run(
+        JSON.stringify(guardedEditSnapshot),
+        guardedEditOrder.itemId,
+      );
+      applyRecipeSnapshot(db, guardedEditSnapshot, {
+        direction: 'deplete',
+        actorUserId: 'owner-edit',
+        referenceId: String(guardedEditOrder.itemId),
+      });
+      const guardedMovementsBefore = db
+        .prepare("SELECT COUNT(*) AS count FROM supply_movements WHERE supply_id = ? AND movement_type = 'recipe_depletion'")
+        .get(beans.id).count;
+      const guardedProductStockBefore = stockOfProduct('prod-edit');
+      const guardedEditResponse = await edit(
+        guardedEditOrder.orderId,
+        guardedEditOrder.itemId,
+        { quantity: 4 },
+        ownerAuth,
+      );
+      assertEqualOrThrow(guardedEditResponse.status, 409, 'quantity increase is rejected when the revised recipe exceeds available supply');
+      assertEqualOrThrow(guardedEditResponse.data.code, 'INSUFFICIENT_SUPPLY_STOCK', 'edit shortage has a stable error code');
+      assertEqualOrThrow(stockOfSupply(beans.id), 0, 'failed edit restores no ingredient balance after rollback');
+      assertEqualOrThrow(
+        db.prepare("SELECT COUNT(*) AS count FROM supply_movements WHERE supply_id = ? AND movement_type = 'recipe_depletion'").get(beans.id).count,
+        guardedMovementsBefore,
+        'failed edit leaves no depletion movement behind',
+      );
+      assertEqualOrThrow(stockOfProduct('prod-edit'), guardedProductStockBefore, 'failed edit rolls its product stock change back');
+      assertEqualOrThrow(
+        (db.prepare('SELECT quantity FROM order_items WHERE id = ?').get(guardedEditOrder.itemId) as any).quantity,
+        3,
+        'failed edit keeps the original order-item quantity',
+      );
+      recordSupplyMovement(db, {
+        supplyId: beans.id,
+        movementType: 'count',
+        quantity: beansStockBeforeGuardedEdit,
+        unit: 'g',
+        actorUserId: 'owner-edit',
+      });
 
       // Verify bill print preview excludes cancelled/voided/superseded lines and matches totals
       const printPreview = await api(baseUrl, '/api/printers/print-bill', {

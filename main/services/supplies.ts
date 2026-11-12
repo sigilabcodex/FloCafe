@@ -57,17 +57,30 @@ export type SupplyServiceDiagnosticCode =
   | 'movement_reason_too_long'
   | 'movement_quantity_invalid'
   | 'movement_zero'
-  | 'movement_negative';
+  | 'movement_negative'
+  | 'insufficient_stock';
 
 export class SupplyServiceError extends Error {
   readonly statusCode: number;
   readonly diagnosticCode?: SupplyServiceDiagnosticCode;
+  readonly code?: string;
+  readonly supplyId?: string;
+  readonly supplyName?: string;
+  readonly requiredQuantity?: number;
+  readonly availableQuantity?: number;
 
-  constructor(statusCode: number, message: string, diagnosticCode?: SupplyServiceDiagnosticCode) {
+  constructor(
+    statusCode: number,
+    message: string,
+    diagnosticCode?: SupplyServiceDiagnosticCode,
+    details?: { supplyId: string; supplyName: string; requiredQuantity: number; availableQuantity: number },
+  ) {
     super(message);
     this.name = 'SupplyServiceError';
     this.statusCode = statusCode;
     this.diagnosticCode = diagnosticCode;
+    this.code = diagnosticCode === 'insufficient_stock' ? 'INSUFFICIENT_SUPPLY_STOCK' : undefined;
+    Object.assign(this, details);
   }
 }
 
@@ -391,6 +404,7 @@ export function applySupplyStockChange(
     referenceType?: string | null;
     referenceId?: string | number | null;
     createdAt?: string;
+    requireSufficientStock?: boolean;
   },
 ): { stockBefore: number; stockAfter: number; movementId: number } {
   const supply = db.prepare('SELECT * FROM supplies WHERE id = ?').get(options.supplyId) as
@@ -418,9 +432,26 @@ export function applySupplyStockChange(
   const nextUnitCost =
     options.unitCostAfter === undefined ? currentUnitCost : options.unitCostAfter;
 
-  db.prepare(
-    'UPDATE supplies SET stock_quantity = ?, unit_cost = ?, updated_at = ? WHERE id = ?',
-  ).run(stockAfter, nextUnitCost, timestamp, options.supplyId);
+  const updateResult = options.requireSufficientStock === true
+    ? db.prepare(`UPDATE supplies SET stock_quantity = ?, unit_cost = ?, updated_at = ?
+                  WHERE id = ? AND stock_quantity >= ?`)
+        .run(stockAfter, nextUnitCost, timestamp, options.supplyId, -deltaInBase)
+    : db.prepare(
+        'UPDATE supplies SET stock_quantity = ?, unit_cost = ?, updated_at = ? WHERE id = ?',
+      ).run(stockAfter, nextUnitCost, timestamp, options.supplyId);
+  if (options.requireSufficientStock === true && updateResult.changes === 0) {
+    const latest = db.prepare('SELECT stock_quantity FROM supplies WHERE id = ?').get(options.supplyId) as
+      | { stock_quantity: number }
+      | undefined;
+    const availableQuantity = roundQuantity(Number(latest?.stock_quantity ?? 0));
+    const requiredQuantity = roundQuantity(Math.abs(deltaInBase));
+    throw new SupplyServiceError(
+      409,
+      `Insufficient stock for supply "${supply.name}": required ${requiredQuantity} ${supply.base_unit}, available ${availableQuantity} ${supply.base_unit}.`,
+      'insufficient_stock',
+      { supplyId: supply.id, supplyName: supply.name, requiredQuantity, availableQuantity },
+    );
+  }
 
   const movement = db
     .prepare(`

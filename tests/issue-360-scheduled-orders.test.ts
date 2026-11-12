@@ -78,7 +78,7 @@ const {
 } = require('./helpers/test-setup');
 const { validateInventoryLedgerDatabase, withTxn } = require('../main/db');
 const { adjustProductStock } = require('../main/services/inventory');
-const { createSupply, getSupply } = require('../main/services/supplies');
+const { createSupply, getSupply, recordSupplyMovement } = require('../main/services/supplies');
 const { saveRecipe } = require('../main/services/recipes');
 const { buildDisplayFeed } = require('../main/services/customer-display-tokens');
 const {
@@ -298,7 +298,7 @@ async function main() {
     });
   });
 
-  // Seed recipe supplies (beans = 500g, milk = 100ml so we also test negative supply stock allowance!)
+  // Seed recipe supplies with enough milk for the later scheduled-order cases.
   const beans = createSupply(db, {
     name: 'Espresso Beans',
     baseUnit: 'g',
@@ -309,7 +309,7 @@ async function main() {
   const oatSupply = createSupply(db, {
     name: 'Barista Milk Supply',
     baseUnit: 'ml',
-    stockQuantity: 100,
+    stockQuantity: 1000,
     lowStockThreshold: 50,
     actorUserId: owner.userId,
   });
@@ -579,7 +579,7 @@ async function main() {
       );
       assertEqualOrThrow(addonStock(db, 'addon-syrup'), 10, 'add-on stock untouched pre-release');
       assertEqualOrThrow(supplyStock(db, beans.id), 500, 'beans supply untouched pre-release');
-      assertEqualOrThrow(supplyStock(db, oatSupply.id), 100, 'milk supply untouched pre-release');
+      assertEqualOrThrow(supplyStock(db, oatSupply.id), 1000, 'milk supply untouched pre-release');
       assertEqualOrThrow(kotPrintCalls.length, 0, 'no automatic KOT printed at scheduled creation');
       assertLedgerReconciles(db, 'after scheduled order creation');
 
@@ -853,7 +853,7 @@ async function main() {
         yieldQuantity: 1,
         items: [
           { supply_id: beans.id, quantity: 25, unit: 'g' }, // was 18g, now 25g -> 2 lattes = 50g
-          { supply_id: oatSupply.id, quantity: 120, unit: 'ml' }, // 2 lattes = 240ml (supply has 100ml -> goes to -140ml!)
+          { supply_id: oatSupply.id, quantity: 500, unit: 'ml' }, // 2 lattes consume the exact 1000ml balance.
         ],
       });
 
@@ -882,7 +882,7 @@ async function main() {
         'concurrent sweep and manual retry release the order exactly once',
       );
 
-      // Verify stock deducted ONCE, using updated recipe (50g beans) and allowing negative supply (-140ml milk)
+      // Verify stock deducted ONCE, using the updated recipe and exact milk balance.
       assertEqualOrThrow(productStock(db, 'prod-latte'), 8, 'prod-latte deducted once (10 -> 8)');
       assertEqualOrThrow(
         variantStock(db, 'var-tea-large'),
@@ -901,8 +901,8 @@ async function main() {
       );
       assertEqualOrThrow(
         supplyStock(db, oatSupply.id),
-        -140,
-        'negative recipe-supply stock remains allowed at release (100 - 240 = -140)',
+        0,
+        'scheduled recipe depletion accepts an exact-balance supply (1000 - 1000 = 0)',
       );
       assertEqualOrThrow(
         kotPrintCalls.length,
@@ -937,6 +937,23 @@ async function main() {
         2,
         'actual depletion snapshot saved on released order item',
       );
+
+      recordSupplyMovement(db, {
+        supplyId: oatSupply.id,
+        movementType: 'receive',
+        quantity: 5000,
+        unit: 'ml',
+        actorUserId: owner.userId,
+        reason: 'Restock scheduled-order test fixture',
+      });
+      saveRecipe(db, {
+        productId: 'prod-latte',
+        yieldQuantity: 1,
+        items: [
+          { supply_id: beans.id, quantity: 18, unit: 'g' },
+          { supply_id: oatSupply.id, quantity: 120, unit: 'ml' },
+        ],
+      });
 
       // Now visible in KDS & customer display!
       const kdsAfter = await api(baseUrl, '/api/kds/orders', { headers: owner.authHeader });
@@ -973,6 +990,56 @@ async function main() {
       // Restore catalog prices for subsequent tests
       db.prepare("UPDATE products SET price = 200 WHERE id = 'prod-latte'").run();
       db.prepare("UPDATE addons SET price = 20 WHERE id = 'addon-syrup'").run();
+    }
+
+    // ── Recipe stock insufficiency blocks release without partial depletion ──
+    {
+      const scarceRecipeSupply = createSupply(db, {
+        name: 'Scheduled scarce flour',
+        baseUnit: 'g',
+        stockQuantity: 2,
+        actorUserId: owner.userId,
+      });
+      seedProduct(db, 'prod-scheduled-recipe-scarce', 'cat-sched', 'Scheduled scarce recipe', 100, {
+        track_inventory: false,
+        stock_quantity: 0,
+      });
+      saveRecipe(db, {
+        productId: 'prod-scheduled-recipe-scarce',
+        items: [{ supply_id: scarceRecipeSupply.id, quantity: 3, unit: 'g' }],
+      });
+      const scheduledFor = futureWallClockInZone('America/New_York', 10);
+      const created = await api(baseUrl, '/api/orders', {
+        method: 'POST',
+        headers: owner.authHeader,
+        body: {
+          type: 'takeaway',
+          scheduled_for: scheduledFor,
+          items: [{ product_id: 'prod-scheduled-recipe-scarce', quantity: 1 }],
+        },
+      });
+      assertEqualOrThrow(created.status, 201, 'scheduled recipe order is accepted before release');
+      const beforeMovementCount = db
+        .prepare('SELECT COUNT(*) AS count FROM supply_movements WHERE supply_id = ?')
+        .get(scarceRecipeSupply.id).count;
+      const release = await releaseScheduledOrder(db, created.data.order.id, {
+        trigger: 'sweep',
+        nowDate: new Date(Date.parse(created.data.order.scheduled_for) + 1000),
+      });
+      assertEqualOrThrow(release.outcome, 'blocked', 'scheduled recipe order blocks at release when supply is short');
+      assertIncludesOrThrow(String(release.order.release_blocked_reason), 'Scheduled scarce flour', 'blocked reason identifies the supply');
+      assertEqualOrThrow(supplyStock(db, scarceRecipeSupply.id), 2, 'failed release leaves supply balance unchanged');
+      assertEqualOrThrow(
+        db.prepare('SELECT COUNT(*) AS count FROM supply_movements WHERE supply_id = ?').get(scarceRecipeSupply.id).count,
+        beforeMovementCount,
+        'failed release writes no partial recipe movement',
+      );
+      assertEqualOrThrow(
+        db.prepare('SELECT recipe_snapshot FROM order_items WHERE order_id = ?').get(created.data.order.id).recipe_snapshot,
+        null,
+        'blocked release does not save a consumed recipe snapshot',
+      );
+      assertLedgerReconciles(db, 'after recipe-insufficient scheduled release');
     }
 
     // ── 4. Startup & resume overdue sweep ────────────────────────────────────

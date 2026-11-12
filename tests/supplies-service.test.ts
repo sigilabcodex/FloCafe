@@ -227,6 +227,14 @@ async function main() {
   // conversion helper still available
   assertEqual(convertQuantity(1, 'kg', 'g'), 1000, 'units helper re-export path works');
 
+  const adjustmentMayOverdraw = createSupply(db, {
+    name: 'Manual adjustment can overdraw', baseUnit: 'g', stockQuantity: 1, actorUserId: actor,
+  });
+  recordSupplyMovement(db, {
+    supplyId: adjustmentMayOverdraw.id, movementType: 'adjustment', quantity: -2, unit: 'g', actorUserId: actor, reason: 'Inventory correction',
+  });
+  assertEqual(getSupply(db, adjustmentMayOverdraw.id).stock_quantity, -1, 'manual negative adjustment retains its existing semantics');
+
   console.log('='.repeat(50));
   const { passed, failed, total } = getResults();
   console.log(`${passed}/${total} passed, ${failed} failed`);
