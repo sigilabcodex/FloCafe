@@ -78,6 +78,16 @@ Procedures for people with release credentials.
 | [mac-app-store.md](maintainers/mac-app-store.md) | The Mac App Store workflow, its secrets, and its release notes. |
 | [upgrade-testing.md](maintainers/upgrade-testing.md) | What an upgrade test proves, and the platforms CI cannot cover. |
 
+## Kalali fork
+
+Contributor guidance for Kalali's operator goals and fork-specific development workflow.
+
+| Page | Subject |
+| --- | --- |
+| [operations.md](kalali/operations.md) | Operator-first goals, production flow, WIP, and shift handover. |
+| [inventory-production.md](kalali/inventory-production.md) | Production and inventory contracts, movements, costs, and migration rules. |
+| [development-workflow.md](kalali/development-workflow.md) | Branching, testing, migrations, and upstream contributions. |
+
 ## Architecture decisions
 
 Choices made once, with consequences that outlive the change. Each records the alternative that
