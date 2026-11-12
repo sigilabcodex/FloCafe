@@ -614,7 +614,7 @@ try {
     'recalculation observes stock consumed by another sale',
   );
 
-  // Service output contains no cost or supplier/admin fields and has no HTTP route.
+  // Service output contains no cost or supplier/admin fields.
   const serialized = JSON.stringify(availability('p-brownie-single'));
   assert.equal(
     /unit_cost|supplier_id|supplier_name|inventory_product_id/i.test(serialized),

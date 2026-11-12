@@ -130,7 +130,18 @@ api.interceptors.request.use((config) => {
 
 // Handle 401 responses
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = String(response.config.method || 'get').toLowerCase();
+    const requestPath = String(response.config.url || '').split('?')[0];
+    if (
+      typeof window !== 'undefined' &&
+      method !== 'get' &&
+      /^\/?orders(?:\/|$)/.test(requestPath)
+    ) {
+      window.dispatchEvent(new Event('flocafe:availability-refresh'));
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       const authHeader = String(error.config?.headers?.Authorization || '');

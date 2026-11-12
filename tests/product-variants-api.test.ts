@@ -96,6 +96,32 @@ async function main() {
     const productId = created.data.product.id;
     assert.deepEqual(created.data.product.dietary_tags, ['veg', 'gluten-free'], 'dietary tags are stored deduplicated');
 
+    const availability = await api(baseUrl, '/api/products/availability', {
+      method: 'POST',
+      headers: cashierAuthHeader,
+      body: { product_ids: [productId] },
+    });
+    assert.equal(availability.status, 200, 'catalog readers can check batched POS availability');
+    assert.ok(
+      availability.data.availability.some((row: any) => row.productId === productId && row.variantId === null),
+      'availability includes the base commercial form',
+    );
+    assert.ok(
+      availability.data.availability.some((row: any) => row.productId === productId && row.variantId === created.data.product.variants[0].id),
+      'availability includes variant commercial forms',
+    );
+    assert.equal(
+      /unit_cost|supplier_id|inventory_product_id|supply_id/i.test(JSON.stringify(availability.data)),
+      false,
+      'availability endpoint omits internal supply and cost fields',
+    );
+    const invalidAvailability = await api(baseUrl, '/api/products/availability', {
+      method: 'POST',
+      headers: owner.authHeader,
+      body: { product_ids: [''] },
+    });
+    assert.equal(invalidAvailability.status, 400, 'availability rejects malformed batch IDs');
+
     const createdVariants = db.prepare(
       'SELECT * FROM product_variants WHERE product_id = ? ORDER BY sort_order, name',
     ).all(productId) as any[];

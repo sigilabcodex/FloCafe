@@ -19,6 +19,7 @@ import * as https from 'https';
 import * as net from 'net';
 import { asyncHandler } from '../middleware/async-handler';
 import { ACTIVE_CATEGORIES_CTE_CLAUSES } from './categories';
+import { calculateProductsAvailability } from '../services/product-availability';
 
 const MAX_FETCH_BYTES = 10 * 1024 * 1024;
 export const MAX_IMAGE_DATA_URI_LENGTH = 50_000;
@@ -1197,6 +1198,35 @@ function validateAddonGroupIds(
 }
 
 // Bulk product list; computes has_image in SQL to avoid loading Base64 blobs into memory.
+router.post('/availability', requirePermission('catalog.view'), (req: Request, res: Response) => {
+  const productIds: unknown = req.body?.product_ids;
+  if (
+    !Array.isArray(productIds) ||
+    productIds.length > 400 ||
+    productIds.some((id) => typeof id !== 'string' || !id.trim())
+  ) {
+    return res
+      .status(400)
+      .json({ error: 'product_ids must be an array of at most 400 product IDs' });
+  }
+  try {
+    const availability = calculateProductsAvailability(getDatabase(), productIds as string[]).map(
+      ({ productId, variantId, status, maxSellableQuantity, reasonCode }) => ({
+        productId,
+        variantId,
+        status,
+        maxSellableQuantity,
+        reasonCode,
+      }),
+    );
+    return res.json({ availability });
+  } catch (error: any) {
+    res.locals.postHogError = error;
+    console.error('[API] Product availability error:', error);
+    return res.status(500).json({ error: 'Could not calculate product availability' });
+  }
+});
+
 router.get('/', requirePermission('catalog.view'), (req: Request, res: Response) => {
   try {
     const db = getDatabase();

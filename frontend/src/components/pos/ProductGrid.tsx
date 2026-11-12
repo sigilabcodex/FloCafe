@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Category, Product, ProductVariant } from '@/lib/types';
@@ -144,6 +144,14 @@ function isValidProductQuantity(product: Product, quantity: number): boolean {
   const step = fractionalQuantityStep(product);
   return step !== null && Math.abs(quantity / step - Math.round(quantity / step)) <= 1e-8;
 }
+
+type AvailabilityRow = {
+  productId: string;
+  variantId: string | null;
+  status: 'available' | 'unavailable' | 'unlimited';
+  maxSellableQuantity: number | null;
+  reasonCode: string;
+};
 
 const CATEGORY_COLORS: Record<
   string,
@@ -331,6 +339,9 @@ export default function ProductGrid({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const cart = useCartStore();
   const { showProductImages: showProductImagesSetting } = usePosSettingsStore();
+  const [availabilityByProduct, setAvailabilityByProduct] = useState<
+    Map<string, AvailabilityRow[]>
+  >(() => new Map());
   const showProductImages = showImages ?? showProductImagesSetting;
   const t = useTranslations('pos');
   const validateSelectionQuantity = (product: Product, quantity: number) => {
@@ -340,6 +351,47 @@ export default function ProductGrid({
   };
   const tenantFmt = useFormatCurrency();
   const fmt = formatPrice ?? tenantFmt;
+  const productIds = useMemo(() => products.map((product) => String(product.id)), [products]);
+  useEffect(() => {
+    if (productIds.length === 0) return;
+    let active = true;
+    const refreshAvailability = async () => {
+      try {
+        const batches = await Promise.all(
+          Array.from({ length: Math.ceil(productIds.length / 400) }, (_, index) =>
+            api.post('/products/availability', {
+              product_ids: productIds.slice(index * 400, (index + 1) * 400),
+            }),
+          ),
+        );
+        if (!active || batches.some(({ data }) => !Array.isArray(data?.availability))) return;
+        const next = new Map<string, AvailabilityRow[]>();
+        for (const { data } of batches) {
+          for (const row of data.availability as AvailabilityRow[]) {
+            const rows = next.get(String(row.productId)) ?? [];
+            rows.push(row);
+            next.set(String(row.productId), rows);
+          }
+        }
+        setAvailabilityByProduct(next);
+      } catch {
+        // Availability is advisory; offline or API failures never disable ordering.
+      }
+    };
+    const onRefresh = () => void refreshAvailability();
+    void refreshAvailability();
+    const interval = window.setInterval(onRefresh, 20_000);
+    window.addEventListener('online', onRefresh);
+    window.addEventListener('focus', onRefresh);
+    window.addEventListener('flocafe:availability-refresh', onRefresh);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener('online', onRefresh);
+      window.removeEventListener('focus', onRefresh);
+      window.removeEventListener('flocafe:availability-refresh', onRefresh);
+    };
+  }, [productIds]);
   useEffect(() => {
     const focusSearchInput = () => {
       searchInputRef.current?.focus();
@@ -520,6 +572,41 @@ export default function ProductGrid({
         >
           {filtered.map((product) => {
             const inCartQty = cartQuantities.get(product.id) || 0;
+            const rows = availabilityByProduct.get(String(product.id));
+            const activeVariantIds = new Set(
+              (product.variants ?? [])
+                .filter((variant) => variant.is_active)
+                .map((variant) => String(variant.id)),
+            );
+            const forms = rows
+              ? activeVariantIds.size > 0
+                ? rows.filter((row) => row.variantId && activeVariantIds.has(row.variantId))
+                : rows.filter((row) => row.variantId === null)
+              : [];
+            const saleForms = forms.filter(
+              (row) =>
+                ![
+                  'product_missing',
+                  'product_deleted',
+                  'product_inactive',
+                  'category_unavailable',
+                  'variant_required',
+                  'variant_missing',
+                  'variant_mismatch',
+                  'variant_inactive',
+                ].includes(row.reasonCode),
+            );
+            const unavailable =
+              saleForms.length > 0 && saleForms.every((row) => row.status === 'unavailable');
+            const limited =
+              !unavailable &&
+              saleForms.some(
+                (row) =>
+                  row.status === 'available' &&
+                  row.maxSellableQuantity !== null &&
+                  row.maxSellableQuantity > 0 &&
+                  row.maxSellableQuantity <= Math.max(5, product.low_stock_threshold ?? 0),
+              );
 
             return (
               <button
@@ -535,18 +622,30 @@ export default function ProductGrid({
                 }}
                 className="min-h-36 bg-card rounded-xl p-2.5 border border-border hover:border-brand/40 active:border-brand active:bg-muted/40 hover:shadow-md transition-all text-start relative cursor-pointer overflow-hidden touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {!!product.track_inventory && (
-                  <>
-                    {product.stock_quantity <= 0 ? (
-                      <span className="absolute top-2 start-2 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-red-200 dark:border-red-800/40 pointer-events-none">
-                        {t('outOfStock')}
-                      </span>
-                    ) : product.stock_quantity <= (product.low_stock_threshold || 0) ? (
-                      <span className="absolute top-2 start-2 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-orange-200 dark:border-orange-800/40 pointer-events-none">
-                        {t('lowStock')}
-                      </span>
-                    ) : null}
-                  </>
+                {rows && saleForms.length > 0 ? (
+                  unavailable ? (
+                    <span className="absolute top-2 start-2 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-red-200 dark:border-red-800/40 pointer-events-none">
+                      {t('outOfStock')}
+                    </span>
+                  ) : limited ? (
+                    <span className="absolute top-2 start-2 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-orange-200 dark:border-orange-800/40 pointer-events-none">
+                      {t('lowStock')}
+                    </span>
+                  ) : null
+                ) : (
+                  !!product.track_inventory && (
+                    <>
+                      {product.stock_quantity <= 0 ? (
+                        <span className="absolute top-2 start-2 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-red-200 dark:border-red-800/40 pointer-events-none">
+                          {t('outOfStock')}
+                        </span>
+                      ) : product.stock_quantity <= (product.low_stock_threshold || 0) ? (
+                        <span className="absolute top-2 start-2 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-orange-200 dark:border-orange-800/40 pointer-events-none">
+                          {t('lowStock')}
+                        </span>
+                      ) : null}
+                    </>
+                  )
                 )}
                 {inCartQty > 0 && (
                   <span className="absolute top-0 end-0 bg-brand text-white text-xs w-6 h-6 rounded-es-lg flex items-center justify-center font-bold z-10">
