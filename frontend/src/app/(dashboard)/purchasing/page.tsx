@@ -224,8 +224,8 @@ export default function PurchasingPage() {
       if (code === 'price_required') {
         startDetails(line);
       } else if ((error as { response?: { status?: number } })?.response?.status === 409) {
-        setActionError(t('versionConflict'));
         await openList(activeList!.id);
+        setActionError(t('versionConflict'));
       } else {
         setActionError(t('saveFailed'));
       }
@@ -265,8 +265,8 @@ export default function PurchasingPage() {
       await refreshLists();
     } catch (error: unknown) {
       if ((error as { response?: { status?: number } })?.response?.status === 409) {
-        setActionError(t('versionConflict'));
         await openList(activeList!.id);
+        setActionError(t('versionConflict'));
       } else setActionError(t('saveFailed'));
     } finally { setSavingLineId(''); }
   };
@@ -324,7 +324,7 @@ export default function PurchasingPage() {
             const lastPrice = lastPrices[line.supply_id];
             return <article key={line.id} className="rounded-xl border border-border bg-card p-4 shadow-sm sm:p-5">
               <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h2 className="text-base font-semibold">{line.supply_name}</h2><p className="mt-1 text-sm text-muted-foreground">{t('plannedQuantity')}: {fmtNum(line.planned_quantity)} {line.planned_unit}</p>{line.purchased_quantity > 0 && <p className="mt-1 text-sm text-muted-foreground">{t('purchasedQuantity')}: {fmtNum(line.purchased_quantity)} {line.purchased_unit || line.base_unit}</p>}</div><Badge variant={line.status === 'pending' ? 'outline' : 'secondary'} className="shrink-0">{line.status === 'pending' ? tCommon('active') : line.status === 'acquired' ? t('acquired') : t('markNotFound')}</Badge></div>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">{line.reference_price !== null && <span>{t('referencePrice')}: {fmt(line.reference_price)}{line.reference_observed_at ? ` · ${formatDate(line.reference_observed_at)}` : ''}</span>}{line.planned_brand && <span>{t('brand')}: {line.planned_brand}</span>}{line.planned_supplier && <span>{t('supplier')}: {line.planned_supplier}</span>}</div>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">{line.reference_price !== null && <span>{t('referencePrice')}: {fmt(line.reference_price)} / {fmtNum(line.planned_quantity)} {line.planned_unit}{line.reference_observed_at ? ` · ${formatDate(line.reference_observed_at)}` : ''}</span>}{line.purchased_quantity > 0 && line.actual_price !== null && <span>{t('actualPrice')}: {fmt(line.actual_price)}</span>}{(line.actual_brand || line.planned_brand) && <span>{t('brand')}: {line.actual_brand || line.planned_brand}</span>}{(line.actual_supplier || line.planned_supplier) && <span>{t('supplier')}: {line.actual_supplier || line.planned_supplier}</span>}</div>
               {lastPrice && <p className="mt-2 text-xs text-muted-foreground">{t('lastPrice', { price: `${fmt(lastPrice.amount)} / ${fmtNum(lastPrice.observed_quantity)} ${lastPrice.unit}`, date: formatDate(lastPrice.effective_at) })}</p>}
               {line.status === 'pending' && <div className="mt-4 flex flex-col gap-2 sm:flex-row">{!showDone && <Button className="min-h-12 flex-1 text-base" disabled={savingLineId === line.id} onClick={() => line.reference_price !== null && line.purchased_quantity === 0 ? void submitAcquisition(line) : startDetails(line)}>{savingLineId === line.id ? <LoaderCircle className="me-2 size-4 animate-spin" /> : <Check className="me-2 size-4" />}{t('markAcquired')}</Button>}<Button variant="outline" className="min-h-12" disabled={savingLineId === line.id} onClick={() => startDetails(line)}>{tCommon('edit')}</Button>{!showDone && <Button variant="ghost" className="min-h-12" disabled={savingLineId === line.id} onClick={() => void markNotFound(line)}><MoreHorizontal className="me-2 size-4" />{t('markNotFound')}</Button>}</div>}
               {editingLine?.id === line.id && <div className="mt-4 space-y-3 rounded-lg border border-primary/30 bg-background p-3 sm:p-4"><h3 className="font-semibold">{t('markAcquired')}</h3><div className="grid grid-cols-1 gap-3 sm:grid-cols-2"><label className="text-sm">{t('plannedQuantity')}<input autoFocus type="number" min="0.00000001" step="any" value={actualQuantity} onChange={(event) => setActualQuantity(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-border bg-background px-3 text-base" /></label><label className="text-sm">{t('baseUnit')}<select value={actualUnit} onChange={(event) => setActualUnit(event.target.value as Unit)} className="mt-1.5 h-11 w-full rounded-lg border border-border bg-background px-3 text-base">{UNITS.map((unit) => <option key={unit}>{unit}</option>)}</select></label><label className="text-sm">{t('actualPrice')}<input type="number" min="0" step="any" value={actualPrice} onChange={(event) => setActualPrice(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-border bg-background px-3 text-base" /></label><Field label={t('supplier')} value={actualSupplier} onChange={setActualSupplier} /><Field label={t('brand')} value={actualBrand} onChange={setActualBrand} /></div><div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><Button variant="outline" className="min-h-11" onClick={() => setEditingLine(null)}>{tCommon('cancel')}</Button><Button className="min-h-11" disabled={savingLineId === line.id} onClick={() => void confirmDetails()}>{savingLineId === line.id && <LoaderCircle className="me-2 size-4 animate-spin" />}{tCommon('save')}</Button></div></div>}
