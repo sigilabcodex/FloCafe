@@ -10679,6 +10679,92 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       }
     },
   },
+  {
+    version: 129,
+    name: 'add_purchasing_lists_and_price_history',
+    up: () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS purchasing_lists (
+          id TEXT PRIMARY KEY,
+          idempotency_key TEXT NOT NULL UNIQUE,
+          request_json TEXT NOT NULL,
+          name TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+          created_by TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS purchasing_list_lines (
+          id TEXT PRIMARY KEY,
+          list_id TEXT NOT NULL REFERENCES purchasing_lists(id) ON DELETE CASCADE,
+          supply_id TEXT NOT NULL REFERENCES supplies(id),
+          planned_quantity REAL NOT NULL CHECK (planned_quantity > 0),
+          planned_unit TEXT NOT NULL CHECK (planned_unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          planned_supplier TEXT,
+          planned_brand TEXT,
+          reference_price REAL CHECK (reference_price IS NULL OR reference_price >= 0),
+          reference_unit TEXT CHECK (reference_unit IS NULL OR reference_unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          reference_observed_at TEXT,
+          reference_source TEXT,
+          purchased_quantity REAL NOT NULL DEFAULT 0 CHECK (purchased_quantity >= 0),
+          purchased_unit TEXT CHECK (purchased_unit IS NULL OR purchased_unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          actual_supplier TEXT,
+          actual_brand TEXT,
+          actual_price REAL CHECK (actual_price IS NULL OR actual_price >= 0),
+          status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'acquired', 'not_found')),
+          version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          UNIQUE(list_id, supply_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_purchasing_lines_list_status ON purchasing_list_lines(list_id, status);
+        CREATE TABLE IF NOT EXISTS purchasing_acquisitions (
+          id TEXT PRIMARY KEY,
+          line_id TEXT NOT NULL REFERENCES purchasing_list_lines(id),
+          idempotency_key TEXT NOT NULL UNIQUE,
+          quantity REAL NOT NULL CHECK (quantity > 0),
+          unit TEXT NOT NULL CHECK (unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          price REAL NOT NULL CHECK (price >= 0),
+          supplier TEXT,
+          brand TEXT,
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          created_at TEXT NOT NULL,
+          request_json TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS purchasing_price_observations (
+          id TEXT PRIMARY KEY,
+          acquisition_id TEXT UNIQUE REFERENCES purchasing_acquisitions(id),
+          line_id TEXT NOT NULL REFERENCES purchasing_list_lines(id),
+          supply_id TEXT NOT NULL REFERENCES supplies(id),
+          amount REAL NOT NULL CHECK (amount >= 0),
+          observed_quantity REAL NOT NULL CHECK (observed_quantity > 0),
+          unit TEXT NOT NULL CHECK (unit IN ('each', 'g', 'kg', 'ml', 'l')),
+          normalized_unit_cost REAL,
+          supplier TEXT,
+          brand TEXT,
+          effective_at TEXT NOT NULL,
+          recorded_at TEXT NOT NULL,
+          source TEXT NOT NULL,
+          corrects_observation_id TEXT REFERENCES purchasing_price_observations(id),
+          correction_reason TEXT,
+          actor_user_id TEXT NOT NULL REFERENCES users(id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_purchasing_price_history ON purchasing_price_observations(supply_id, effective_at, id);
+        CREATE TABLE IF NOT EXISTS purchasing_line_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          line_id TEXT NOT NULL REFERENCES purchasing_list_lines(id),
+          actor_user_id TEXT NOT NULL REFERENCES users(id),
+          action TEXT NOT NULL,
+          details_json TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_purchasing_line_events ON purchasing_line_events(line_id, id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_purchasing_event_idempotency
+          ON purchasing_line_events(json_extract(details_json, '$.idempotency_key'))
+          WHERE json_extract(details_json, '$.idempotency_key') IS NOT NULL;
+      `);
+    },
+  },
 ];
 
 export function backfillWhatsAppMessageAttempts(

@@ -13,6 +13,7 @@ import { cashClosureRoutes } from './cash-closures';
 import { cashSessionRoutes } from './cash-sessions';
 import { inventoryRoutes } from './inventory';
 import { supplyRoutes } from './supplies';
+import { purchasingRoutes } from './purchasing';
 import { expenseRoutes } from './expenses';
 import { recipeRoutes } from './recipes';
 import { productionRoutes } from './production';
@@ -123,6 +124,7 @@ export function registerRoutes(app: Express): void {
   app.use('/api/cash-sessions', cashSessionRoutes);
   app.use('/api/inventory', inventoryRoutes);
   app.use('/api/supplies', supplyRoutes);
+  app.use('/api/purchasing', purchasingRoutes);
   app.use('/api/expenses', expenseRoutes);
   app.use('/api/recipes', recipeRoutes);
   app.use('/api/production', productionRoutes);
