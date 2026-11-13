@@ -606,7 +606,22 @@
     "lastPrice": "최근 가격: {price} · {date}",
     "versionConflict": "목록이 변경되었습니다. 새로고침 후 다시 시도하세요.",
     "acquired": "구매 완료",
-    "actualPrice": "참고 가격"
+    "actualPrice": "참고 가격",
+    "offlineMode": "오프라인 · 로컬 목록",
+    "savedOnDevice": "이 기기에 저장됨",
+    "pendingSyncCount": "대기 중 {count}개",
+    "syncingNow": "동기화 중…",
+    "syncedWithServer": "동기화됨",
+    "conflictNeedsReview": "검토 필요",
+    "syncNow": "지금 동기화",
+    "retryOnLatest": "로컬 변경 적용",
+    "discardLocalChange": "로컬 변경 취소",
+    "localIntent": "저장하려던 변경 내용",
+    "serverCurrent": "현재 서버 버전",
+    "listNotCached": "이 기기에서 오프라인으로 이 목록을 사용할 수 없습니다.",
+    "connectToCreate": "목록을 만들려면 서버에 연결하세요.",
+    "offlineNoList": "온라인 상태에서 열었던 오프라인 목록이 여기에 표시됩니다.",
+    "offlineStorageUnavailable": "로컬 구매 저장소를 사용할 수 없습니다. 변경 사항이 저장되지 않았습니다."
   },
   "kds": {
     "addonsLabel": "추가 메뉴",

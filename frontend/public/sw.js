@@ -1,7 +1,8 @@
-const CACHE_NAME = 'flo-v19';
+const CACHE_NAME = 'flo-v20';
 const PRECACHE_URLS = [
   '/dashboard',
   '/pos',
+  '/purchasing',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
@@ -11,9 +12,32 @@ const PRECACHE_URLS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => Promise.all(
-        PRECACHE_URLS.map((url) => cache.add(url).catch(() => undefined))
-      ))
+      .then(async (cache) => {
+        await Promise.all(PRECACHE_URLS.map((url) => cache.add(url).catch(() => undefined)));
+        // The shopping view is a static export route. Cache only that public
+        // shell and its same-origin Next static chunks; never API responses.
+        try {
+          const response = await fetch('/purchasing', { cache: 'reload' });
+          if (response.ok) {
+            // Next's desktop export may redirect /purchasing to its trailing
+            // slash route. Store both request keys so navigation fallback works
+            // regardless of the configured URL form.
+            await cache.put('/purchasing', response.clone());
+            await cache.put('/purchasing/', response.clone());
+            const html = await response.clone().text();
+            const assetUrls = new Set();
+            for (const match of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
+              try {
+                const url = new URL(match[1], self.location.origin);
+                if (url.origin === self.location.origin && url.pathname.startsWith('/_next/static/')) {
+                  assetUrls.add(url.pathname + url.search);
+                }
+              } catch { /* Ignore malformed markup references. */ }
+            }
+            await Promise.all([...assetUrls].map((url) => cache.add(url).catch(() => undefined)));
+          }
+        } catch { /* A missing shell cache must not prevent worker installation. */ }
+      })
       .then(() => self.skipWaiting())
   );
 });

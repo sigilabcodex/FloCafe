@@ -148,14 +148,16 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isStandalonePath || !user || !currentTenant) return;
     const refresh = () => {
-      void refreshAuthContext();
+      if (navigator.onLine) void refreshAuthContext().catch(() => {});
     };
     window.addEventListener('focus', refresh);
     window.addEventListener('flo:authorization-denied', refresh);
+    window.addEventListener('online', refresh);
     const interval = window.setInterval(refresh, 30_000);
     return () => {
       window.removeEventListener('focus', refresh);
       window.removeEventListener('flo:authorization-denied', refresh);
+      window.removeEventListener('online', refresh);
       window.clearInterval(interval);
     };
   }, [currentTenant, isStandalonePath, refreshAuthContext, user]);

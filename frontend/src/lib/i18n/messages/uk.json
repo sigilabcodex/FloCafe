@@ -606,7 +606,22 @@
     "lastPrice": "Остання ціна: {price} · {date}",
     "versionConflict": "Список змінився. Оновіть його та спробуйте ще раз.",
     "acquired": "Придбано",
-    "actualPrice": "Довідкова ціна"
+    "actualPrice": "Довідкова ціна",
+    "offlineMode": "Офлайн · локальні списки",
+    "savedOnDevice": "Збережено на цьому пристрої",
+    "pendingSyncCount": "Очікують: {count}",
+    "syncingNow": "Синхронізація…",
+    "syncedWithServer": "Синхронізовано",
+    "conflictNeedsReview": "Потрібна перевірка",
+    "syncNow": "Синхронізувати",
+    "retryOnLatest": "Застосувати локальну зміну",
+    "discardLocalChange": "Відхилити локальну зміну",
+    "localIntent": "Зміна, яку ви хотіли внести",
+    "serverCurrent": "Поточна версія сервера",
+    "listNotCached": "Цей список недоступний офлайн на цьому пристрої.",
+    "connectToCreate": "Підключіться до сервера, щоб створити список.",
+    "offlineNoList": "Офлайн-списки, відкриті під час підключення, з’являться тут.",
+    "offlineStorageUnavailable": "Локальне сховище покупок недоступне. Зміни не збережено."
   },
   "kds": {
     "addonsLabel": "Додатки",

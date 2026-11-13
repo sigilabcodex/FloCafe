@@ -606,7 +606,22 @@
     "lastPrice": "Laatste prijs: {price} · {date}",
     "versionConflict": "Deze lijst is gewijzigd. Vernieuw en probeer opnieuw.",
     "acquired": "Ingekocht",
-    "actualPrice": "Richtprijs"
+    "actualPrice": "Richtprijs",
+    "offlineMode": "Offline",
+    "savedOnDevice": "Op dit apparaat opgeslagen",
+    "pendingSyncCount": "{count} in afwachting",
+    "syncingNow": "Bezig met synchroniseren",
+    "syncedWithServer": "Gesynchroniseerd met de server",
+    "conflictNeedsReview": "Controle nodig",
+    "syncNow": "Nu synchroniseren",
+    "retryOnLatest": "Lokale wijziging toepassen",
+    "discardLocalChange": "Lokale wijziging verwerpen",
+    "localIntent": "Je beoogde wijziging",
+    "serverCurrent": "Huidige serverversie",
+    "listNotCached": "Deze lijst is offline niet beschikbaar op dit apparaat.",
+    "connectToCreate": "Maak verbinding met de server om een lijst te maken.",
+    "offlineNoList": "Offline lijsten die je online hebt geopend, verschijnen hier.",
+    "offlineStorageUnavailable": "Lokale opslag voor inkopen is niet beschikbaar. Er zijn geen wijzigingen opgeslagen."
   },
   "kds": {
     "addonsLabel": "Add-ons",

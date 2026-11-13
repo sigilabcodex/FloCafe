@@ -606,7 +606,22 @@
     "lastPrice": "Giá gần nhất: {price} · {date}",
     "versionConflict": "Danh sách đã thay đổi. Hãy làm mới rồi thử lại.",
     "acquired": "Đã mua",
-    "actualPrice": "Giá tham khảo"
+    "actualPrice": "Giá tham khảo",
+    "offlineMode": "Ngoại tuyến",
+    "savedOnDevice": "Đã lưu trên thiết bị này",
+    "pendingSyncCount": "{count} mục đang chờ",
+    "syncingNow": "Đang đồng bộ",
+    "syncedWithServer": "Đã đồng bộ với máy chủ",
+    "conflictNeedsReview": "Cần xem lại",
+    "syncNow": "Đồng bộ ngay",
+    "retryOnLatest": "Áp dụng thay đổi cục bộ",
+    "discardLocalChange": "Hủy thay đổi cục bộ",
+    "localIntent": "Thay đổi bạn muốn ghi nhận",
+    "serverCurrent": "Trạng thái hiện tại trên máy chủ",
+    "listNotCached": "Danh sách này không có trên thiết bị khi ngoại tuyến.",
+    "connectToCreate": "Kết nối với máy chủ để tạo danh sách.",
+    "offlineNoList": "Danh sách ngoại tuyến sẽ xuất hiện tại đây sau khi bạn mở chúng khi đang kết nối.",
+    "offlineStorageUnavailable": "Không thể dùng bộ nhớ mua hàng cục bộ. Không có thay đổi nào được lưu."
   },
   "kds": {
     "addonsLabel": "Tuỳ chọn",

@@ -606,7 +606,22 @@
     "lastPrice": "Bei ya mwisho: {price} · {date}",
     "versionConflict": "Orodha hii imebadilika. Onyesha upya kisha ujaribu tena.",
     "acquired": "Imenunuliwa",
-    "actualPrice": "Bei ya marejeo"
+    "actualPrice": "Bei ya marejeo",
+    "offlineMode": "Nje ya mtandao · orodha za ndani",
+    "savedOnDevice": "Imehifadhiwa kwenye kifaa hiki",
+    "pendingSyncCount": "{count} zinasubiri",
+    "syncingNow": "Inasawazisha…",
+    "syncedWithServer": "Imesawazishwa",
+    "conflictNeedsReview": "Inahitaji kukaguliwa",
+    "syncNow": "Sawazisha sasa",
+    "retryOnLatest": "Tumia mabadiliko ya ndani",
+    "discardLocalChange": "Ondoa mabadiliko ya ndani",
+    "localIntent": "Mabadiliko uliyokusudia",
+    "serverCurrent": "Toleo la sasa la seva",
+    "listNotCached": "Orodha hii haipatikani nje ya mtandao kwenye kifaa hiki.",
+    "connectToCreate": "Unganisha kwenye seva ili kuunda orodha.",
+    "offlineNoList": "Orodha za nje ya mtandao ulizofungua ukiwa umeunganishwa zitaonekana hapa.",
+    "offlineStorageUnavailable": "Hifadhi ya ununuzi kwenye kifaa haipatikani. Hakuna mabadiliko yaliyohifadhiwa."
   },
   "kds": {
     "addonsLabel": "Viongezeo",

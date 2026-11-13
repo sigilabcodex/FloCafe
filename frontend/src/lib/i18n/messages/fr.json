@@ -606,7 +606,22 @@
     "lastPrice": "Dernier prix : {price} · {date}",
     "versionConflict": "La liste a changé. Actualisez et réessayez.",
     "acquired": "Acheté",
-    "actualPrice": "Prix de référence"
+    "actualPrice": "Prix de référence",
+    "offlineMode": "Hors ligne · listes locales",
+    "savedOnDevice": "Enregistré sur cet appareil",
+    "pendingSyncCount": "{count} en attente",
+    "syncingNow": "Synchronisation…",
+    "syncedWithServer": "Synchronisé",
+    "conflictNeedsReview": "À vérifier",
+    "syncNow": "Synchroniser",
+    "retryOnLatest": "Appliquer le changement local",
+    "discardLocalChange": "Ignorer le changement local",
+    "localIntent": "Votre changement prévu",
+    "serverCurrent": "Version actuelle du serveur",
+    "listNotCached": "Cette liste est indisponible hors ligne sur cet appareil.",
+    "connectToCreate": "Connectez-vous au serveur pour créer une liste.",
+    "offlineNoList": "Les listes hors ligne apparaissent ici après une ouverture avec une connexion.",
+    "offlineStorageUnavailable": "Le stockage local des achats est indisponible. Aucune modification n’a été enregistrée."
   },
   "kds": {
     "addonsLabel": "Options",

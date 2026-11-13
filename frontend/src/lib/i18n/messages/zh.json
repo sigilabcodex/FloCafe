@@ -606,7 +606,22 @@
     "lastPrice": "最近价格：{price} · {date}",
     "versionConflict": "清单已更改。请刷新后重试。",
     "acquired": "已购买",
-    "actualPrice": "参考价格"
+    "actualPrice": "参考价格",
+    "offlineMode": "离线 · 本地列表",
+    "savedOnDevice": "已保存在此设备",
+    "pendingSyncCount": "{count} 项待处理",
+    "syncingNow": "正在同步…",
+    "syncedWithServer": "已同步",
+    "conflictNeedsReview": "需要检查",
+    "syncNow": "立即同步",
+    "retryOnLatest": "应用本地更改",
+    "discardLocalChange": "丢弃本地更改",
+    "localIntent": "你准备提交的更改",
+    "serverCurrent": "服务器当前版本",
+    "listNotCached": "此列表在此设备上无法离线使用。",
+    "connectToCreate": "连接服务器后才能创建列表。",
+    "offlineNoList": "联网时打开过的离线清单会显示在这里。",
+    "offlineStorageUnavailable": "本地采购数据存储不可用。未保存任何更改。"
   },
   "kds": {
     "addonsLabel": "加购",

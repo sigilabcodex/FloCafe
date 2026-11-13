@@ -606,7 +606,22 @@
     "lastPrice": "Huling presyo: {price} · {date}",
     "versionConflict": "Nagbago ang listahan. I-refresh at subukan muli.",
     "acquired": "Nabili",
-    "actualPrice": "Batayang presyo"
+    "actualPrice": "Batayang presyo",
+    "offlineMode": "Offline · mga lokal na listahan",
+    "savedOnDevice": "Na-save sa device na ito",
+    "pendingSyncCount": "{count} nakabinbin",
+    "syncingNow": "Sini-sync…",
+    "syncedWithServer": "Naka-sync",
+    "conflictNeedsReview": "Kailangang suriin",
+    "syncNow": "I-sync ngayon",
+    "retryOnLatest": "Ilapat ang lokal na pagbabago",
+    "discardLocalChange": "Itapon ang lokal na pagbabago",
+    "localIntent": "Nilalayong pagbabago mo",
+    "serverCurrent": "Kasalukuyang bersyon sa server",
+    "listNotCached": "Hindi available offline sa device na ito ang listahang ito.",
+    "connectToCreate": "Kumonekta sa server para gumawa ng listahan.",
+    "offlineNoList": "Lalabas dito ang mga offline na listahan matapos buksan habang konektado.",
+    "offlineStorageUnavailable": "Hindi available ang lokal na storage. Walang pagbabagong na-save."
   },
   "kds": {
     "addonsLabel": "Mga Addon",

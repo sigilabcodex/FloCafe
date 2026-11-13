@@ -606,7 +606,22 @@
     "lastPrice": "Harga terakhir: {price} · {date}",
     "versionConflict": "Daftar ini berubah. Muat ulang lalu coba lagi.",
     "acquired": "Dibeli",
-    "actualPrice": "Harga acuan"
+    "actualPrice": "Harga acuan",
+    "offlineMode": "Offline · daftar lokal",
+    "savedOnDevice": "Disimpan di perangkat ini",
+    "pendingSyncCount": "{count} tertunda",
+    "syncingNow": "Menyinkronkan…",
+    "syncedWithServer": "Tersinkron",
+    "conflictNeedsReview": "Perlu ditinjau",
+    "syncNow": "Sinkronkan sekarang",
+    "retryOnLatest": "Terapkan perubahan lokal",
+    "discardLocalChange": "Buang perubahan lokal",
+    "localIntent": "Perubahan yang ingin Anda simpan",
+    "serverCurrent": "Versi server saat ini",
+    "listNotCached": "Daftar ini tidak tersedia offline di perangkat ini.",
+    "connectToCreate": "Hubungkan ke server untuk membuat daftar.",
+    "offlineNoList": "Daftar offline akan muncul di sini setelah dibuka saat terhubung.",
+    "offlineStorageUnavailable": "Penyimpanan pembelian lokal tidak tersedia. Tidak ada perubahan yang disimpan."
   },
   "kds": {
     "addonsLabel": "Tambahan",

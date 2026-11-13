@@ -606,7 +606,22 @@
     "lastPrice": "最終価格: {price} · {date}",
     "versionConflict": "リストが変更されました。更新して再試行してください。",
     "acquired": "購入済み",
-    "actualPrice": "参考価格"
+    "actualPrice": "参考価格",
+    "offlineMode": "オフライン・端末内のリスト",
+    "savedOnDevice": "この端末に保存済み",
+    "pendingSyncCount": "保留中 {count} 件",
+    "syncingNow": "同期中…",
+    "syncedWithServer": "同期済み",
+    "conflictNeedsReview": "確認が必要",
+    "syncNow": "今すぐ同期",
+    "retryOnLatest": "ローカル変更を適用",
+    "discardLocalChange": "ローカル変更を破棄",
+    "localIntent": "登録しようとした変更",
+    "serverCurrent": "サーバーの現在の状態",
+    "listNotCached": "この端末ではこのリストをオフラインで利用できません。",
+    "connectToCreate": "リスト作成にはサーバー接続が必要です。",
+    "offlineNoList": "オンライン中に開いたオフライン用リストがここに表示されます。",
+    "offlineStorageUnavailable": "購入データのローカル保存を利用できません。変更は保存されませんでした。"
   },
   "kds": {
     "addonsLabel": "追加項目",

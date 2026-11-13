@@ -606,7 +606,22 @@
     "lastPrice": "अंतिम मूल्य: {price} · {date}",
     "versionConflict": "सूची बदल गई है। रीफ़्रेश करके फिर प्रयास करें।",
     "acquired": "खरीदा गया",
-    "actualPrice": "संदर्भ मूल्य"
+    "actualPrice": "संदर्भ मूल्य",
+    "offlineMode": "ऑफ़लाइन · स्थानीय सूचियाँ",
+    "savedOnDevice": "इस डिवाइस पर सहेजा गया",
+    "pendingSyncCount": "{count} लंबित",
+    "syncingNow": "सिंक हो रहा है…",
+    "syncedWithServer": "सिंक हो गया",
+    "conflictNeedsReview": "समीक्षा आवश्यक",
+    "syncNow": "अभी सिंक करें",
+    "retryOnLatest": "स्थानीय बदलाव लागू करें",
+    "discardLocalChange": "स्थानीय बदलाव हटाएँ",
+    "localIntent": "आपका इच्छित बदलाव",
+    "serverCurrent": "सर्वर का वर्तमान संस्करण",
+    "listNotCached": "यह सूची इस डिवाइस पर ऑफ़लाइन उपलब्ध नहीं है।",
+    "connectToCreate": "सूची बनाने के लिए सर्वर से जुड़ें।",
+    "offlineNoList": "ऑनलाइन रहते हुए खोली गई ऑफ़लाइन सूचियाँ यहाँ दिखाई देंगी।",
+    "offlineStorageUnavailable": "स्थानीय खरीद संग्रहण उपलब्ध नहीं है। कोई बदलाव सहेजा नहीं गया।"
   },
   "kds": {
     "addonsLabel": "ऐड-ऑन",

@@ -606,7 +606,22 @@
     "lastPrice": "آخری قیمت: {price} · {date}",
     "versionConflict": "فہرست بدل گئی ہے۔ تازہ کریں اور دوبارہ کوشش کریں۔",
     "acquired": "خریدا گیا",
-    "actualPrice": "حوالہ قیمت"
+    "actualPrice": "حوالہ قیمت",
+    "offlineMode": "آف لائن · مقامی فہرستیں",
+    "savedOnDevice": "اس آلے پر محفوظ",
+    "pendingSyncCount": "{count} زیرِ التوا",
+    "syncingNow": "ہم وقت ہو رہا ہے…",
+    "syncedWithServer": "ہم وقت ہو گیا",
+    "conflictNeedsReview": "جائزہ درکار",
+    "syncNow": "ابھی ہم وقت کریں",
+    "retryOnLatest": "مقامی تبدیلی لاگو کریں",
+    "discardLocalChange": "مقامی تبدیلی رد کریں",
+    "localIntent": "آپ کی مطلوبہ تبدیلی",
+    "serverCurrent": "سرور کا موجودہ ورژن",
+    "listNotCached": "یہ فہرست اس آلے پر آف لائن دستیاب نہیں۔",
+    "connectToCreate": "فہرست بنانے کے لیے سرور سے منسلک ہوں۔",
+    "offlineNoList": "انٹرنیٹ سے منسلک ہونے کے بعد کھولی گئی آف لائن فہرستیں یہاں دکھائی دیں گی۔",
+    "offlineStorageUnavailable": "مقامی خریداری اسٹوریج دستیاب نہیں۔ کوئی تبدیلی محفوظ نہیں ہوئی۔"
   },
   "kds": {
     "addonsLabel": "ایڈ آنز",

@@ -606,7 +606,22 @@
     "lastPrice": "Çmimi i fundit: {price} · {date}",
     "versionConflict": "Lista ndryshoi. Rifreskoje dhe provo përsëri.",
     "acquired": "E blerë",
-    "actualPrice": "Çmimi referencë"
+    "actualPrice": "Çmimi referencë",
+    "offlineMode": "Pa lidhje",
+    "savedOnDevice": "U ruajt në këtë pajisje",
+    "pendingSyncCount": "{count} në pritje",
+    "syncingNow": "Po sinkronizohet",
+    "syncedWithServer": "U sinkronizua me serverin",
+    "conflictNeedsReview": "Kërkon shqyrtim",
+    "syncNow": "Sinkronizo tani",
+    "retryOnLatest": "Zbato ndryshimin lokal",
+    "discardLocalChange": "Hidh poshtë ndryshimin lokal",
+    "localIntent": "Ndryshimi që synove",
+    "serverCurrent": "Gjendja aktuale e serverit",
+    "listNotCached": "Kjo listë nuk është e disponueshme jashtë linje në këtë pajisje.",
+    "connectToCreate": "Lidhu me serverin për të krijuar një listë.",
+    "offlineNoList": "Listat jashtë linje shfaqen këtu pasi t’i hapni kur jeni të lidhur.",
+    "offlineStorageUnavailable": "Ruajtja lokale e blerjeve nuk është e disponueshme. Asnjë ndryshim nuk u ruajt."
   },
   "kds": {
     "addonsLabel": "Shtesat",

@@ -9,6 +9,11 @@ import { isLanguage, type Language } from '../lib/i18n/languages';
 import { syncPrintPoliciesAtBootstrap } from '../lib/print-policy-bootstrap';
 
 let authOperation = 0;
+const PURCHASING_OFFLINE_USER_KEY = 'flo-purchasing-offline-user-v1';
+
+function rememberPurchasingOfflineUser(userId: number | string): void {
+  try { localStorage.setItem(PURCHASING_OFFLINE_USER_KEY, String(userId)); } catch { /* Offline reads will be unavailable when browser storage is blocked. */ }
+}
 
 function syncTenantLanguage(t: Tenant | null | undefined) {
   const lang = t?.language;
@@ -37,6 +42,7 @@ function removeSessionStorageKeys(): void {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('tenant');
+      localStorage.removeItem(PURCHASING_OFFLINE_USER_KEY);
     }
   } catch {
     // Ignore storage removal errors in non-browser contexts.
@@ -114,6 +120,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const tenants: Tenant[] = data.tenants;
     const currentTenant = tenants.length === 1 ? tenants[0] : null;
     persistSession(data.access_token, currentTenant);
+    rememberPurchasingOfflineUser(data.user.id);
     syncTenantLanguage(currentTenant);
     const failedLanguages = currentTenant
       ? await syncPrintPoliciesAtBootstrap(
@@ -142,6 +149,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const tenants: Tenant[] = data.tenants;
     const currentTenant = tenants.length === 1 ? tenants[0] : null;
     persistSession(data.access_token, currentTenant);
+    rememberPurchasingOfflineUser(data.user.id);
     syncTenantLanguage(currentTenant);
     const failedLanguages = currentTenant
       ? await syncPrintPoliciesAtBootstrap(
@@ -177,6 +185,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('tenant');
+      localStorage.removeItem(PURCHASING_OFFLINE_USER_KEY);
     } catch {
       // Ignore storage removal errors during lock.
     }
@@ -197,6 +206,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { data } = await api.post('/auth/tenants/select', { tenant_id: tenantId });
     if (operation !== authOperation) return;
     persistSession(data.access_token, data.tenant);
+    const selectedUserId = get().user?.id;
+    if (selectedUserId) rememberPurchasingOfflineUser(selectedUserId);
     syncTenantLanguage(data.tenant);
     const failedLanguages = await syncPrintPoliciesAtBootstrap(
       data.tenant,
@@ -282,6 +293,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const tenants = payload.tenants ?? (payload.currentTenant ? [payload.currentTenant] : []);
     const currentTenant = payload.currentTenant ?? (tenants.length === 1 ? tenants[0] : null);
     persistSession(payload.token, currentTenant);
+    rememberPurchasingOfflineUser(payload.user.id);
     syncTenantLanguage(currentTenant);
     notifySessionBoundary('login');
     set({
@@ -351,6 +363,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     if (token) {
+      const offlineUserId = localStorage.getItem(PURCHASING_OFFLINE_USER_KEY);
+      const isPurchasingRoute = window.location.pathname.replace(/\/$/, '') === '/purchasing';
+      const hasOfflineUser = Boolean(offlineUserId && offlineUserId.length <= 128 && offlineUserId.trim() === offlineUserId);
+      if (!navigator.onLine && isPurchasingRoute && hasOfflineUser && currentTenant) {
+        set({
+          user: { id: offlineUserId as unknown as number, name: '', email: '', phone: null, country_code: '', is_active: true },
+          token,
+          tenants: [currentTenant],
+          currentTenant,
+          loading: false,
+          printLanguageLoadErrors: [],
+        });
+        return;
+      }
       await api
         .get('/auth/me', { skipAuthRedirect: true })
         .then(({ data }) => {
@@ -362,6 +388,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             : null;
           const resolved = freshTenant ?? (tenants.length === 1 ? tenants[0] : null);
           if (resolved) localStorage.setItem('tenant', JSON.stringify(resolved));
+          rememberPurchasingOfflineUser(data.user.id);
           set({
             user: data.user,
             token,
@@ -390,6 +417,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               try {
                 localStorage.removeItem('token');
                 localStorage.removeItem('tenant');
+                localStorage.removeItem(PURCHASING_OFFLINE_USER_KEY);
               } catch {
                 // Ignore storage removal errors in non-browser contexts.
               }
@@ -403,6 +431,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               });
               return;
             }
+          }
+          const offlineUserId = localStorage.getItem(PURCHASING_OFFLINE_USER_KEY);
+          const isPurchasingRoute = window.location.pathname.replace(/\/$/, '') === '/purchasing';
+          const isTransientFailure = status === undefined || status >= 500;
+          const hasOfflineUser = Boolean(offlineUserId && offlineUserId.length <= 128 && offlineUserId.trim() === offlineUserId);
+          if (isPurchasingRoute && isTransientFailure && hasOfflineUser && currentTenant) {
+            set({
+              user: { id: offlineUserId as unknown as number, name: '', email: '', phone: null, country_code: '', is_active: true },
+              token,
+              tenants: [currentTenant],
+              currentTenant,
+              loading: false,
+              printLanguageLoadErrors: [],
+            });
+            return;
           }
           set({
             loading: false,

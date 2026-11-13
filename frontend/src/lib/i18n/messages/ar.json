@@ -606,7 +606,22 @@
     "lastPrice": "آخر سعر: {price} · {date}",
     "versionConflict": "تغيرت القائمة. حدّثها ثم حاول مرة أخرى.",
     "acquired": "تم الشراء",
-    "actualPrice": "السعر المرجعي"
+    "actualPrice": "السعر المرجعي",
+    "offlineMode": "دون اتصال · قوائم محلية",
+    "savedOnDevice": "حُفظ على هذا الجهاز",
+    "pendingSyncCount": "{count} قيد الانتظار",
+    "syncingNow": "جارٍ المزامنة…",
+    "syncedWithServer": "تمت المزامنة",
+    "conflictNeedsReview": "يتطلب المراجعة",
+    "syncNow": "زامن الآن",
+    "retryOnLatest": "تطبيق التغيير المحلي",
+    "discardLocalChange": "حذف التغيير المحلي",
+    "localIntent": "التغيير الذي أردت تسجيله",
+    "serverCurrent": "إصدار الخادم الحالي",
+    "listNotCached": "هذه القائمة غير متاحة دون اتصال على هذا الجهاز.",
+    "connectToCreate": "اتصل بالخادم لإنشاء قائمة.",
+    "offlineNoList": "ستظهر القوائم المتاحة دون اتصال هنا بعد فتحها أثناء الاتصال بالإنترنت.",
+    "offlineStorageUnavailable": "مساحة تخزين المشتريات المحلية غير متاحة. لم تُحفظ أي تغييرات."
   },
   "kds": {
     "addonsLabel": "الإضافات",

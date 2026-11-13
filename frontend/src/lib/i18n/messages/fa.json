@@ -606,7 +606,22 @@
     "lastPrice": "آخرین قیمت: {price} · {date}",
     "versionConflict": "فهرست تغییر کرده است. تازه‌سازی کنید و دوباره تلاش کنید.",
     "acquired": "خریداری‌شده",
-    "actualPrice": "قیمت مرجع"
+    "actualPrice": "قیمت مرجع",
+    "offlineMode": "آفلاین · فهرست‌های محلی",
+    "savedOnDevice": "در این دستگاه ذخیره شد",
+    "pendingSyncCount": "{count} در انتظار",
+    "syncingNow": "در حال همگام‌سازی…",
+    "syncedWithServer": "همگام‌سازی شد",
+    "conflictNeedsReview": "نیازمند بررسی",
+    "syncNow": "همگام‌سازی اکنون",
+    "retryOnLatest": "اعمال تغییر محلی",
+    "discardLocalChange": "حذف تغییر محلی",
+    "localIntent": "تغییری که قصد ثبت آن را داشتید",
+    "serverCurrent": "نسخه فعلی سرور",
+    "listNotCached": "این فهرست در حالت آفلاین روی این دستگاه موجود نیست.",
+    "connectToCreate": "برای ساخت فهرست به سرور وصل شوید.",
+    "offlineNoList": "فهرست‌های آفلاین پس از بازکردن هنگام اتصال، اینجا نمایش داده می‌شوند.",
+    "offlineStorageUnavailable": "ذخیره‌سازی محلی خرید در دسترس نیست. هیچ تغییری ذخیره نشد."
   },
   "kds": {
     "addonsLabel": "افزودنی‌ها",

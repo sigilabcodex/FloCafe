@@ -606,7 +606,22 @@
     "lastPrice": "शेवटची किंमत: {price} · {date}",
     "versionConflict": "यादी बदलली आहे. रिफ्रेश करून पुन्हा प्रयत्न करा.",
     "acquired": "खरेदी झाले",
-    "actualPrice": "संदर्भ किंमत"
+    "actualPrice": "संदर्भ किंमत",
+    "offlineMode": "ऑफलाइन · स्थानिक याद्या",
+    "savedOnDevice": "या डिव्हाइसवर जतन केले",
+    "pendingSyncCount": "{count} प्रलंबित",
+    "syncingNow": "सिंक होत आहे…",
+    "syncedWithServer": "सिंक झाले",
+    "conflictNeedsReview": "पुनरावलोकन आवश्यक",
+    "syncNow": "आता सिंक करा",
+    "retryOnLatest": "स्थानिक बदल लागू करा",
+    "discardLocalChange": "स्थानिक बदल टाकून द्या",
+    "localIntent": "तुम्हाला करायचा असलेला बदल",
+    "serverCurrent": "सर्व्हरची सध्याची आवृत्ती",
+    "listNotCached": "ही यादी या डिव्हाइसवर ऑफलाइन उपलब्ध नाही.",
+    "connectToCreate": "यादी तयार करण्यासाठी सर्व्हरशी जोडा.",
+    "offlineNoList": "ऑनलाइन असताना उघडलेल्या ऑफलाइन याद्या येथे दिसतील.",
+    "offlineStorageUnavailable": "स्थानिक खरेदी संचयन उपलब्ध नाही. कोणताही बदल जतन झाला नाही."
   },
   "kds": {
     "addonsLabel": "ॲड-ऑन्स",

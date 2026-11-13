@@ -606,7 +606,22 @@
     "lastPrice": "ਆਖਰੀ ਕੀਮਤ: {price} · {date}",
     "versionConflict": "ਸੂਚੀ ਬਦਲ ਗਈ ਹੈ। ਤਾਜ਼ਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
     "acquired": "ਖਰੀਦਿਆ",
-    "actualPrice": "ਹਵਾਲਾ ਕੀਮਤ"
+    "actualPrice": "ਹਵਾਲਾ ਕੀਮਤ",
+    "offlineMode": "ਆਫ਼ਲਾਈਨ · ਸਥਾਨਕ ਸੂਚੀਆਂ",
+    "savedOnDevice": "ਇਸ ਡਿਵਾਈਸ ਤੇ ਸੰਭਾਲਿਆ",
+    "pendingSyncCount": "{count} ਬਾਕੀ",
+    "syncingNow": "ਸਿੰਕ ਹੋ ਰਿਹਾ ਹੈ…",
+    "syncedWithServer": "ਸਿੰਕ ਹੋ ਗਿਆ",
+    "conflictNeedsReview": "ਜਾਂਚ ਲੋੜੀਂਦੀ",
+    "syncNow": "ਹੁਣੇ ਸਿੰਕ ਕਰੋ",
+    "retryOnLatest": "ਸਥਾਨਕ ਤਬਦੀਲੀ ਲਾਗੂ ਕਰੋ",
+    "discardLocalChange": "ਸਥਾਨਕ ਤਬਦੀਲੀ ਰੱਦ ਕਰੋ",
+    "localIntent": "ਤੁਹਾਡੀ ਇੱਛਿਤ ਤਬਦੀਲੀ",
+    "serverCurrent": "ਸਰਵਰ ਦਾ ਮੌਜੂਦਾ ਸੰਸਕਰਣ",
+    "listNotCached": "ਇਹ ਸੂਚੀ ਇਸ ਡਿਵਾਈਸ ਤੇ ਆਫ਼ਲਾਈਨ ਉਪਲਬਧ ਨਹੀਂ।",
+    "connectToCreate": "ਸੂਚੀ ਬਣਾਉਣ ਲਈ ਸਰਵਰ ਨਾਲ ਜੁੜੋ।",
+    "offlineNoList": "ਕਨੈਕਟ ਹੋਣ ਸਮੇਂ ਖੋਲ੍ਹੀਆਂ ਆਫ਼ਲਾਈਨ ਸੂਚੀਆਂ ਇੱਥੇ ਦਿਖਣਗੀਆਂ।",
+    "offlineStorageUnavailable": "ਸਥਾਨਕ ਖਰੀਦ ਸਟੋਰੇਜ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕੋਈ ਤਬਦੀਲੀ ਸੰਭਾਲੀ ਨਹੀਂ ਗਈ।"
   },
   "kds": {
     "addonsLabel": "ਐਡ-ਆਨ",

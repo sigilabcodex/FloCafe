@@ -606,7 +606,22 @@
     "lastPrice": "Son fiyat: {price} · {date}",
     "versionConflict": "Liste değişti. Yenileyip tekrar deneyin.",
     "acquired": "Satın alındı",
-    "actualPrice": "Referans fiyatı"
+    "actualPrice": "Referans fiyatı",
+    "offlineMode": "Çevrimdışı · yerel listeler",
+    "savedOnDevice": "Bu cihaza kaydedildi",
+    "pendingSyncCount": "{count} bekliyor",
+    "syncingNow": "Eşitleniyor…",
+    "syncedWithServer": "Eşitlendi",
+    "conflictNeedsReview": "İnceleme gerekli",
+    "syncNow": "Şimdi eşitle",
+    "retryOnLatest": "Yerel değişikliği uygula",
+    "discardLocalChange": "Yerel değişikliği sil",
+    "localIntent": "Yapmak istediğiniz değişiklik",
+    "serverCurrent": "Sunucudaki güncel sürüm",
+    "listNotCached": "Bu liste bu cihazda çevrimdışı kullanılamıyor.",
+    "connectToCreate": "Liste oluşturmak için sunucuya bağlanın.",
+    "offlineNoList": "Çevrimdışı listeler, bağlıyken açıldıktan sonra burada görünür.",
+    "offlineStorageUnavailable": "Yerel satın alma depolaması kullanılamıyor. Hiçbir değişiklik kaydedilmedi."
   },
   "kds": {
     "addonsLabel": "Eklentiler",

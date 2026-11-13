@@ -606,7 +606,22 @@
     "lastPrice": "Rega pungkasan: {price} · {date}",
     "versionConflict": "Dhaptar iki wis owah. Muat maneh banjur coba maneh.",
     "acquired": "Wis dituku",
-    "actualPrice": "Rega referensi"
+    "actualPrice": "Rega referensi",
+    "offlineMode": "Offline · dhaptar lokal",
+    "savedOnDevice": "Disimpen ing piranti iki",
+    "pendingSyncCount": "{count} isih ditundha",
+    "syncingNow": "Nyinkronake…",
+    "syncedWithServer": "Wis disinkronake",
+    "conflictNeedsReview": "Perlu ditinjau",
+    "syncNow": "Sinkronake saiki",
+    "retryOnLatest": "Terapake owah-owahan lokal",
+    "discardLocalChange": "Busak owah-owahan lokal",
+    "localIntent": "Owah-owahan sing arep kok simpen",
+    "serverCurrent": "Versi server saiki",
+    "listNotCached": "Dhaptar iki ora kasedhiya offline ing piranti iki.",
+    "connectToCreate": "Sambung menyang server kanggo nggawe dhaptar.",
+    "offlineNoList": "Dhaptar offline bakal katon ing kene sawise dibukak nalika piranti nyambung.",
+    "offlineStorageUnavailable": "Panyimpen lokal kanggo tuku ora kasedhiya. Ora ana owah-owahan sing disimpen."
   },
   "kds": {
     "addonsLabel": "Imbuhan",

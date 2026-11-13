@@ -606,7 +606,22 @@
     "lastPrice": "最近價格：{price} · {date}",
     "versionConflict": "清單已變更。請重新整理後再試。",
     "acquired": "已購買",
-    "actualPrice": "參考價格"
+    "actualPrice": "參考價格",
+    "offlineMode": "離線 · 本機清單",
+    "savedOnDevice": "已儲存在此裝置",
+    "pendingSyncCount": "{count} 項待處理",
+    "syncingNow": "正在同步…",
+    "syncedWithServer": "已同步",
+    "conflictNeedsReview": "需要檢查",
+    "syncNow": "立即同步",
+    "retryOnLatest": "套用本機變更",
+    "discardLocalChange": "捨棄本機變更",
+    "localIntent": "您準備提交的變更",
+    "serverCurrent": "伺服器目前版本",
+    "listNotCached": "此清單無法在此裝置離線使用。",
+    "connectToCreate": "連線至伺服器後才能建立清單。",
+    "offlineNoList": "連線時曾開啟的離線清單會顯示在這裡。",
+    "offlineStorageUnavailable": "本機採購資料儲存空間無法使用。未儲存任何變更。"
   },
   "kds": {
     "addonsLabel": "加購",

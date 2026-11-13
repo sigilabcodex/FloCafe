@@ -606,7 +606,22 @@
     "lastPrice": "अन्तिम मूल्य: {price} · {date}",
     "versionConflict": "सूची परिवर्तन भयो। रिफ्रेस गरेर फेरि प्रयास गर्नुहोस्।",
     "acquired": "खरिद गरिएको",
-    "actualPrice": "सन्दर्भ मूल्य"
+    "actualPrice": "सन्दर्भ मूल्य",
+    "offlineMode": "अफलाइन · स्थानीय सूची",
+    "savedOnDevice": "यस उपकरणमा सुरक्षित",
+    "pendingSyncCount": "{count} बाँकी",
+    "syncingNow": "सिंक हुँदै…",
+    "syncedWithServer": "सिंक भयो",
+    "conflictNeedsReview": "समीक्षा आवश्यक",
+    "syncNow": "अहिले सिंक गर्नुहोस्",
+    "retryOnLatest": "स्थानीय परिवर्तन लागू गर्नुहोस्",
+    "discardLocalChange": "स्थानीय परिवर्तन हटाउनुहोस्",
+    "localIntent": "तपाईंले गर्न चाहेको परिवर्तन",
+    "serverCurrent": "सर्भरको हालको संस्करण",
+    "listNotCached": "यो सूची यस उपकरणमा अफलाइन उपलब्ध छैन।",
+    "connectToCreate": "सूची बनाउन सर्भरमा जोडिनुहोस्।",
+    "offlineNoList": "जडान भएको बेला खोलिएका अफलाइन सूचीहरू यहाँ देखिनेछन्।",
+    "offlineStorageUnavailable": "स्थानीय खरिद भण्डारण उपलब्ध छैन। कुनै परिवर्तन सुरक्षित भएन।"
   },
   "kds": {
     "addonsLabel": "एडअनहरू",

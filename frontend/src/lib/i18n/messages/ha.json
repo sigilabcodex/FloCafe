@@ -606,7 +606,22 @@
     "lastPrice": "Farashi na ƙarshe: {price} · {date}",
     "versionConflict": "Jerin ya canza. Sabunta shi sannan a sake gwadawa.",
     "acquired": "An saya",
-    "actualPrice": "Farashin tunani"
+    "actualPrice": "Farashin tunani",
+    "offlineMode": "Ba a haɗa ba · jerin gida",
+    "savedOnDevice": "An ajiye a wannan na’ura",
+    "pendingSyncCount": "{count} na jira",
+    "syncingNow": "Ana daidaitawa…",
+    "syncedWithServer": "An daidaita",
+    "conflictNeedsReview": "A sake dubawa",
+    "syncNow": "Daidaita yanzu",
+    "retryOnLatest": "Aiwatar da canjin gida",
+    "discardLocalChange": "Watsar da canjin gida",
+    "localIntent": "Canjin da kuka shirya",
+    "serverCurrent": "Sigar sabar ta yanzu",
+    "listNotCached": "Ba a samun wannan jerin a wannan na’ura idan babu haɗi.",
+    "connectToCreate": "Haɗa da sabar don ƙirƙirar jeri.",
+    "offlineNoList": "Jerin ayyukan da aka buɗe yayin da akwai haɗi za su bayyana a nan.",
+    "offlineStorageUnavailable": "Ba a samun ma’ajiyar sayayya ta na’ura. Ba a adana wani canji ba."
   },
   "kds": {
     "addonsLabel": "Ƙarin Abubuwa",

@@ -606,7 +606,22 @@
     "lastPrice": "చివరి ధర: {price} · {date}",
     "versionConflict": "జాబితా మారింది. రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.",
     "acquired": "కొనుగోలు చేశారు",
-    "actualPrice": "సూచన ధర"
+    "actualPrice": "సూచన ధర",
+    "offlineMode": "ఆఫ్లైన్ · స్థానిక జాబితాలు",
+    "savedOnDevice": "ఈ పరికరంలో సేవ్ చేయబడింది",
+    "pendingSyncCount": "{count} పెండింగ్లో",
+    "syncingNow": "సింక్ అవుతోంది…",
+    "syncedWithServer": "సింక్ అయింది",
+    "conflictNeedsReview": "సమీక్ష అవసరం",
+    "syncNow": "ఇప్పుడే సింక్ చేయండి",
+    "retryOnLatest": "స్థానిక మార్పును వర్తింపజేయండి",
+    "discardLocalChange": "స్థానిక మార్పును తీసివేయండి",
+    "localIntent": "మీరు నమోదు చేయాలనుకున్న మార్పు",
+    "serverCurrent": "సర్వర్ ప్రస్తుత సంస్కరణ",
+    "listNotCached": "ఈ పరికరంలో ఈ జాబితా ఆఫ్లైన్లో అందుబాటులో లేదు.",
+    "connectToCreate": "జాబితా సృష్టించడానికి సర్వర్కు కనెక్ట్ అవ్వండి.",
+    "offlineNoList": "కనెక్ట్ అయి ఉన్నప్పుడు తెరిచిన ఆఫ్లైన్ జాబితాలు ఇక్కడ కనిపిస్తాయి.",
+    "offlineStorageUnavailable": "స్థానిక కొనుగోలు నిల్వ అందుబాటులో లేదు. మార్పులు ఏవీ సేవ్ కాలేదు."
   },
   "kds": {
     "addonsLabel": "యాడ్-ఆన్లు",

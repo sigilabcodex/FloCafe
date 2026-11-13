@@ -606,7 +606,22 @@
     "lastPrice": "Last price: {price} · {date}",
     "versionConflict": "This list changed. Refresh and try again.",
     "acquired": "Acquired",
-    "actualPrice": "Actual price"
+    "actualPrice": "Actual price",
+    "offlineMode": "Offline · local lists",
+    "savedOnDevice": "Saved on this device",
+    "pendingSyncCount": "{count} pending",
+    "syncingNow": "Syncing…",
+    "syncedWithServer": "Synced",
+    "conflictNeedsReview": "Needs review",
+    "syncNow": "Sync now",
+    "retryOnLatest": "Apply local change",
+    "discardLocalChange": "Discard local change",
+    "localIntent": "Your intended change",
+    "serverCurrent": "Current server version",
+    "listNotCached": "This list is not available offline on this device.",
+    "connectToCreate": "Connect to the server to create a list.",
+    "offlineNoList": "Offline lists appear here after you open them while connected.",
+    "offlineStorageUnavailable": "Local purchasing storage is unavailable. No changes were saved."
   },
   "kds": {
     "addonsLabel": "Add-ons",
