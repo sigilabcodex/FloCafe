@@ -8,6 +8,7 @@ import { useTranslations } from 'use-intl';
 import { Plus, ArrowLeft, ShoppingBasket, Check, MoreHorizontal, LoaderCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
+import { ShoppingListCard } from '@/components/purchasing/ShoppingListCard';
 import { Badge } from '@/components/ui/badge';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { useFormatDate } from '@/hooks/useFormatDate';
@@ -330,7 +331,7 @@ export default function PurchasingPage() {
             </article>;
           })}</div>}
         </section>
-      ) : loading ? <div className="flex justify-center py-16 text-muted-foreground"><LoaderCircle className="size-6 animate-spin" /></div> : lists.length === 0 ? <div className="rounded-xl border border-dashed border-border bg-card px-4 py-16 text-center"><ShoppingBasket className="mx-auto size-8 text-muted-foreground" /><p className="mt-3 text-sm text-muted-foreground">{t('emptyShoppingLists')}</p><Button className="mt-4 min-h-11" onClick={() => setCreating(true)}><Plus className="me-1 size-4" />{t('newShoppingList')}</Button></div> : <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{lists.map((list) => <button key={list.id} type="button" className="min-h-24 rounded-xl border border-border bg-card p-4 text-start shadow-sm transition hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => void openList(list.id)}><span className="block truncate font-semibold">{list.name}</span><span className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"><span>{list.line_count} · {t('shoppingLists')}</span><span>·</span><span>{formatDate(list.created_at)}</span></span></button>)}</div>}
+      ) : loading ? <div className="flex justify-center py-16 text-muted-foreground"><LoaderCircle className="size-6 animate-spin" /></div> : lists.length === 0 ? <div className="rounded-xl border border-dashed border-border bg-card px-4 py-16 text-center"><ShoppingBasket className="mx-auto size-8 text-muted-foreground" /><p className="mt-3 text-sm text-muted-foreground">{t('emptyShoppingLists')}</p><Button className="mt-4 min-h-11" onClick={() => setCreating(true)}><Plus className="me-1 size-4" />{t('newShoppingList')}</Button></div> : <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{lists.map((list) => <ShoppingListCard key={list.id} name={list.name} lineCount={list.line_count || 0} lineCountLabel={t('shoppingLists')} createdAt={formatDate(list.created_at)} onSelect={() => void openList(list.id)} />)}</div>}
     </main>
   );
 }

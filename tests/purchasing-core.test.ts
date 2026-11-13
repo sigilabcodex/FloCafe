@@ -1,5 +1,6 @@
 const Module = require('module');
 const originalLoad = Module._load;
+const originalResolveFilename = Module._resolveFilename;
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -8,12 +9,25 @@ Module._load = function (request: string) {
   if (request === 'electron') return { app: { isPackaged: true, getPath: () => testDir, getVersion: () => 'test' } };
   return originalLoad.apply(this, arguments as any);
 };
+Module._resolveFilename = function (request: string, parent: unknown, isMain: boolean, options?: unknown) {
+  const resolved = request.startsWith('@/') ? path.resolve(__dirname, '../frontend/src', request.slice(2)) : request;
+  return originalResolveFilename.call(this, resolved, parent, isMain, options);
+};
 const { initTestDb, seedOwnerUser, assertOrThrow, assertEqualOrThrow, resetCounters, getResults, createApp, startServer, api } = require('./helpers/test-setup');
 const { createSupply, getSupply } = require('../main/services/supplies');
 const { createPurchasingList, getPurchasingList, acquirePurchasingLine, listPriceObservations, correctPriceObservation, markPurchasingLineNotFound } = require('../main/services/purchasing');
 
 async function main() {
   resetCounters();
+  const frontendRequire = Module.createRequire(path.resolve(__dirname, '../frontend/package.json'));
+  const React = frontendRequire('react');
+  const ReactDOMServer = frontendRequire('react-dom/server');
+  const { ShoppingListCard } = require('../frontend/src/components/purchasing/ShoppingListCard');
+  const renderedCard = ReactDOMServer.renderToStaticMarkup(React.createElement(ShoppingListCard, {
+    name: 'Weekly flour', lineCount: 3, lineCountLabel: 'shopping list lines', createdAt: 'Nov 12', onSelect: () => undefined,
+  }));
+  assertOrThrow(renderedCard.includes('Weekly flour') && renderedCard.includes('3 · shopping list lines'), 'shopping list card renders list summary');
+  assertOrThrow(renderedCard.includes('min-h-24') && renderedCard.includes('type="button"'), 'shopping list card provides a touch-sized button');
   const db = initTestDb();
   const owner = seedOwnerUser(db);
   const actor = owner.userId;
