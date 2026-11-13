@@ -1,4 +1,6 @@
-const CACHE_NAME = 'flo-v20';
+const CACHE_NAME = 'flo-v21';
+const APP_CACHE_PATTERN = /^flo-v\d+$/;
+const PUBLIC_SHELL_PATHS = new Set(['/dashboard', '/pos', '/purchasing']);
 const PRECACHE_URLS = [
   '/dashboard',
   '/pos',
@@ -46,7 +48,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys
-        .filter((k) => k !== CACHE_NAME)
+        .filter((k) => APP_CACHE_PATTERN.test(k) && k !== CACHE_NAME)
         .map((k) => caches.delete(k).catch(() => false)))
     ).then(() => self.clients.claim())
   );
@@ -83,6 +85,17 @@ function isPageRequest(request) {
   return !lastSegment.includes('.');
 }
 
+function isCacheablePublicRequest(request, url) {
+  if (url.origin !== self.location.origin) return false;
+  if (url.pathname.startsWith('/_next/static/')) return true;
+  if (['/manifest.json', '/icon-192.png', '/icon-512.png', '/logo.svg'].includes(url.pathname)) return true;
+  if (request.mode === 'navigate' || isPageRequest(request)) {
+    const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/$/, '') : url.pathname;
+    return PUBLIC_SHELL_PATHS.has(pathname);
+  }
+  return false;
+}
+
 function offlineResponse(request) {
   // Navigation (and page prefetches) need a real HTTP response so Electron
   // shows a useful offline state instead of a service-worker
@@ -104,11 +117,11 @@ self.addEventListener('fetch', (event) => {
 
   // Never cache API/setup/auth calls — these must reflect current DB state.
   if (
-    url.hostname !== self.location.hostname ||
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/auth') ||
     url.pathname.startsWith('/setup')
   ) return;
+  if (!isCacheablePublicRequest(event.request, url)) return;
 
   event.respondWith(
     fetch(event.request)
@@ -131,12 +144,12 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
         return matchCached(event.request)
-          .then((cached) => cached || matchCached('/dashboard'))
+          .then((cached) => cached || matchCached('/purchasing'))
           .then((cached) => cached || response);
       })
       .catch(() => matchCached(event.request)
         .then((cached) => cached || (
-          isPageRequest(event.request) ? matchCached('/dashboard') : null
+          isPageRequest(event.request) ? matchCached('/purchasing') : null
         ))
         .then((cached) => cached || offlineResponse(event.request))
       )

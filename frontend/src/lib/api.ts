@@ -154,6 +154,7 @@ api.interceptors.response.use(
       // KDS routes render inline login; avoid redirecting away to /auth/login.
       const isKdsPath = window.location.pathname.startsWith('/kds');
       localStorage.removeItem('token');
+      localStorage.removeItem('flo-purchasing-offline-session-v1');
       if (isKdsPath || error.config?.skipAuthRedirect) return Promise.reject(error);
       // Don't redirect when already on the login page — let the login handler show the error
       if (!window.location.pathname.includes('/auth/login') && !authRedirectInProgress) {

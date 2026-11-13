@@ -71,8 +71,8 @@ export default function KdsPage() {
         .getState()
         .replaceSessionToken(nextToken, hasPin !== undefined ? { has_pin: hasPin } : undefined);
     },
-    onSessionAuthenticated: ({ token, user, tenant, tenants }) => {
-      useAuthStore.getState().syncAuthenticatedSession({
+    onSessionAuthenticated: async ({ token, user, tenant, tenants }) => {
+      await useAuthStore.getState().syncAuthenticatedSession({
         token,
         user,
         currentTenant: tenant,

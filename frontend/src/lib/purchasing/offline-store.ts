@@ -1,6 +1,7 @@
 export type PurchasingUnit = 'each' | 'g' | 'kg' | 'ml' | 'l';
 export type PurchasingStatus = 'pending' | 'acquired' | 'not_found';
-export type PurchasingScope = { installationId: string; tenantId: number; userId: number };
+export type PurchasingScope = { installationId: string; tenantId: number; userId: number | string; principalId: string };
+export type PurchasingIdentityBinding = { userId: number | string; tenantId: number; principalId: string };
 export type OfflineLine = {
   id: string;
   supply_id: string;
@@ -58,16 +59,123 @@ type CachedRecord = { key: string; scopeKey: string; listId: string; list: Offli
 type ScopeRecord = { scopeKey: string; nextSequence: number; lockOwner?: string; lockExpiresAt?: number };
 
 const DATABASE = 'flo-purchasing-offline-v1';
-const VERSION = 1;
+const VERSION = 2;
+const IDENTITY_SESSION_KEY = 'flo-purchasing-offline-session-v1';
 let databasePromise: Promise<IDBDatabase> | null = null;
 
-export function getPurchasingScope(tenantId: number, userId: number): PurchasingScope {
-  const installationId = typeof window === 'undefined' ? 'server' : window.location.origin;
-  return { installationId, tenantId, userId };
+function installationId(): string {
+  return typeof window === 'undefined' ? 'server' : window.location.origin;
+}
+
+function identityAccountKey(userId: number | string, tenantId: number, origin = installationId()): string {
+  return JSON.stringify([origin, tenantId, String(userId)]);
+}
+
+function legacyScopeKey(userId: number | string, tenantId: number, origin: string): string {
+  // v1 used the original numeric user ID in its JSON scope key.
+  return JSON.stringify([origin, tenantId, userId]);
+}
+
+export function readPurchasingIdentityBinding(): PurchasingIdentityBinding | null {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const value = JSON.parse(localStorage.getItem(IDENTITY_SESSION_KEY) || 'null') as Partial<PurchasingIdentityBinding> | null;
+    const validUserId = typeof value?.userId === 'number'
+      ? Number.isSafeInteger(value.userId) && value.userId > 0
+      : typeof value?.userId === 'string' && value.userId.length > 0 && value.userId.length <= 128;
+    if (!value || !validUserId || !Number.isSafeInteger(value.tenantId) || value.tenantId! <= 0 || typeof value.principalId !== 'string' || !/^[0-9a-f]{64}$/.test(value.principalId)) return null;
+    return value as PurchasingIdentityBinding;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPurchasingIdentityBinding(): void {
+  try { localStorage.removeItem(IDENTITY_SESSION_KEY); } catch { /* Session cleanup remains best-effort. */ }
+}
+
+function makePrincipalId(): string | null {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi?.getRandomValues) return null;
+  const bytes = cryptoApi.getRandomValues(new Uint8Array(32));
+  return Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
+}
+
+async function migrateLegacyScope(db: IDBDatabase, scope: PurchasingScope): Promise<void> {
+  const oldKey = legacyScopeKey(scope.userId, scope.tenantId, scope.installationId);
+  const newKey = scopeKey(scope);
+  if (oldKey === newKey) return;
+  const tx = db.transaction(['lists', 'operations', 'scopes'], 'readwrite');
+  const done = transactionDone(tx);
+  const lists = tx.objectStore('lists');
+  const operations = tx.objectStore('operations');
+  const scopes = tx.objectStore('scopes');
+  try {
+    const [oldLists, newLists, oldOperations, newOperations, oldScope, newScope] = await Promise.all([
+      requestValue(lists.index('scopeKey').getAll(oldKey) as IDBRequest<CachedRecord[]>),
+      requestValue(lists.index('scopeKey').getAll(newKey) as IDBRequest<CachedRecord[]>),
+      requestValue(operations.index('scopeKey').getAll(oldKey) as IDBRequest<OfflineOperation[]>),
+      requestValue(operations.index('scopeKey').getAll(newKey) as IDBRequest<OfflineOperation[]>),
+      requestValue(scopes.get(oldKey) as IDBRequest<ScopeRecord | undefined>),
+      requestValue(scopes.get(newKey) as IDBRequest<ScopeRecord | undefined>),
+    ]);
+    if (oldLists.length === 0 && oldOperations.length === 0 && !oldScope) { await done; return; }
+    const existingListIds = new Set(newLists.map((record) => record.listId));
+    for (const record of oldLists) {
+      lists.delete(record.key);
+      if (!existingListIds.has(record.listId)) lists.put({ ...record, key: lineKey(scope, record.listId), scopeKey: newKey });
+    }
+    const orderedOperations = [...newOperations, ...oldOperations]
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.sequence - b.sequence);
+    orderedOperations.forEach((operation, index) => operations.put({ ...operation, scopeKey: newKey, sequence: index + 1 }));
+    if (oldScope) scopes.delete(oldKey);
+    if (oldScope || newScope || orderedOperations.length > 0) {
+      scopes.put({ scopeKey: newKey, nextSequence: orderedOperations.length + 1, ...(newScope?.lockOwner ? { lockOwner: newScope.lockOwner, lockExpiresAt: newScope.lockExpiresAt } : {}) });
+    }
+    await done;
+  } catch (error) {
+    await done.catch(() => {});
+    throw error;
+  }
+}
+
+export async function bindPurchasingIdentity(userId: number | string, tenantId: number): Promise<PurchasingIdentityBinding | null> {
+  if (typeof localStorage === 'undefined' || !Number.isSafeInteger(tenantId)) return null;
+  const db = await openDatabase();
+  const origin = installationId();
+  const accountKey = identityAccountKey(userId, tenantId, origin);
+  const tx = db.transaction('identities', 'readwrite');
+  const store = tx.objectStore('identities');
+  const done = transactionDone(tx);
+  let principalId: string | null;
+  try {
+    const existing = await requestValue(store.get(accountKey) as IDBRequest<{ accountKey: string; principalId: string } | undefined>);
+    principalId = existing?.principalId || makePrincipalId();
+    if (!principalId) {
+      tx.abort();
+      await done.catch(() => {});
+      return null;
+    }
+    if (!existing) store.put({ accountKey, principalId });
+    await done;
+  } catch (error) {
+    await done.catch(() => {});
+    throw error;
+  }
+  const binding: PurchasingIdentityBinding = { userId, tenantId, principalId };
+  localStorage.setItem(IDENTITY_SESSION_KEY, JSON.stringify(binding));
+  await migrateLegacyScope(db, { installationId: origin, tenantId, userId, principalId });
+  return binding;
+}
+
+export function getPurchasingScope(tenantId: number, userId: number | string): PurchasingScope | null {
+  const binding = readPurchasingIdentityBinding();
+  if (!binding || binding.tenantId !== tenantId || String(binding.userId) !== String(userId)) return null;
+  return { installationId: installationId(), tenantId, userId, principalId: binding.principalId };
 }
 
 export function scopeKey(scope: PurchasingScope): string {
-  return JSON.stringify([scope.installationId, scope.tenantId, scope.userId]);
+  return JSON.stringify([scope.installationId, scope.tenantId, String(scope.userId), scope.principalId]);
 }
 
 function openDatabase(): Promise<IDBDatabase> {
@@ -77,13 +185,20 @@ function openDatabase(): Promise<IDBDatabase> {
       const request = indexedDB.open(DATABASE, VERSION);
       request.onupgradeneeded = () => {
         const db = request.result;
-        const lists = db.createObjectStore('lists', { keyPath: 'key' });
-        lists.createIndex('scopeKey', 'scopeKey', { unique: false });
-        const operations = db.createObjectStore('operations', { keyPath: 'operationId' });
-        operations.createIndex('scopeKey', 'scopeKey', { unique: false });
-        operations.createIndex('scopeSequence', ['scopeKey', 'sequence'], { unique: true });
-        const scopes = db.createObjectStore('scopes', { keyPath: 'scopeKey' });
-        scopes.createIndex('installationId', 'installationId', { unique: false });
+        if (!db.objectStoreNames.contains('lists')) {
+          const lists = db.createObjectStore('lists', { keyPath: 'key' });
+          lists.createIndex('scopeKey', 'scopeKey', { unique: false });
+        }
+        if (!db.objectStoreNames.contains('operations')) {
+          const operations = db.createObjectStore('operations', { keyPath: 'operationId' });
+          operations.createIndex('scopeKey', 'scopeKey', { unique: false });
+          operations.createIndex('scopeSequence', ['scopeKey', 'sequence'], { unique: true });
+        }
+        if (!db.objectStoreNames.contains('scopes')) {
+          const scopes = db.createObjectStore('scopes', { keyPath: 'scopeKey' });
+          scopes.createIndex('installationId', 'installationId', { unique: false });
+        }
+        if (!db.objectStoreNames.contains('identities')) db.createObjectStore('identities', { keyPath: 'accountKey' });
       };
       request.onsuccess = () => {
         request.result.onversionchange = () => request.result.close();
@@ -275,7 +390,13 @@ export async function confirmOfflineOperation(scope: PurchasingScope, operationI
       if (line.id !== operation.lineId) return line;
       if (operation.kind === 'not_found') {
         const resultLine = serverResult.line as Partial<OfflineLine> | undefined;
-        return { ...line, status: 'not_found' as const, version: resultLine?.version ?? operation.expectedVersion + 1 };
+        return {
+          ...line,
+          status: 'not_found' as const,
+          version: resultLine?.version ?? operation.expectedVersion + 1,
+          syncState: undefined,
+          localOperationId: undefined,
+        };
       }
       const result = serverResult.acquisition as { status?: PurchasingStatus; purchasedQuantity?: number; version?: number } | undefined;
       const payload = operation.payload || {};

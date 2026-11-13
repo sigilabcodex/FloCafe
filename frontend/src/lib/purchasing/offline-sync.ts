@@ -95,7 +95,7 @@ async function synchronize(scope: PurchasingScope, onChange?: () => void): Promi
 }
 
 export function flushPurchasingOutbox(scope: PurchasingScope, onChange?: () => void): Promise<SyncResult> {
-  const key = JSON.stringify([scope.installationId, scope.tenantId, scope.userId]);
+  const key = JSON.stringify([scope.installationId, scope.tenantId, String(scope.userId), scope.principalId]);
   const existing = running.get(key);
   if (existing) return existing;
   const job = synchronize(scope, onChange).finally(() => running.delete(key));

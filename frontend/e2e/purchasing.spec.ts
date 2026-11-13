@@ -70,18 +70,13 @@ test('purchasing list workflow stays confirmed, responsive, and recoverable', as
       forceConflict = false;
       await route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ code: 'conflict' }) });
     } else {
-      const appliedResponse = await route.fetch();
-      expect(appliedResponse.status()).toBe(201);
-      await route.abort('failed');
+      await route.continue();
     }
   });
   const flourCard = page.locator('article').filter({ hasText: supplyNames[0] });
   await flourCard.getByRole('button', { name: 'Mark acquired' }).click();
   await expect(flourCard.getByRole('heading', { name: 'Needs review' })).toBeVisible();
   await flourCard.getByRole('button', { name: 'Apply local change' }).click();
-  await expect(page.getByText(/\d+ pending/)).toBeVisible();
-  await page.unrouteAll({ behavior: 'wait' });
-  await page.getByRole('button', { name: 'Sync now' }).click();
   await expect(page.getByRole('button', { name: 'Sync now' })).toHaveCount(0);
   await expect.poll(async () => {
     const response = await request.get(`${BASE}/api/purchasing/lists/${listId}`, { headers });
@@ -179,8 +174,22 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   const flourCard = page.locator('article').filter({ hasText: `C3 Offline Flour ${stamp}` });
   const partialCard = page.locator('article').filter({ hasText: `C3 Partial Sugar ${stamp}` });
   const notFoundCard = page.locator('article').filter({ hasText: `C3 Unavailable Salt ${stamp}` });
+  const notFoundResponses: Array<{ status: number; body: string }> = [];
+  page.on('response', async (response) => {
+    if (response.url().includes('/not-found')) {
+      notFoundResponses.push({ status: response.status(), body: await response.text().catch(() => '') });
+    }
+  });
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+  const cacheState = await page.evaluate(async () => ({
+    purchasingShell: Boolean(await caches.match('/purchasing')),
+    privateApi: Boolean(await caches.match('/api/purchasing/lists')),
+    unrelatedRoute: Boolean(await caches.match('/orders')),
+  }));
+  expect(cacheState.purchasingShell).toBe(true);
+  expect(cacheState.privateApi).toBe(false);
+  expect(cacheState.unrelatedRoute).toBe(false);
 
   await page.context().setOffline(true);
   await flourCard.getByRole('button', { name: 'Mark acquired' }).click();
@@ -196,6 +205,7 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   await partialCard.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(partialCard).toContainText('Purchased quantity: 1 kg');
   await notFoundCard.getByRole('button', { name: 'Not found' }).click();
+  await expect(notFoundCard.getByText('Saved on this device')).toBeVisible();
   await page.reload();
   await expect(page.getByText(`C3 Offline List ${stamp}`)).toBeVisible();
   await page.getByText(`C3 Offline List ${stamp}`).click();
@@ -203,13 +213,42 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   await expect(page.locator('article').filter({ hasText: `C3 Partial Sugar ${stamp}` })).toContainText('Purchased quantity: 1 kg');
   await expect(page.locator('article').filter({ hasText: `C3 Unavailable Salt ${stamp}` }).getByText('Not found', { exact: true })).toBeVisible();
 
+  const acquisitionUrl = `**/api/purchasing/lines/${line.id}/acquisitions`;
+  await page.route(acquisitionUrl, async (route) => {
+    const response = await route.fetch();
+    expect(response.status()).toBe(201);
+    await route.abort();
+  });
   await page.context().setOffline(false);
+  await expect(flourCard.getByText('Saved on this device')).toBeVisible();
   await expect.poll(async () => {
+    const response = await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers });
+    const current = (await response.json()).list;
+    return current.lines.find((item: { id: string }) => item.id === line.id).status;
+  }).toBe('acquired');
+  await page.unroute(acquisitionUrl);
+  const syncButton = page.getByRole('button', { name: 'Sync now' });
+  await expect(syncButton).toBeEnabled();
+  await syncButton.click();
+  try {
+    await expect.poll(async () => {
     const response = await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers });
     const lines = (await response.json()).list.lines;
     const partial = lines.find((item: { supply_id: string }) => item.supply_id === partialSupplyId);
     return [lines.find((item: { id: string }) => item.id === line.id)?.status, partial?.status, partial?.purchased_quantity, lines.find((item: { supply_id: string }) => item.supply_id === notFoundSupplyId)?.status].join('|');
-  }).toBe('acquired|pending|1|not_found');
+    }, { timeout: 20000 }).toBe('acquired|pending|1|not_found');
+  } catch (error) {
+    const operations = await page.evaluate(async () => new Promise((resolve, reject) => {
+      const request = indexedDB.open('flo-purchasing-offline-v1');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const transaction = request.result.transaction('operations', 'readonly');
+        const all = transaction.objectStore('operations').getAll();
+        all.onsuccess = () => resolve(all.result.map((item: { kind: string; state: string; error?: string; lineId: string }) => ({ ...item })));
+      };
+    }));
+    throw new Error(`${String(error)}; not-found responses=${JSON.stringify(notFoundResponses)}; operations=${JSON.stringify(operations)}`);
+  }
   const syncedList = (await (await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers })).json()).list;
   expect(syncedList.lines.find((item: { supply_id: string }) => item.supply_id === partialSupplyId).status).toBe('pending');
   expect(syncedList.lines.find((item: { supply_id: string }) => item.supply_id === partialSupplyId).purchased_quantity).toBe(1);
@@ -224,4 +263,86 @@ test('a cached purchasing list survives an offline reload and syncs once online'
     const response = await request.get(`${BASE}/api/supplies/${id}`, { headers });
     expect((await response.json()).supply.stock_quantity).toBe(0);
   }
+
+  // A forged local user ID must not select the previously authenticated user's cache.
+  await page.context().setOffline(true);
+  await page.evaluate(() => {
+    const key = 'flo-purchasing-offline-session-v1';
+    const identity = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!identity) throw new Error('Purchasing identity binding was not persisted');
+    identity.userId = 'forged-user-id';
+    localStorage.setItem(key, JSON.stringify(identity));
+  });
+  await page.reload();
+  await expect(page.getByText(`C3 Offline List ${stamp}`)).toHaveCount(0);
+});
+
+test('an offline purchase keeps its intent through a version conflict', async ({ page, request }) => {
+  const login = await request.post(`${BASE}/api/auth/login`, {
+    data: { email: 'owner@flo.local', password: E2E_PASSWORD },
+  });
+  expect(login.status()).toBe(200);
+  const { access_token } = await login.json();
+  const headers = { Authorization: `Bearer ${access_token}` };
+  const stamp = Date.now();
+  const supplyResponse = await request.post(`${BASE}/api/supplies`, {
+    headers,
+    data: { name: `C3 Conflict Flour ${stamp}`, base_unit: 'kg', stock_quantity: 0 },
+  });
+  expect(supplyResponse.status()).toBe(201);
+  const supplyId = (await supplyResponse.json()).supply.id;
+  const listResponse = await request.post(`${BASE}/api/purchasing/lists`, {
+    headers,
+    data: {
+      name: `C3 Conflict List ${stamp}`,
+      idempotency_key: `c3-conflict-list-${stamp}`,
+      lines: [{ supply_id: supplyId, planned_quantity: 2, planned_unit: 'kg', reference_price: 30, reference_unit: 'kg' }],
+    },
+  });
+  expect(listResponse.status()).toBe(201);
+  const list = (await listResponse.json()).list;
+  const line = list.lines[0];
+
+  await page.goto(`${BASE}/auth/login`);
+  await page.locator('#email').fill('owner@flo.local');
+  await page.locator('#password').fill(E2E_PASSWORD);
+  await page.locator('button[type="submit"]').click();
+  await page.waitForURL((url) => !url.pathname.startsWith('/auth/login'));
+  await page.goto(`${BASE}/purchasing`);
+  await page.getByText(`C3 Conflict List ${stamp}`).click();
+  await expect(page.getByText(`C3 Conflict Flour ${stamp}`)).toBeVisible();
+  const card = page.locator('article').filter({ hasText: `C3 Conflict Flour ${stamp}` });
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+  await page.context().setOffline(true);
+  await card.getByRole('button', { name: 'Edit', exact: true }).click();
+  await card.getByLabel('Planned quantity').fill('0.5');
+  await card.getByLabel('Actual price').fill('31');
+  await card.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(card.getByText('Saved on this device')).toBeVisible();
+  await page.reload();
+  await page.getByText(`C3 Conflict List ${stamp}`).click();
+  await expect(page.getByText(`C3 Conflict Flour ${stamp}`)).toBeVisible();
+
+  const competingPurchase = await request.post(`${BASE}/api/purchasing/lines/${line.id}/acquisitions`, {
+    headers,
+    data: { quantity: 0.5, unit: 'kg', price: 35, expected_version: 0, idempotency_key: `c3-race-${stamp}` },
+  });
+  expect(competingPurchase.status()).toBe(201);
+  await page.context().setOffline(false);
+  await expect(page.getByText(/Needs review: 1/)).toBeVisible();
+  const listButton = page.getByRole('button', { name: new RegExp(`C3 Conflict List ${stamp}`) });
+  if (await listButton.count()) await listButton.click();
+  await expect(card.getByText('Needs review').first()).toBeVisible();
+  await expect(card.getByText(/Your intended change/)).toBeVisible();
+  await expect(card).toContainText('31');
+  await card.getByRole('button', { name: 'Apply local change' }).click();
+  await expect.poll(async () => {
+    const response = await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers });
+    const current = (await response.json()).list.lines[0];
+    return `${current.status}|${current.purchased_quantity}`;
+  }).toBe('pending|1');
+  const stock = await request.get(`${BASE}/api/supplies/${supplyId}`, { headers });
+  expect((await stock.json()).supply.stock_quantity).toBe(0);
 });
