@@ -592,7 +592,21 @@
     "recipeCost": "Собівартість рецепта",
     "costUnknown": "Собівартість невідома",
     "productionIssue": "Витрати на виробництво",
-    "productionOutput": "Випуск продукції"
+    "productionOutput": "Випуск продукції",
+    "shoppingLists": "Списки покупок",
+    "newShoppingList": "Новий список",
+    "emptyShoppingLists": "Списків покупок ще немає",
+    "plannedQuantity": "Запланована кількість",
+    "referencePrice": "Довідкова ціна",
+    "markAcquired": "Позначити як придбане",
+    "markNotFound": "Не знайдено",
+    "brand": "Бренд",
+    "supplier": "Постачальник",
+    "purchasedQuantity": "Придбана кількість",
+    "lastPrice": "Остання ціна: {price} · {date}",
+    "versionConflict": "Список змінився. Оновіть його та спробуйте ще раз.",
+    "acquired": "Придбано",
+    "actualPrice": "Довідкова ціна"
   },
   "kds": {
     "addonsLabel": "Додатки",
@@ -666,7 +680,8 @@
     "user": "Користувач",
     "whatsapp": "WhatsApp",
     "inventory": "Склад",
-    "tables": "Столи"
+    "tables": "Столи",
+    "purchasing": "Закупівлі"
   },
   "orders": {
     "active": "Активні",

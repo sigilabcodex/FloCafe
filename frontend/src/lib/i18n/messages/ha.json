@@ -592,7 +592,21 @@
     "recipeCost": "Farashin tsarin girki",
     "costUnknown": "Ba a san farashin samarwa ba",
     "productionIssue": "Amfani wajen samarwa",
-    "productionOutput": "Abin da aka samar"
+    "productionOutput": "Abin da aka samar",
+    "shoppingLists": "Jerin sayayya",
+    "newShoppingList": "Sabon jeri",
+    "emptyShoppingLists": "Babu jerin sayayya tukuna",
+    "plannedQuantity": "Adadin da aka tsara",
+    "referencePrice": "Farashin tunani",
+    "markAcquired": "Alama a matsayin an saya",
+    "markNotFound": "Ba a samu ba",
+    "brand": "Alama",
+    "supplier": "Mai kaya",
+    "purchasedQuantity": "Adadin da aka saya",
+    "lastPrice": "Farashi na ƙarshe: {price} · {date}",
+    "versionConflict": "Jerin ya canza. Sabunta shi sannan a sake gwadawa.",
+    "acquired": "An saya",
+    "actualPrice": "Farashin tunani"
   },
   "kds": {
     "addonsLabel": "Ƙarin Abubuwa",
@@ -666,7 +680,8 @@
     "user": "Mai amfani",
     "whatsapp": "WhatsApp",
     "inventory": "Kayan Ajiya",
-    "tables": "Tebura"
+    "tables": "Tebura",
+    "purchasing": "Sayayya"
   },
   "orders": {
     "active": "Masu aiki",

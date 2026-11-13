@@ -592,7 +592,21 @@
     "recipeCost": "تكلفة الوصفة",
     "costUnknown": "التكلفة غير معروفة",
     "productionIssue": "استهلاك الإنتاج",
-    "productionOutput": "ناتج الإنتاج"
+    "productionOutput": "ناتج الإنتاج",
+    "shoppingLists": "قوائم التسوق",
+    "newShoppingList": "قائمة جديدة",
+    "emptyShoppingLists": "لا توجد قوائم تسوق بعد",
+    "plannedQuantity": "الكمية المخططة",
+    "referencePrice": "السعر المرجعي",
+    "markAcquired": "تحديد كمشترى",
+    "markNotFound": "غير متوفر",
+    "brand": "العلامة التجارية",
+    "supplier": "المورد",
+    "purchasedQuantity": "الكمية المشتراة",
+    "lastPrice": "آخر سعر: {price} · {date}",
+    "versionConflict": "تغيرت القائمة. حدّثها ثم حاول مرة أخرى.",
+    "acquired": "تم الشراء",
+    "actualPrice": "السعر المرجعي"
   },
   "kds": {
     "addonsLabel": "الإضافات",
@@ -666,7 +680,8 @@
     "uptimeLabel": "أعلى: ",
     "user": "المستخدم",
     "whatsapp": "واتساب",
-    "inventory": "المخزون"
+    "inventory": "المخزون",
+    "purchasing": "المشتريات"
   },
   "orders": {
     "active": "نشط",

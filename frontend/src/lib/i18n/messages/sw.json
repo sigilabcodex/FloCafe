@@ -592,7 +592,21 @@
     "recipeCost": "Gharama ya mapishi",
     "costUnknown": "Gharama haijulikani",
     "productionIssue": "Matumizi ya uzalishaji",
-    "productionOutput": "Matokeo ya uzalishaji"
+    "productionOutput": "Matokeo ya uzalishaji",
+    "shoppingLists": "Orodha za manunuzi",
+    "newShoppingList": "Orodha mpya",
+    "emptyShoppingLists": "Bado hakuna orodha za manunuzi",
+    "plannedQuantity": "Kiasi kilichopangwa",
+    "referencePrice": "Bei ya marejeo",
+    "markAcquired": "Weka kuwa imenunuliwa",
+    "markNotFound": "Haikupatikana",
+    "brand": "Chapa",
+    "supplier": "Msambazaji",
+    "purchasedQuantity": "Kiasi kilichonunuliwa",
+    "lastPrice": "Bei ya mwisho: {price} · {date}",
+    "versionConflict": "Orodha hii imebadilika. Onyesha upya kisha ujaribu tena.",
+    "acquired": "Imenunuliwa",
+    "actualPrice": "Bei ya marejeo"
   },
   "kds": {
     "addonsLabel": "Viongezeo",
@@ -666,7 +680,8 @@
     "user": "Mtumiaji",
     "whatsapp": "WhatsApp",
     "inventory": "Akiba",
-    "tables": "Meza"
+    "tables": "Meza",
+    "purchasing": "Ununuzi"
   },
   "orders": {
     "active": "Zinazoendelea",

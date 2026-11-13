@@ -592,7 +592,21 @@
     "recipeCost": "레시피 원가",
     "costUnknown": "원가 미지정",
     "productionIssue": "생산 사용량",
-    "productionOutput": "생산 산출량"
+    "productionOutput": "생산 산출량",
+    "shoppingLists": "장보기 목록",
+    "newShoppingList": "새 목록",
+    "emptyShoppingLists": "장보기 목록이 없습니다",
+    "plannedQuantity": "계획 수량",
+    "referencePrice": "참고 가격",
+    "markAcquired": "구매 완료로 표시",
+    "markNotFound": "찾을 수 없음",
+    "brand": "브랜드",
+    "supplier": "공급업체",
+    "purchasedQuantity": "구매 수량",
+    "lastPrice": "최근 가격: {price} · {date}",
+    "versionConflict": "목록이 변경되었습니다. 새로고침 후 다시 시도하세요.",
+    "acquired": "구매 완료",
+    "actualPrice": "참고 가격"
   },
   "kds": {
     "addonsLabel": "추가 메뉴",
@@ -666,7 +680,8 @@
     "user": "사용자",
     "whatsapp": "WhatsApp",
     "inventory": "재고",
-    "tables": "테이블"
+    "tables": "테이블",
+    "purchasing": "구매"
   },
   "orders": {
     "active": "진행 중",

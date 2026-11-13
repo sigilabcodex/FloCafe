@@ -592,7 +592,21 @@
     "recipeCost": "レシピ原価",
     "costUnknown": "原価未設定",
     "productionIssue": "製造消費",
-    "productionOutput": "製造出力"
+    "productionOutput": "製造出力",
+    "shoppingLists": "買い物リスト",
+    "newShoppingList": "新しいリスト",
+    "emptyShoppingLists": "買い物リストはありません",
+    "plannedQuantity": "予定数量",
+    "referencePrice": "参考価格",
+    "markAcquired": "購入済みにする",
+    "markNotFound": "見つかりません",
+    "brand": "ブランド",
+    "supplier": "仕入先",
+    "purchasedQuantity": "購入数量",
+    "lastPrice": "最終価格: {price} · {date}",
+    "versionConflict": "リストが変更されました。更新して再試行してください。",
+    "acquired": "購入済み",
+    "actualPrice": "参考価格"
   },
   "kds": {
     "addonsLabel": "追加項目",
@@ -666,7 +680,8 @@
     "user": "ユーザー",
     "whatsapp": "WhatsApp",
     "inventory": "在庫",
-    "tables": "テーブル"
+    "tables": "テーブル",
+    "purchasing": "仕入れ"
   },
   "orders": {
     "active": "有効",

@@ -592,7 +592,21 @@
     "recipeCost": "Biaya resep",
     "costUnknown": "Biaya belum diketahui",
     "productionIssue": "Pemakaian produksi",
-    "productionOutput": "Hasil produksi"
+    "productionOutput": "Hasil produksi",
+    "shoppingLists": "Daftar belanja",
+    "newShoppingList": "Daftar baru",
+    "emptyShoppingLists": "Belum ada daftar belanja",
+    "plannedQuantity": "Jumlah rencana",
+    "referencePrice": "Harga acuan",
+    "markAcquired": "Tandai dibeli",
+    "markNotFound": "Tidak ditemukan",
+    "brand": "Merek",
+    "supplier": "Pemasok",
+    "purchasedQuantity": "Jumlah dibeli",
+    "lastPrice": "Harga terakhir: {price} · {date}",
+    "versionConflict": "Daftar ini berubah. Muat ulang lalu coba lagi.",
+    "acquired": "Dibeli",
+    "actualPrice": "Harga acuan"
   },
   "kds": {
     "addonsLabel": "Tambahan",
@@ -666,7 +680,8 @@
     "user": "Pengguna",
     "whatsapp": "WhatsApp",
     "inventory": "Persediaan",
-    "tables": "Meja"
+    "tables": "Meja",
+    "purchasing": "Pembelian"
   },
   "orders": {
     "active": "Aktif",

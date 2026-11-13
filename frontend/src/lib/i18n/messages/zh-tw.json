@@ -592,7 +592,21 @@
     "recipeCost": "配方成本",
     "costUnknown": "成本未知",
     "productionIssue": "生產耗用",
-    "productionOutput": "生產產出"
+    "productionOutput": "生產產出",
+    "shoppingLists": "採買清單",
+    "newShoppingList": "新增清單",
+    "emptyShoppingLists": "尚無採買清單",
+    "plannedQuantity": "預計數量",
+    "referencePrice": "參考價格",
+    "markAcquired": "標記為已購買",
+    "markNotFound": "找不到",
+    "brand": "品牌",
+    "supplier": "供應商",
+    "purchasedQuantity": "已購數量",
+    "lastPrice": "最近價格：{price} · {date}",
+    "versionConflict": "清單已變更。請重新整理後再試。",
+    "acquired": "已購買",
+    "actualPrice": "參考價格"
   },
   "kds": {
     "addonsLabel": "加購",
@@ -666,7 +680,8 @@
     "uptimeLabel": "執行：",
     "user": "使用者",
     "whatsapp": "WhatsApp",
-    "inventory": "庫存"
+    "inventory": "庫存",
+    "purchasing": "採購"
   },
   "orders": {
     "active": "進行中",

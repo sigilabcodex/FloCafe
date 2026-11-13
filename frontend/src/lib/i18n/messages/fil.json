@@ -592,7 +592,21 @@
     "recipeCost": "Gastos sa recipe",
     "costUnknown": "Hindi alam ang gastos",
     "productionIssue": "Konsumo sa produksyon",
-    "productionOutput": "Output ng produksyon"
+    "productionOutput": "Output ng produksyon",
+    "shoppingLists": "Mga listahan ng bibilhin",
+    "newShoppingList": "Bagong listahan",
+    "emptyShoppingLists": "Wala pang listahan ng bibilhin",
+    "plannedQuantity": "Nakaplanong dami",
+    "referencePrice": "Batayang presyo",
+    "markAcquired": "Markahang nabili",
+    "markNotFound": "Hindi nakita",
+    "brand": "Tatak",
+    "supplier": "Tagapagtustos",
+    "purchasedQuantity": "Dami ng nabili",
+    "lastPrice": "Huling presyo: {price} · {date}",
+    "versionConflict": "Nagbago ang listahan. I-refresh at subukan muli.",
+    "acquired": "Nabili",
+    "actualPrice": "Batayang presyo"
   },
   "kds": {
     "addonsLabel": "Mga Addon",
@@ -666,7 +680,8 @@
     "uptimeLabel": "Uptime",
     "user": "Gumagamit",
     "whatsapp": "WhatsApp",
-    "inventory": "Imbentaryo"
+    "inventory": "Imbentaryo",
+    "purchasing": "Pamimili"
   },
   "orders": {
     "active": "Aktibo",

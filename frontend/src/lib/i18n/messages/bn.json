@@ -592,7 +592,21 @@
     "recipeCost": "রেসিপি খরচ",
     "costUnknown": "খরচ অজানা",
     "productionIssue": "উৎপাদনে ব্যবহার",
-    "productionOutput": "উৎপাদিত পরিমাণ"
+    "productionOutput": "উৎপাদিত পরিমাণ",
+    "shoppingLists": "কেনাকাটার তালিকা",
+    "newShoppingList": "নতুন তালিকা",
+    "emptyShoppingLists": "এখনও কোনো কেনাকাটার তালিকা নেই",
+    "plannedQuantity": "পরিকল্পিত পরিমাণ",
+    "referencePrice": "রেফারেন্স মূল্য",
+    "markAcquired": "কেনা হয়েছে চিহ্নিত করুন",
+    "markNotFound": "পাওয়া যায়নি",
+    "brand": "ব্র্যান্ড",
+    "supplier": "সরবরাহকারী",
+    "purchasedQuantity": "কেনা পরিমাণ",
+    "lastPrice": "সর্বশেষ মূল্য: {price} · {date}",
+    "versionConflict": "তালিকাটি পরিবর্তিত হয়েছে। রিফ্রেশ করে আবার চেষ্টা করুন।",
+    "acquired": "কেনা হয়েছে",
+    "actualPrice": "রেফারেন্স মূল্য"
   },
   "kds": {
     "addonsLabel": "অ্যাড-অন",
@@ -666,7 +680,8 @@
     "user": "ব্যবহারকারী",
     "whatsapp": "হোয়াটসঅ্যাপ",
     "inventory": "ইনভেন্টরি",
-    "tables": "টেবিল"
+    "tables": "টেবিল",
+    "purchasing": "ক্রয়"
   },
   "orders": {
     "active": "সক্রিয়",

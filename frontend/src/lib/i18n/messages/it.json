@@ -592,7 +592,21 @@
     "recipeCost": "Costo della ricetta",
     "costUnknown": "Costo sconosciuto",
     "productionIssue": "Consumo di produzione",
-    "productionOutput": "Risultato della produzione"
+    "productionOutput": "Risultato della produzione",
+    "shoppingLists": "Liste della spesa",
+    "newShoppingList": "Nuova lista",
+    "emptyShoppingLists": "Nessuna lista della spesa",
+    "plannedQuantity": "Quantità pianificata",
+    "referencePrice": "Prezzo di riferimento",
+    "markAcquired": "Segna come acquistato",
+    "markNotFound": "Non trovato",
+    "brand": "Marca",
+    "supplier": "Fornitore",
+    "purchasedQuantity": "Quantità acquistata",
+    "lastPrice": "Ultimo prezzo: {price} · {date}",
+    "versionConflict": "La lista è cambiata. Aggiorna e riprova.",
+    "acquired": "Acquistato",
+    "actualPrice": "Prezzo di riferimento"
   },
   "kds": {
     "addonsLabel": "Extra",
@@ -666,7 +680,8 @@
     "user": "Utente",
     "whatsapp": "WhatsApp",
     "inventory": "Scorte",
-    "tables": "Tavoli"
+    "tables": "Tavoli",
+    "purchasing": "Acquisti"
   },
   "orders": {
     "active": "Attivo",

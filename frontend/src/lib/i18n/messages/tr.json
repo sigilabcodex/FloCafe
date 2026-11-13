@@ -592,7 +592,21 @@
     "recipeCost": "Reçete maliyeti",
     "costUnknown": "Maliyet bilinmiyor",
     "productionIssue": "Üretim tüketimi",
-    "productionOutput": "Üretim çıktısı"
+    "productionOutput": "Üretim çıktısı",
+    "shoppingLists": "Alışveriş listeleri",
+    "newShoppingList": "Yeni liste",
+    "emptyShoppingLists": "Henüz alışveriş listesi yok",
+    "plannedQuantity": "Planlanan miktar",
+    "referencePrice": "Referans fiyatı",
+    "markAcquired": "Alındı olarak işaretle",
+    "markNotFound": "Bulunamadı",
+    "brand": "Marka",
+    "supplier": "Tedarikçi",
+    "purchasedQuantity": "Satın alınan miktar",
+    "lastPrice": "Son fiyat: {price} · {date}",
+    "versionConflict": "Liste değişti. Yenileyip tekrar deneyin.",
+    "acquired": "Satın alındı",
+    "actualPrice": "Referans fiyatı"
   },
   "kds": {
     "addonsLabel": "Eklentiler",
@@ -666,7 +680,8 @@
     "uptimeLabel": "Çalışma Süresi",
     "user": "Kullanıcı",
     "whatsapp": "WhatsApp",
-    "inventory": "Stok"
+    "inventory": "Stok",
+    "purchasing": "Satın alma"
   },
   "orders": {
     "active": "Aktif",

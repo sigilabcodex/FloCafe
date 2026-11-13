@@ -592,7 +592,21 @@
     "recipeCost": "Receptkost",
     "costUnknown": "Kostprijs onbekend",
     "productionIssue": "Productieverbruik",
-    "productionOutput": "Productieopbrengst"
+    "productionOutput": "Productieopbrengst",
+    "shoppingLists": "Boodschappenlijsten",
+    "newShoppingList": "Nieuwe lijst",
+    "emptyShoppingLists": "Nog geen boodschappenlijsten",
+    "plannedQuantity": "Geplande hoeveelheid",
+    "referencePrice": "Richtprijs",
+    "markAcquired": "Markeren als ingekocht",
+    "markNotFound": "Niet gevonden",
+    "brand": "Merk",
+    "supplier": "Leverancier",
+    "purchasedQuantity": "Ingekochte hoeveelheid",
+    "lastPrice": "Laatste prijs: {price} · {date}",
+    "versionConflict": "Deze lijst is gewijzigd. Vernieuw en probeer opnieuw.",
+    "acquired": "Ingekocht",
+    "actualPrice": "Richtprijs"
   },
   "kds": {
     "addonsLabel": "Add-ons",
@@ -666,7 +680,8 @@
     "user": "Gebruiker",
     "whatsapp": "WhatsApp",
     "inventory": "Voorraad",
-    "tables": "Tafels"
+    "tables": "Tafels",
+    "purchasing": "Inkopen"
   },
   "orders": {
     "active": "Actief",

@@ -592,7 +592,21 @@
     "recipeCost": "रेसिपी लागत",
     "costUnknown": "लागत थाहा छैन",
     "productionIssue": "उत्पादन खपत",
-    "productionOutput": "उत्पादन उत्पादन"
+    "productionOutput": "उत्पादन उत्पादन",
+    "shoppingLists": "किनमेल सूचीहरू",
+    "newShoppingList": "नयाँ सूची",
+    "emptyShoppingLists": "अहिलेसम्म कुनै किनमेल सूची छैन",
+    "plannedQuantity": "योजनाबद्ध परिमाण",
+    "referencePrice": "सन्दर्भ मूल्य",
+    "markAcquired": "खरिद भएको चिन्ह लगाउनुहोस्",
+    "markNotFound": "भेटिएन",
+    "brand": "ब्रान्ड",
+    "supplier": "आपूर्तिकर्ता",
+    "purchasedQuantity": "खरिद गरिएको परिमाण",
+    "lastPrice": "अन्तिम मूल्य: {price} · {date}",
+    "versionConflict": "सूची परिवर्तन भयो। रिफ्रेस गरेर फेरि प्रयास गर्नुहोस्।",
+    "acquired": "खरिद गरिएको",
+    "actualPrice": "सन्दर्भ मूल्य"
   },
   "kds": {
     "addonsLabel": "एडअनहरू",
@@ -666,7 +680,8 @@
     "uptimeLabel": "माथि: ",
     "user": "प्रयोगकर्ता",
     "whatsapp": "व्हाट्सएप",
-    "inventory": "सूची"
+    "inventory": "सूची",
+    "purchasing": "खरिद"
   },
   "orders": {
     "active": "सक्रिय",

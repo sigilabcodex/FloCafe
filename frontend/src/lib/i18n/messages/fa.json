@@ -592,7 +592,21 @@
     "recipeCost": "هزینه دستور تهیه",
     "costUnknown": "هزینه نامشخص",
     "productionIssue": "مصرف تولید",
-    "productionOutput": "محصول تولید"
+    "productionOutput": "محصول تولید",
+    "shoppingLists": "فهرست‌های خرید",
+    "newShoppingList": "فهرست جدید",
+    "emptyShoppingLists": "هنوز فهرست خریدی وجود ندارد",
+    "plannedQuantity": "مقدار برنامه‌ریزی‌شده",
+    "referencePrice": "قیمت مرجع",
+    "markAcquired": "علامت‌گذاری به‌عنوان خریداری‌شده",
+    "markNotFound": "یافت نشد",
+    "brand": "برند",
+    "supplier": "تأمین‌کننده",
+    "purchasedQuantity": "مقدار خریداری‌شده",
+    "lastPrice": "آخرین قیمت: {price} · {date}",
+    "versionConflict": "فهرست تغییر کرده است. تازه‌سازی کنید و دوباره تلاش کنید.",
+    "acquired": "خریداری‌شده",
+    "actualPrice": "قیمت مرجع"
   },
   "kds": {
     "addonsLabel": "افزودنی‌ها",
@@ -666,7 +680,8 @@
     "user": "کاربر",
     "whatsapp": "واتساپ",
     "inventory": "موجودی",
-    "tables": "میزها"
+    "tables": "میزها",
+    "purchasing": "خرید"
   },
   "orders": {
     "active": "فعال",

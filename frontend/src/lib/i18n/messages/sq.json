@@ -592,7 +592,21 @@
     "recipeCost": "Kosto e recetës",
     "costUnknown": "Kosto e panjohur",
     "productionIssue": "Konsum prodhimi",
-    "productionOutput": "Prodhimi i përfunduar"
+    "productionOutput": "Prodhimi i përfunduar",
+    "shoppingLists": "Listat e blerjeve",
+    "newShoppingList": "Listë e re",
+    "emptyShoppingLists": "Nuk ka ende lista blerjesh",
+    "plannedQuantity": "Sasia e planifikuar",
+    "referencePrice": "Çmimi referencë",
+    "markAcquired": "Shëno si të blerë",
+    "markNotFound": "Nuk u gjet",
+    "brand": "Marka",
+    "supplier": "Furnizuesi",
+    "purchasedQuantity": "Sasia e blerë",
+    "lastPrice": "Çmimi i fundit: {price} · {date}",
+    "versionConflict": "Lista ndryshoi. Rifreskoje dhe provo përsëri.",
+    "acquired": "E blerë",
+    "actualPrice": "Çmimi referencë"
   },
   "kds": {
     "addonsLabel": "Shtesat",
@@ -666,7 +680,8 @@
     "uptimeLabel": "Lart: ",
     "user": "Përdoruesi",
     "whatsapp": "WhatsApp",
-    "inventory": "Inventari"
+    "inventory": "Inventari",
+    "purchasing": "Blerje"
   },
   "orders": {
     "active": "Aktive",

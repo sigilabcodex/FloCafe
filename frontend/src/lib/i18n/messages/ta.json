@@ -592,7 +592,21 @@
     "recipeCost": "செய்முறைச் செலவு",
     "costUnknown": "செலவு தெரியவில்லை",
     "productionIssue": "உற்பத்தி பயன்பாடு",
-    "productionOutput": "உற்பத்தி வெளியீடு"
+    "productionOutput": "உற்பத்தி வெளியீடு",
+    "shoppingLists": "வாங்கும் பட்டியல்கள்",
+    "newShoppingList": "புதிய பட்டியல்",
+    "emptyShoppingLists": "வாங்கும் பட்டியல்கள் எதுவும் இல்லை",
+    "plannedQuantity": "திட்டமிட்ட அளவு",
+    "referencePrice": "குறிப்பு விலை",
+    "markAcquired": "வாங்கியதாகக் குறிக்கவும்",
+    "markNotFound": "கிடைக்கவில்லை",
+    "brand": "பிராண்ட்",
+    "supplier": "வழங்குநர்",
+    "purchasedQuantity": "வாங்கிய அளவு",
+    "lastPrice": "கடைசி விலை: {price} · {date}",
+    "versionConflict": "பட்டியல் மாறிவிட்டது. புதுப்பித்து மீண்டும் முயற்சிக்கவும்.",
+    "acquired": "வாங்கப்பட்டது",
+    "actualPrice": "குறிப்பு விலை"
   },
   "kds": {
     "addonsLabel": "கூடுதல் இணைப்புகள்",
@@ -666,7 +680,8 @@
     "user": "பயனர்",
     "whatsapp": "வாட்ஸ்அப் (WhatsApp)",
     "inventory": "சரக்கு இருப்பு",
-    "tables": "மேசைகள்"
+    "tables": "மேசைகள்",
+    "purchasing": "கொள்முதல்"
   },
   "orders": {
     "active": "செயலில்",

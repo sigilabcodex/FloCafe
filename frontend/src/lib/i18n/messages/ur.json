@@ -592,7 +592,21 @@
     "recipeCost": "ترکیب کی لاگت",
     "costUnknown": "لاگت نامعلوم",
     "productionIssue": "پیداواری استعمال",
-    "productionOutput": "پیداواری پیداوار"
+    "productionOutput": "پیداواری پیداوار",
+    "shoppingLists": "خریداری کی فہرستیں",
+    "newShoppingList": "نئی فہرست",
+    "emptyShoppingLists": "ابھی کوئی خریداری فہرست نہیں",
+    "plannedQuantity": "منصوبہ بند مقدار",
+    "referencePrice": "حوالہ قیمت",
+    "markAcquired": "خریدا ہوا نشان زد کریں",
+    "markNotFound": "نہیں ملا",
+    "brand": "برانڈ",
+    "supplier": "سپلائر",
+    "purchasedQuantity": "خریدی گئی مقدار",
+    "lastPrice": "آخری قیمت: {price} · {date}",
+    "versionConflict": "فہرست بدل گئی ہے۔ تازہ کریں اور دوبارہ کوشش کریں۔",
+    "acquired": "خریدا گیا",
+    "actualPrice": "حوالہ قیمت"
   },
   "kds": {
     "addonsLabel": "ایڈ آنز",
@@ -666,7 +680,8 @@
     "user": "صارف",
     "whatsapp": "WhatsApp",
     "inventory": "اسٹاک",
-    "tables": "میزیں"
+    "tables": "میزیں",
+    "purchasing": "خریداری"
   },
   "orders": {
     "active": "فعال",

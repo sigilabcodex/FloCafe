@@ -592,7 +592,21 @@
     "recipeCost": "Recipe cost",
     "costUnknown": "Cost unknown",
     "productionIssue": "Production issue",
-    "productionOutput": "Production output"
+    "productionOutput": "Production output",
+    "shoppingLists": "Shopping lists",
+    "newShoppingList": "New list",
+    "emptyShoppingLists": "No shopping lists yet",
+    "plannedQuantity": "Planned quantity",
+    "referencePrice": "Reference price",
+    "markAcquired": "Mark acquired",
+    "markNotFound": "Not found",
+    "brand": "Brand",
+    "supplier": "Supplier",
+    "purchasedQuantity": "Purchased quantity",
+    "lastPrice": "Last price: {price} · {date}",
+    "versionConflict": "This list changed. Refresh and try again.",
+    "acquired": "Acquired",
+    "actualPrice": "Actual price"
   },
   "kds": {
     "addonsLabel": "Add-ons",
@@ -666,7 +680,8 @@
     "user": "User",
     "whatsapp": "WhatsApp",
     "inventory": "Inventory",
-    "tables": "Tables"
+    "tables": "Tables",
+    "purchasing": "Purchasing"
   },
   "orders": {
     "active": "Active",

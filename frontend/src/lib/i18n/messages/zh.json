@@ -592,7 +592,21 @@
     "recipeCost": "配方成本",
     "costUnknown": "成本未知",
     "productionIssue": "生产耗用",
-    "productionOutput": "生产产出"
+    "productionOutput": "生产产出",
+    "shoppingLists": "采购清单",
+    "newShoppingList": "新建清单",
+    "emptyShoppingLists": "暂无采购清单",
+    "plannedQuantity": "计划数量",
+    "referencePrice": "参考价格",
+    "markAcquired": "标记为已购",
+    "markNotFound": "未找到",
+    "brand": "品牌",
+    "supplier": "供应商",
+    "purchasedQuantity": "已购数量",
+    "lastPrice": "最近价格：{price} · {date}",
+    "versionConflict": "清单已更改。请刷新后重试。",
+    "acquired": "已购买",
+    "actualPrice": "参考价格"
   },
   "kds": {
     "addonsLabel": "加购",
@@ -666,7 +680,8 @@
     "uptimeLabel": "运行：",
     "user": "用户",
     "whatsapp": "WhatsApp",
-    "inventory": "库存"
+    "inventory": "库存",
+    "purchasing": "采购"
   },
   "orders": {
     "active": "进行中",

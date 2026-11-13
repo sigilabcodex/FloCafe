@@ -48,6 +48,8 @@ async function main() {
     assertEqualOrThrow(apiAcquisition.status, 201, 'purchaser can confirm acquisition through the private API');
     const apiHistory = await api(server.baseUrl, `/api/purchasing/supplies/${supply.id}/price-history`, { headers: owner.authHeader });
     assertEqualOrThrow(apiHistory.data.observations.length, 1, 'private API exposes associated price history');
+    const apiLatestPrice = await api(server.baseUrl, '/api/purchasing/prices/latest', { headers: owner.authHeader });
+    assertEqualOrThrow(apiLatestPrice.data.observations[0]?.supply_id, supply.id, 'purchasing UI can query each supply latest price');
   } finally {
     await new Promise<void>((resolve, reject) => server.server.close((error: Error | undefined) => error ? reject(error) : resolve()));
   }

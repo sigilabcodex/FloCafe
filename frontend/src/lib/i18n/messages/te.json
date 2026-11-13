@@ -592,7 +592,21 @@
     "recipeCost": "రెసిపీ ఖర్చు",
     "costUnknown": "ఖర్చు తెలియదు",
     "productionIssue": "ఉత్పత్తి వినియోగం",
-    "productionOutput": "ఉత్పత్తి దిగుబడి"
+    "productionOutput": "ఉత్పత్తి దిగుబడి",
+    "shoppingLists": "కొనుగోలు జాబితాలు",
+    "newShoppingList": "కొత్త జాబితా",
+    "emptyShoppingLists": "ఇంకా కొనుగోలు జాబితాలు లేవు",
+    "plannedQuantity": "ప్రణాళిక పరిమాణం",
+    "referencePrice": "సూచన ధర",
+    "markAcquired": "కొనుగోలు చేసినట్లు గుర్తించండి",
+    "markNotFound": "దొరకలేదు",
+    "brand": "బ్రాండ్",
+    "supplier": "సరఫరాదారు",
+    "purchasedQuantity": "కొన్న పరిమాణం",
+    "lastPrice": "చివరి ధర: {price} · {date}",
+    "versionConflict": "జాబితా మారింది. రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "acquired": "కొనుగోలు చేశారు",
+    "actualPrice": "సూచన ధర"
   },
   "kds": {
     "addonsLabel": "యాడ్-ఆన్లు",
@@ -666,7 +680,8 @@
     "user": "వినియోగదారు",
     "whatsapp": "WhatsApp",
     "inventory": "ఇన్వెంటరీ",
-    "tables": "టేబుళ్లు"
+    "tables": "టేబుళ్లు",
+    "purchasing": "కొనుగోళ్లు"
   },
   "orders": {
     "active": "యాక్టివ్",

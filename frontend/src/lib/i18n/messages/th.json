@@ -592,7 +592,21 @@
     "recipeCost": "ต้นทุนสูตร",
     "costUnknown": "ไม่ทราบต้นทุน",
     "productionIssue": "วัตถุดิบที่ใช้ในการผลิต",
-    "productionOutput": "ผลผลิตจากการผลิต"
+    "productionOutput": "ผลผลิตจากการผลิต",
+    "shoppingLists": "รายการซื้อของ",
+    "newShoppingList": "รายการใหม่",
+    "emptyShoppingLists": "ยังไม่มีรายการซื้อของ",
+    "plannedQuantity": "จำนวนที่วางแผนไว้",
+    "referencePrice": "ราคาอ้างอิง",
+    "markAcquired": "ทำเครื่องหมายว่าซื้อแล้ว",
+    "markNotFound": "ไม่พบสินค้า",
+    "brand": "แบรนด์",
+    "supplier": "ผู้จัดจำหน่าย",
+    "purchasedQuantity": "จำนวนที่ซื้อ",
+    "lastPrice": "ราคาล่าสุด: {price} · {date}",
+    "versionConflict": "รายการนี้เปลี่ยนแปลงแล้ว รีเฟรชแล้วลองอีกครั้ง",
+    "acquired": "ซื้อแล้ว",
+    "actualPrice": "ราคาอ้างอิง"
   },
   "kds": {
     "addonsLabel": "ตัวเลือกเพิ่ม",
@@ -666,7 +680,8 @@
     "uptimeLabel": "ทำงานมา: ",
     "user": "ผู้ใช้",
     "whatsapp": "WhatsApp",
-    "inventory": "สินค้าคงคลัง"
+    "inventory": "สินค้าคงคลัง",
+    "purchasing": "การจัดซื้อ"
   },
   "orders": {
     "active": "ดำเนินการอยู่",

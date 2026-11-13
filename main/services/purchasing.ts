@@ -166,6 +166,17 @@ export function listPriceObservations(db: Db, supplyId: string) {
   return db.prepare(`SELECT * FROM purchasing_price_observations WHERE supply_id=? ORDER BY effective_at,recorded_at,rowid`).all(supplyId);
 }
 
+export function listLatestPriceObservations(db: Db) {
+  return db.prepare(`
+    SELECT * FROM (
+      SELECT observations.*, ROW_NUMBER() OVER (
+        PARTITION BY supply_id ORDER BY effective_at DESC, recorded_at DESC, rowid DESC
+      ) AS recency_rank
+      FROM purchasing_price_observations observations
+    ) WHERE recency_rank = 1 ORDER BY supply_id
+  `).all();
+}
+
 export function correctPriceObservation(db: Db, input: { observationId: string; actorUserId: string; amount: number; quantity?: number; unit: string; reason: string; effectiveAt?: string; idempotencyKey: string }) {
   const previous = db.prepare('SELECT * FROM purchasing_price_observations WHERE id=?').get(input.observationId) as {
     id: string; acquisition_id: string | null; line_id: string; supply_id: string; observed_quantity: number;

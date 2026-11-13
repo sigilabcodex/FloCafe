@@ -592,7 +592,21 @@
     "recipeCost": "ਰੈਸਿਪੀ ਲਾਗਤ",
     "costUnknown": "ਲਾਗਤ ਅਣਜਾਣ",
     "productionIssue": "ਉਤਪਾਦਨ ਦੀ ਖਪਤ",
-    "productionOutput": "ਉਤਪਾਦਨ ਦਾ ਨਤੀਜਾ"
+    "productionOutput": "ਉਤਪਾਦਨ ਦਾ ਨਤੀਜਾ",
+    "shoppingLists": "ਖਰੀਦਦਾਰੀ ਸੂਚੀਆਂ",
+    "newShoppingList": "ਨਵੀਂ ਸੂਚੀ",
+    "emptyShoppingLists": "ਹਾਲੇ ਕੋਈ ਖਰੀਦਦਾਰੀ ਸੂਚੀ ਨਹੀਂ",
+    "plannedQuantity": "ਯੋਜਨਾਬੱਧ ਮਾਤਰਾ",
+    "referencePrice": "ਹਵਾਲਾ ਕੀਮਤ",
+    "markAcquired": "ਖਰੀਦਿਆ ਹੋਇਆ ਨਿਸ਼ਾਨ ਲਗਾਓ",
+    "markNotFound": "ਨਹੀਂ ਮਿਲਿਆ",
+    "brand": "ਬ੍ਰਾਂਡ",
+    "supplier": "ਸਪਲਾਇਰ",
+    "purchasedQuantity": "ਖਰੀਦੀ ਮਾਤਰਾ",
+    "lastPrice": "ਆਖਰੀ ਕੀਮਤ: {price} · {date}",
+    "versionConflict": "ਸੂਚੀ ਬਦਲ ਗਈ ਹੈ। ਤਾਜ਼ਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+    "acquired": "ਖਰੀਦਿਆ",
+    "actualPrice": "ਹਵਾਲਾ ਕੀਮਤ"
   },
   "kds": {
     "addonsLabel": "ਐਡ-ਆਨ",
@@ -666,7 +680,8 @@
     "user": "ਵਰਤੋਂਕਾਰ",
     "whatsapp": "WhatsApp",
     "inventory": "ਇਨਵੈਂਟਰੀ",
-    "tables": "ਟੇਬਲ"
+    "tables": "ਟੇਬਲ",
+    "purchasing": "ਖਰੀਦਦਾਰੀ"
   },
   "orders": {
     "active": "ਸਰਗਰਮ",

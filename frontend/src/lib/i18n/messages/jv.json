@@ -592,7 +592,21 @@
     "recipeCost": "Ragad resep",
     "costUnknown": "Ragad durung dingerteni",
     "productionIssue": "Panggunaan produksi",
-    "productionOutput": "Asil produksi"
+    "productionOutput": "Asil produksi",
+    "shoppingLists": "Dhaptar blanja",
+    "newShoppingList": "Dhaptar anyar",
+    "emptyShoppingLists": "Durung ana dhaptar blanja",
+    "plannedQuantity": "Jumlah sing direncanakake",
+    "referencePrice": "Rega referensi",
+    "markAcquired": "Tandhani wis dituku",
+    "markNotFound": "Ora ketemu",
+    "brand": "Merek",
+    "supplier": "Pemasok",
+    "purchasedQuantity": "Jumlah sing dituku",
+    "lastPrice": "Rega pungkasan: {price} · {date}",
+    "versionConflict": "Dhaptar iki wis owah. Muat maneh banjur coba maneh.",
+    "acquired": "Wis dituku",
+    "actualPrice": "Rega referensi"
   },
   "kds": {
     "addonsLabel": "Imbuhan",
@@ -666,7 +680,8 @@
     "user": "Panganggo",
     "whatsapp": "WhatsApp",
     "inventory": "Pasokan",
-    "tables": "Meja"
+    "tables": "Meja",
+    "purchasing": "Tuku"
   },
   "orders": {
     "active": "Aktif",

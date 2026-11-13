@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   ShoppingCart,
+  ShoppingBasket,
   ClipboardList,
   Package,
   Grid3X3,
@@ -106,6 +107,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     labelKey: 'inventory',
     icon: Boxes,
     permission: 'inventory.view',
+    businessTypes: null,
+  },
+  {
+    href: '/purchasing',
+    labelKey: 'purchasing',
+    icon: ShoppingBasket,
+    permission: 'supplies.manage',
     businessTypes: null,
   },
   {

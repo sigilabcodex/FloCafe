@@ -592,7 +592,21 @@
     "recipeCost": "Себестоимость рецепта",
     "costUnknown": "Себестоимость неизвестна",
     "productionIssue": "Расход на производство",
-    "productionOutput": "Выпуск продукции"
+    "productionOutput": "Выпуск продукции",
+    "shoppingLists": "Списки покупок",
+    "newShoppingList": "Новый список",
+    "emptyShoppingLists": "Списков покупок пока нет",
+    "plannedQuantity": "Плановое количество",
+    "referencePrice": "Справочная цена",
+    "markAcquired": "Отметить как купленное",
+    "markNotFound": "Не найдено",
+    "brand": "Бренд",
+    "supplier": "Поставщик",
+    "purchasedQuantity": "Купленное количество",
+    "lastPrice": "Последняя цена: {price} · {date}",
+    "versionConflict": "Список изменился. Обновите его и повторите попытку.",
+    "acquired": "Куплено",
+    "actualPrice": "Справочная цена"
   },
   "kds": {
     "addonsLabel": "Дополнения",
@@ -666,7 +680,8 @@
     "user": "Пользователь",
     "whatsapp": "WhatsApp",
     "inventory": "Склад",
-    "tables": "Столы"
+    "tables": "Столы",
+    "purchasing": "Закупки"
   },
   "orders": {
     "active": "Активные",

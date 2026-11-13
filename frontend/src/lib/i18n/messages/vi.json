@@ -592,7 +592,21 @@
     "recipeCost": "Giá vốn công thức",
     "costUnknown": "Chưa rõ giá vốn",
     "productionIssue": "Tiêu hao sản xuất",
-    "productionOutput": "Sản lượng sản xuất"
+    "productionOutput": "Sản lượng sản xuất",
+    "shoppingLists": "Danh sách mua hàng",
+    "newShoppingList": "Danh sách mới",
+    "emptyShoppingLists": "Chưa có danh sách mua hàng",
+    "plannedQuantity": "Số lượng dự kiến",
+    "referencePrice": "Giá tham khảo",
+    "markAcquired": "Đánh dấu đã mua",
+    "markNotFound": "Không tìm thấy",
+    "brand": "Thương hiệu",
+    "supplier": "Nhà cung cấp",
+    "purchasedQuantity": "Số lượng đã mua",
+    "lastPrice": "Giá gần nhất: {price} · {date}",
+    "versionConflict": "Danh sách đã thay đổi. Hãy làm mới rồi thử lại.",
+    "acquired": "Đã mua",
+    "actualPrice": "Giá tham khảo"
   },
   "kds": {
     "addonsLabel": "Tuỳ chọn",
@@ -666,7 +680,8 @@
     "user": "Người dùng",
     "whatsapp": "WhatsApp",
     "inventory": "Kho",
-    "tables": "Bàn"
+    "tables": "Bàn",
+    "purchasing": "Mua hàng"
   },
   "orders": {
     "active": "Đang hoạt động",

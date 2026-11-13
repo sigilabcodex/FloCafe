@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { getDatabase } from '../db';
 import { requirePermission } from '../services/authorization';
-import { acquirePurchasingLine, correctPriceObservation, createPurchasingList, getPurchasingList, listPriceObservations, listPurchasingLists, markPurchasingLineNotFound } from '../services/purchasing';
+import { acquirePurchasingLine, correctPriceObservation, createPurchasingList, getPurchasingList, listLatestPriceObservations, listPriceObservations, listPurchasingLists, markPurchasingLineNotFound } from '../services/purchasing';
 
 const router = Router();
 const actor = (req: Request) => String((req as Request & { user?: { userId?: string } }).user?.userId || '');
@@ -44,6 +44,7 @@ router.post('/lines/:id/not-found', requirePermission('supplies.manage'), (req, 
   } catch (error) { return fail(res, error); }
 });
 router.get('/supplies/:id/price-history', requirePermission('supplies.manage'), (req, res) => res.json({ observations: listPriceObservations(getDatabase(), String(req.params.id)) }));
+router.get('/prices/latest', requirePermission('supplies.manage'), (_req, res) => res.json({ observations: listLatestPriceObservations(getDatabase()) }));
 router.post('/price-observations/:id/corrections', requirePermission('supplies.manage'), (req, res) => {
   try {
     const body = req.body || {};
