@@ -346,3 +346,83 @@ test('an offline purchase keeps its intent through a version conflict', async ({
   const stock = await request.get(`${BASE}/api/supplies/${supplyId}`, { headers });
   expect((await stock.json()).supply.stock_quantity).toBe(0);
 });
+
+test('an authorization failure stops the outbox batch and preserves queued operations', async ({ page, request }) => {
+  const login = await request.post(`${BASE}/api/auth/login`, {
+    data: { email: 'owner@flo.local', password: E2E_PASSWORD },
+  });
+  expect(login.status()).toBe(200);
+  const { access_token } = await login.json();
+  const headers = { Authorization: `Bearer ${access_token}` };
+  const stamp = Date.now();
+  const supplyIds: string[] = [];
+  for (const name of [`C3 Auth Stop A ${stamp}`, `C3 Auth Stop B ${stamp}`]) {
+    const response = await request.post(`${BASE}/api/supplies`, {
+      headers,
+      data: { name, base_unit: 'kg', stock_quantity: 0 },
+    });
+    expect(response.status()).toBe(201);
+    supplyIds.push((await response.json()).supply.id);
+  }
+  await page.goto(`${BASE}/auth/login`);
+  await page.locator('#email').fill('owner@flo.local');
+  await page.locator('#password').fill(E2E_PASSWORD);
+  await page.locator('button[type="submit"]').click();
+  await page.waitForURL((url) => !url.pathname.startsWith('/auth/login'));
+  await page.goto(`${BASE}/purchasing`);
+  await page.getByRole('button', { name: 'New list' }).click();
+  await page.getByLabel('Name').fill(`C3 Auth Stop List ${stamp}`);
+  for (const name of [`C3 Auth Stop A ${stamp}`, `C3 Auth Stop B ${stamp}`]) {
+    await page.getByLabel('Supply').selectOption({ label: `${name} (kg)` });
+    await page.getByLabel('Planned quantity').fill('1');
+    await page.getByLabel('Base unit').selectOption('kg');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    const details = page.locator('details').filter({ hasText: name });
+    await details.locator('summary').click();
+    await details.getByLabel('Reference price').fill('12');
+    await details.locator('summary').click();
+  }
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await expect(page.getByText(`C3 Auth Stop A ${stamp}`).first()).toBeVisible();
+  const serverLists = await request.get(`${BASE}/api/purchasing/lists`, { headers });
+  const list = (await serverLists.json()).lists.find((item: { name: string }) => item.name === `C3 Auth Stop List ${stamp}`);
+  const serverDetail = await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers });
+  const lines = (await serverDetail.json()).list.lines as Array<{ supply_id: string; id: string }>;
+  const firstLine = lines.find((item) => item.supply_id === supplyIds[0])!;
+  const secondLine = lines.find((item) => item.supply_id === supplyIds[1])!;
+  const firstCard = page.locator('article').filter({ hasText: `C3 Auth Stop A ${stamp}` });
+  const secondCard = page.locator('article').filter({ hasText: `C3 Auth Stop B ${stamp}` });
+  await page.context().setOffline(true);
+  for (const card of [firstCard, secondCard]) {
+    await card.getByRole('button', { name: 'Mark acquired' }).click();
+    await expect(card.getByText('Saved on this device')).toBeVisible();
+  }
+
+  let firstAttempts = 0;
+  let secondAttempts = 0;
+  page.on('request', (requestEvent) => {
+    if (requestEvent.url().includes(`/lines/${firstLine.id}/acquisitions`)) firstAttempts += 1;
+    if (requestEvent.url().includes(`/lines/${secondLine.id}/acquisitions`)) secondAttempts += 1;
+  });
+  await page.route(`**/api/purchasing/lines/${firstLine.id}/acquisitions`, (route) =>
+    route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 'unauthorized' }) }));
+  await page.context().setOffline(false);
+  await page.waitForURL((url) => url.pathname.startsWith('/auth/login'));
+  expect(firstAttempts).toBe(1);
+  expect(secondAttempts).toBe(0);
+  const operations = await page.evaluate(async () => new Promise<Array<{ state: string; error?: string }>>((resolve, reject) => {
+    const opening = indexedDB.open('flo-purchasing-offline-v1');
+    opening.onerror = () => reject(opening.error);
+    opening.onsuccess = () => {
+      const transaction = opening.result.transaction('operations', 'readonly');
+      const read = transaction.objectStore('operations').getAll();
+      read.onerror = () => reject(read.error);
+      read.onsuccess = () => resolve(read.result);
+    };
+  }));
+  expect(operations).toHaveLength(2);
+  expect(operations.every((operation) => operation.state === 'pending')).toBe(true);
+  expect(operations.filter((operation) => operation.error === 'authorization')).toHaveLength(1);
+  const serverList = (await (await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers })).json()).list;
+  expect(serverList.lines.map((item: { status: string }) => item.status)).toEqual(['pending', 'pending']);
+});

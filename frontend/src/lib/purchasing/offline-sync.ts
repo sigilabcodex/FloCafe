@@ -83,8 +83,8 @@ async function synchronize(scope: PurchasingScope, onChange?: () => void): Promi
         const errorClass = status === 401 || status === 403 ? 'authorization' : status === undefined ? 'network' : 'server';
         await setOperationState(scope, operation.operationId, 'pending', errorClass);
         onChange?.();
-        if (status === undefined) {
-          reachable = false;
+        if (status === undefined || status === 401 || status === 403) {
+          if (status === undefined) reachable = false;
           break;
         }
       }
