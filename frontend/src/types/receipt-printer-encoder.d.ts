@@ -1,6 +1,7 @@
 declare module '@point-of-sale/receipt-printer-encoder' {
   export interface ReceiptPrinterEncoderOptions {
     columns: number;
+    codepageCandidates?: string[];
   }
 
   class ReceiptPrinterEncoder {
@@ -8,6 +9,7 @@ declare module '@point-of-sale/receipt-printer-encoder' {
     initialize(): this;
     align(alignment: 'left' | 'center' | 'right'): this;
     bold(enabled: boolean): this;
+    codepage(codepage: string): this;
     italic(enabled?: boolean): this;
     width(n: 1 | 2): this;
     height(n: 1 | 2): this;

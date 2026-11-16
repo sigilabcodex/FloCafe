@@ -1,8 +1,10 @@
 import ReceiptPrinterEncoder from '@point-of-sale/receipt-printer-encoder';
 import {
   LATIN_THERMAL_CAPABILITIES,
+  hasArabicScript,
   isThermalTextRepresentable,
   normalizeThermalText,
+  selectThermalCodePage,
   type ThermalPrinterCapabilities,
 } from '../../../../shared/print/thermal-capabilities';
 import { columnsForReceiptPaperSize, wrapToDisplayCells } from '../../../../shared/print/width';
@@ -114,16 +116,29 @@ export function buildShoppingChecklistBytes(
 ): Uint8Array {
   const selected = options.pendingOnly ? lines.filter((line) => line.status === 'pending') : lines;
   const columns = options.columns ?? columnsForReceiptPaperSize(options.paperWidth);
-  const encoder = new ReceiptPrinterEncoder({ columns });
   const capabilities = options.capabilities ?? LATIN_THERMAL_CAPABILITIES;
+  const encoder = new ReceiptPrinterEncoder({
+    columns,
+    codepageCandidates: capabilities.encoding.codePages.filter((page) => page !== 'ascii'),
+  });
+  const exactCapabilities = capabilities.transliteration.enabled
+    ? { ...capabilities, transliteration: { enabled: false } }
+    : capabilities;
   const writeLine = (value: string, maxColumns = columns): void => {
-    const normalized = normalizeThermalText(value, capabilities);
-    if (!isThermalTextRepresentable(normalized, capabilities)) {
+    if (hasArabicScript(value) || !isThermalTextRepresentable(value, exactCapabilities)) {
       throw new Error(
         'This WebUSB printer cannot represent all checklist text. Use system/browser printing.',
       );
     }
+    const normalized = normalizeThermalText(value, capabilities);
     for (const line of wrapToDisplayCells(normalized, maxColumns)) {
+      const codePage = selectThermalCodePage(line, exactCapabilities);
+      if (!codePage) {
+        throw new Error(
+          'This WebUSB printer cannot represent all checklist text. Use system/browser printing.',
+        );
+      }
+      if (codePage !== 'ascii') encoder.codepage(codePage);
       encoder.text(line).newline();
     }
   };

@@ -5,6 +5,7 @@ import {
   buildShoppingChecklistHtml,
   type ShoppingChecklistLine,
 } from '../frontend/src/lib/purchasing/shopping-checklist-print';
+import { GENERIC_THERMAL_CAPABILITIES } from '../shared/print/thermal-capabilities';
 
 const lines: ShoppingChecklistLine[] = [
   {
@@ -101,11 +102,20 @@ assert.match(nativeText, /Reference: \$45 \/ kg/);
 assert.match(nativeText, /Molino Norte/);
 assert.match(nativeText, /ABC12345/);
 assert.match(nativeText, /\x1d/);
+assert.ok(nativeBytes.some((byte, index) => byte === 0x1b && nativeBytes[index + 1] === 0x74), 'profile code page is emitted for accented text');
 assert.throws(
   () =>
     buildShoppingChecklistBytes('Compra', 'id', [{ ...lines[0], supply_name: 'طحين' }], defaults),
   /cannot represent all checklist text/,
   'unrepresentable text is rejected before sending bytes to a printer',
+);
+assert.throws(
+  () => buildShoppingChecklistBytes('Compra', 'id', [{ ...lines[0], supply_name: 'Café' }], {
+    ...defaults,
+    capabilities: GENERIC_THERMAL_CAPABILITIES,
+  }),
+  /cannot represent all checklist text/,
+  'ASCII-only profiles fall back instead of silently dropping accents',
 );
 
 const pendingNative = Buffer.from(
