@@ -127,18 +127,15 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   const headers = { Authorization: `Bearer ${access_token}` };
   await page.addInitScript(() => {
     const target = window as Window & { __shoppingChecklistHtml?: string };
-    window.addEventListener('message', (event) => {
-      const message = event.data as { type?: string; html?: string } | null;
-      if (message?.type === 'shopping-checklist-print') {
-        target.__shoppingChecklistHtml = message.html || '';
-      }
-    });
-    window.print = () => {
-      window.opener?.postMessage({
-        type: 'shopping-checklist-print',
-        html: `${document.head.innerHTML}${document.body.innerHTML}`,
-      }, '*');
-    };
+    window.open = (() => {
+      const printDocument = document.implementation.createHTMLDocument('checklist');
+      printDocument.close = () => undefined;
+      return {
+        document: printDocument,
+        print: () => { target.__shoppingChecklistHtml = printDocument.documentElement.outerHTML; },
+        close: () => undefined,
+      } as unknown as Window;
+    }) as typeof window.open;
   });
   const stamp = Date.now();
   const supplyResponse = await request.post(`${BASE}/api/supplies`, {
@@ -182,7 +179,14 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   await page.locator('#password').fill(E2E_PASSWORD);
   await page.locator('button[type="submit"]').click();
   await page.waitForURL((url) => !url.pathname.startsWith('/auth/login'));
+  const browserListsResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return url.pathname === '/api/purchasing/lists' && response.request().method() === 'GET';
+  });
   await page.goto(`${BASE}/purchasing`);
+  const browserLists = await (await browserListsResponse).json();
+  expect(browserLists.lists.some((item: { id: string }) => item.id === list.id)).toBe(true);
+  await page.reload();
   await expect(page.getByText(`C3 Offline List ${stamp}`)).toBeVisible();
   await page.getByText(`C3 Offline List ${stamp}`).click();
   await expect(page.getByText(`C3 Offline Flour ${stamp}`)).toBeVisible();
@@ -247,16 +251,20 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   await page.getByRole('button', { name: 'Print', exact: true }).click();
   await expect(page.getByRole('group', { name: 'Print' })).toBeVisible();
   await page.getByRole('button', { name: '80 mm' }).click();
-  const printPage = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Print', exact: true }).last().click();
-  await printPage;
   await expect.poll(() => page.evaluate(() => Boolean((window as Window & { __shoppingChecklistHtml?: string }).__shoppingChecklistHtml))).toBe(true);
   const ticket = await page.evaluate(() => (window as Window & { __shoppingChecklistHtml?: string }).__shoppingChecklistHtml || '');
-  expect(ticket).toContain('size:80mm auto');
+  expect(ticket).toContain('size: 80mm auto');
   expect(ticket).toContain('Kalali');
   expect(ticket).toContain(`C3 Partial Sugar ${stamp}`);
   expect(ticket).not.toContain(`C3 Offline Flour ${stamp}`);
   expect(ticket).not.toContain('Reference:');
+  expect(await readOutbox()).toBe(outboxBeforePrint);
+  expect(purchasingRequestsDuringPrint).toBe(0);
+  await page.evaluate(() => { window.open = (() => null) as typeof window.open; });
+  await page.getByRole('button', { name: 'Print', exact: true }).click();
+  await page.getByRole('button', { name: 'Print', exact: true }).last().click();
+  await expect(page.getByText('Please allow popups to print')).toBeVisible();
   expect(await readOutbox()).toBe(outboxBeforePrint);
   expect(purchasingRequestsDuringPrint).toBe(0);
   page.off('request', countPurchasingRequest);
@@ -432,9 +440,14 @@ test('an authorization failure stops the outbox batch and preserves queued opera
   }
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByText(`C3 Auth Stop A ${stamp}`).first()).toBeVisible();
-  const serverLists = await request.get(`${BASE}/api/purchasing/lists`, { headers });
-  const list = (await serverLists.json()).lists.find((item: { name: string }) => item.name === `C3 Auth Stop List ${stamp}`);
-  const serverDetail = await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers });
+  let list: { id: string } | undefined;
+  await expect.poll(async () => {
+    const serverLists = await request.get(`${BASE}/api/purchasing/lists`, { headers });
+    list = (await serverLists.json()).lists.find((item: { name: string }) => item.name === `C3 Auth Stop List ${stamp}`);
+    return Boolean(list);
+  }).toBe(true);
+  expect(list).toBeDefined();
+  const serverDetail = await request.get(`${BASE}/api/purchasing/lists/${list!.id}`, { headers });
   const lines = (await serverDetail.json()).list.lines as Array<{ supply_id: string; id: string }>;
   const firstLine = lines.find((item) => item.supply_id === supplyIds[0])!;
   const secondLine = lines.find((item) => item.supply_id === supplyIds[1])!;
@@ -458,7 +471,7 @@ test('an authorization failure stops the outbox batch and preserves queued opera
   await page.waitForURL((url) => url.pathname.startsWith('/auth/login'));
   expect(firstAttempts).toBe(1);
   expect(secondAttempts).toBe(0);
-  const operations = await page.evaluate(async () => new Promise<Array<{ state: string; error?: string }>>((resolve, reject) => {
+  const readOperations = () => page.evaluate(async () => new Promise<Array<{ state: string; error?: string }>>((resolve, reject) => {
     const opening = indexedDB.open('flo-purchasing-offline-v1');
     opening.onerror = () => reject(opening.error);
     opening.onsuccess = () => {
@@ -468,9 +481,14 @@ test('an authorization failure stops the outbox batch and preserves queued opera
       read.onsuccess = () => resolve(read.result);
     };
   }));
+  let operations: Array<{ state: string; error?: string }> = [];
+  await expect.poll(async () => {
+    operations = await readOperations();
+    return operations.length === 2 && operations.every((operation) => operation.state === 'pending') &&
+      operations.filter((operation) => operation.error === 'authorization').length === 1;
+  }).toBe(true);
   expect(operations).toHaveLength(2);
-  expect(operations.every((operation) => operation.state === 'pending')).toBe(true);
   expect(operations.filter((operation) => operation.error === 'authorization')).toHaveLength(1);
-  const serverList = (await (await request.get(`${BASE}/api/purchasing/lists/${list.id}`, { headers })).json()).list;
+  const serverList = (await (await request.get(`${BASE}/api/purchasing/lists/${list!.id}`, { headers })).json()).list;
   expect(serverList.lines.map((item: { status: string }) => item.status)).toEqual(['pending', 'pending']);
 });
