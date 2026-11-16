@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { printerService } from '../frontend/src/lib/printer/PrinterService';
 import {
+  buildShoppingChecklistBytes,
   buildShoppingChecklistHtml,
   type ShoppingChecklistLine,
 } from '../frontend/src/lib/purchasing/shopping-checklist-print';
@@ -83,6 +84,39 @@ const escaped = buildShoppingChecklistHtml(
 assert.match(escaped, /&lt;script&gt;/);
 assert.match(escaped, /&lt;b&gt;Malta &amp; café&lt;\/b&gt;/);
 assert.doesNotMatch(escaped, /<script>|<b>Malta/);
+
+const nativeBytes = buildShoppingChecklistBytes('Compra semanal', 'list-abc12345', lines, {
+  ...defaults,
+  paperWidth: 58,
+  showReferencePrices: true,
+  showSupplierBrand: true,
+  labels: { supplier: 'Supplier', brand: 'Brand', reference: 'Reference' },
+});
+const nativeText = Buffer.from(nativeBytes).toString('latin1');
+assert.match(nativeText, /Kalali/);
+assert.match(nativeText, /Compra semanal/);
+assert.match(nativeText, /\[ \] Harina de trigo/);
+assert.match(nativeText, /2\.5 kg/);
+assert.match(nativeText, /Reference: \$45 \/ kg/);
+assert.match(nativeText, /Molino Norte/);
+assert.match(nativeText, /ABC12345/);
+assert.match(nativeText, /\x1d/);
+assert.throws(
+  () =>
+    buildShoppingChecklistBytes('Compra', 'id', [{ ...lines[0], supply_name: 'طحين' }], defaults),
+  /cannot represent all checklist text/,
+  'unrepresentable text is rejected before sending bytes to a printer',
+);
+
+const pendingNative = Buffer.from(
+  buildShoppingChecklistBytes('Compra', 'id', lines, {
+    ...defaults,
+    paperWidth: 80,
+    pendingOnly: true,
+  }),
+).toString('latin1');
+assert.match(pendingNative, /Harina de trigo/);
+assert.doesNotMatch(pendingNative, /Leche entera|Sal fina|Reference:|Molino Norte/);
 
 void (async () => {
   await assert.rejects(

@@ -26,8 +26,9 @@ import { Badge } from '@/components/ui/badge';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useFormatNumber } from '@/hooks/useFormatNumber';
+import { resolveWebUsbCapabilities, usePrinterStore } from '@/hooks/usePrinter';
 import { printerService } from '@/lib/printer/PrinterService';
-import { buildShoppingChecklistHtml } from '@/lib/purchasing/shopping-checklist-print';
+import { buildShoppingChecklistBytes, buildShoppingChecklistHtml } from '@/lib/purchasing/shopping-checklist-print';
 
 const UNITS = ['each', 'g', 'kg', 'ml', 'l'] as const;
 type Unit = (typeof UNITS)[number];
@@ -305,11 +306,12 @@ export default function PurchasingPage() {
   const printList = async () => {
     if (!activeList) return;
     try {
-      const html = buildShoppingChecklistHtml(activeList.name, activeList.id, (activeList.lines || []).map((line) => ({
+      const printLines = (activeList.lines || []).map((line) => ({
         ...line,
         planned_quantity: fmtNum(line.planned_quantity),
         reference_price: line.reference_price === null ? null : fmt(line.reference_price),
-      })), {
+      }));
+      const printOptions = {
         paperWidth: printPaperWidth,
         pendingOnly: printPendingOnly,
         showReferencePrices: printPrices,
@@ -317,8 +319,28 @@ export default function PurchasingPage() {
         timezone: currentTenant?.timezone || undefined,
         locale: typeof navigator === 'undefined' ? undefined : navigator.language,
         labels: { supplier: t('supplier'), brand: t('brand'), reference: t('referencePrice') },
-      });
-      await printerService.printViaBrowser(html, printPaperWidth);
+      } as const;
+      const html = buildShoppingChecklistHtml(activeList.name, activeList.id, printLines, printOptions);
+      const printerState = usePrinterStore.getState();
+      const webusbPrinter = printerState.webusbPrinter;
+      if (printerState.printMethod === 'escpos' && webusbPrinter && printerService.isConnected) {
+        try {
+          const bytes = buildShoppingChecklistBytes(activeList.name, activeList.id, printLines, {
+            ...printOptions,
+            columns: printPaperWidth === 58 ? 32 : 42,
+            capabilities: resolveWebUsbCapabilities(webusbPrinter, printPaperWidth),
+          });
+          await printerService.printToConfiguredDevice(bytes, webusbPrinter.name);
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('cannot represent all checklist text')) {
+            await printerService.printViaBrowser(html, printPaperWidth);
+          } else {
+            throw error;
+          }
+        }
+      } else {
+        await printerService.printViaBrowser(html, printPaperWidth);
+      }
       setPrintOptionsOpen(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t('loadFailed'));

@@ -1,3 +1,12 @@
+import ReceiptPrinterEncoder from '@point-of-sale/receipt-printer-encoder';
+import {
+  LATIN_THERMAL_CAPABILITIES,
+  isThermalTextRepresentable,
+  normalizeThermalText,
+  type ThermalPrinterCapabilities,
+} from '../../../../shared/print/thermal-capabilities';
+import { columnsForReceiptPaperSize, wrapToDisplayCells } from '../../../../shared/print/width';
+
 export type ShoppingChecklistLine = {
   id: string;
   supply_name: string;
@@ -18,6 +27,11 @@ export type ShoppingChecklistOptions = {
   timezone?: string;
   locale?: string;
   labels?: { supplier: string; brand: string; reference: string };
+};
+
+export type ShoppingChecklistEscPosOptions = ShoppingChecklistOptions & {
+  columns?: number;
+  capabilities?: ThermalPrinterCapabilities;
 };
 
 function escapeHtml(value: unknown): string {
@@ -89,4 +103,66 @@ export function buildShoppingChecklistHtml(
     @media print{html,body{width:${width}mm!important;max-width:${width}mm!important;color:#000!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
   </style></head><body><header><div class="brand">Kalali</div><h1>${escapeHtml(name)}</h1><div class="meta">${escapeHtml(printDate(options.printedAt ?? new Date(), options.locale, options.timezone))}</div></header>
   <main>${items}</main><footer class="footer"><div>${selected.length}${shortId ? ` · ${shortId}` : ''}</div><div class="notes"></div></footer></body></html>`;
+}
+
+/** Build native text-first ESC/POS bytes for an already-connected WebUSB printer. */
+export function buildShoppingChecklistBytes(
+  name: string,
+  listId: string,
+  lines: ShoppingChecklistLine[],
+  options: ShoppingChecklistEscPosOptions,
+): Uint8Array {
+  const selected = options.pendingOnly ? lines.filter((line) => line.status === 'pending') : lines;
+  const columns = options.columns ?? columnsForReceiptPaperSize(options.paperWidth);
+  const encoder = new ReceiptPrinterEncoder({ columns });
+  const capabilities = options.capabilities ?? LATIN_THERMAL_CAPABILITIES;
+  const writeLine = (value: string, maxColumns = columns): void => {
+    const normalized = normalizeThermalText(value, capabilities);
+    if (!isThermalTextRepresentable(normalized, capabilities)) {
+      throw new Error(
+        'This WebUSB printer cannot represent all checklist text. Use system/browser printing.',
+      );
+    }
+    for (const line of wrapToDisplayCells(normalized, maxColumns)) {
+      encoder.text(line).newline();
+    }
+  };
+
+  encoder.initialize().align('center').bold(true);
+  writeLine('Kalali');
+  encoder.bold(false);
+  writeLine(name);
+  writeLine(printDate(options.printedAt ?? new Date(), options.locale, options.timezone));
+  encoder.align('left');
+  writeLine('-'.repeat(columns));
+
+  if (selected.length === 0) {
+    writeLine('No items');
+  } else {
+    for (const line of selected) {
+      writeLine(`[ ] ${line.supply_name}`);
+      encoder.bold(true);
+      writeLine(`    ${line.planned_quantity} ${line.planned_unit}`);
+      encoder.bold(false);
+      if (options.showSupplierBrand && line.planned_supplier) {
+        writeLine(`    ${options.labels?.supplier ?? 'Supplier'}: ${line.planned_supplier}`);
+      }
+      if (options.showSupplierBrand && line.planned_brand) {
+        writeLine(`    ${options.labels?.brand ?? 'Brand'}: ${line.planned_brand}`);
+      }
+      if (options.showReferencePrices && line.reference_price != null) {
+        writeLine(`    ${options.labels?.reference ?? 'Reference'}: ${line.reference_price}`);
+      }
+      writeLine('-'.repeat(columns));
+    }
+  }
+
+  const shortId = listId
+    .replace(/[^a-z0-9]/gi, '')
+    .slice(-8)
+    .toUpperCase();
+  encoder.align('center');
+  writeLine(`${selected.length}${shortId ? ` · ${shortId}` : ''}`);
+  encoder.align('left').newline().newline().cut();
+  return encoder.encode();
 }
