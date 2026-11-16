@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { printerService } from '../frontend/src/lib/printer/PrinterService';
 import {
   buildShoppingChecklistHtml,
   type ShoppingChecklistLine,
@@ -83,6 +84,13 @@ assert.match(escaped, /&lt;script&gt;/);
 assert.match(escaped, /&lt;b&gt;Malta &amp; café&lt;\/b&gt;/);
 assert.doesNotMatch(escaped, /<script>|<b>Malta/);
 
-console.log(
-  'Purchasing checklist renderer: synthetic content, filtering, visibility, escaping, and both paper widths passed.',
-);
+void (async () => {
+  await assert.rejects(
+    printerService.printViaBrowser('', 58),
+    /Please allow popups to print/,
+    'an unavailable browser print window reports a usable error instead of pretending to print',
+  );
+  console.log(
+    'Purchasing checklist renderer and unavailable browser print path passed with synthetic content.',
+  );
+})();

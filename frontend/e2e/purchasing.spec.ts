@@ -125,6 +125,21 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   expect(login.status()).toBe(200);
   const { access_token } = await login.json();
   const headers = { Authorization: `Bearer ${access_token}` };
+  await page.addInitScript(() => {
+    const target = window as Window & { __shoppingChecklistHtml?: string };
+    window.addEventListener('message', (event) => {
+      const message = event.data as { type?: string; html?: string } | null;
+      if (message?.type === 'shopping-checklist-print') {
+        target.__shoppingChecklistHtml = message.html || '';
+      }
+    });
+    window.print = () => {
+      window.opener?.postMessage({
+        type: 'shopping-checklist-print',
+        html: `${document.head.innerHTML}${document.body.innerHTML}`,
+      }, '*');
+    };
+  });
   const stamp = Date.now();
   const supplyResponse = await request.post(`${BASE}/api/supplies`, {
     headers,
@@ -212,6 +227,39 @@ test('a cached purchasing list survives an offline reload and syncs once online'
   await expect(flourCard.getByText('Saved on this device')).toBeVisible();
   await expect(page.locator('article').filter({ hasText: `C3 Partial Sugar ${stamp}` })).toContainText('Purchased quantity: 1 kg');
   await expect(page.locator('article').filter({ hasText: `C3 Unavailable Salt ${stamp}` }).getByText('Not found', { exact: true })).toBeVisible();
+
+  const readOutbox = () => page.evaluate(() => new Promise<string>((resolve, reject) => {
+    const open = indexedDB.open('flo-purchasing-offline-v1');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const transaction = open.result.transaction('operations', 'readonly');
+      const operations = transaction.objectStore('operations').getAll();
+      operations.onerror = () => reject(operations.error);
+      operations.onsuccess = () => resolve(JSON.stringify(operations.result));
+    };
+  }));
+  const outboxBeforePrint = await readOutbox();
+  let purchasingRequestsDuringPrint = 0;
+  const countPurchasingRequest = (request: { url(): string }) => {
+    if (request.url().includes('/api/purchasing/')) purchasingRequestsDuringPrint += 1;
+  };
+  page.on('request', countPurchasingRequest);
+  await page.getByRole('button', { name: 'Print', exact: true }).click();
+  await expect(page.getByRole('group', { name: 'Print' })).toBeVisible();
+  await page.getByRole('button', { name: '80 mm' }).click();
+  const printPage = page.waitForEvent('popup');
+  await page.getByRole('button', { name: 'Print', exact: true }).last().click();
+  await printPage;
+  await expect.poll(() => page.evaluate(() => Boolean((window as Window & { __shoppingChecklistHtml?: string }).__shoppingChecklistHtml))).toBe(true);
+  const ticket = await page.evaluate(() => (window as Window & { __shoppingChecklistHtml?: string }).__shoppingChecklistHtml || '');
+  expect(ticket).toContain('size:80mm auto');
+  expect(ticket).toContain('Kalali');
+  expect(ticket).toContain(`C3 Partial Sugar ${stamp}`);
+  expect(ticket).not.toContain(`C3 Offline Flour ${stamp}`);
+  expect(ticket).not.toContain('Reference:');
+  expect(await readOutbox()).toBe(outboxBeforePrint);
+  expect(purchasingRequestsDuringPrint).toBe(0);
+  page.off('request', countPurchasingRequest);
 
   const acquisitionUrl = `**/api/purchasing/lines/${line.id}/acquisitions`;
   await page.route(acquisitionUrl, async (route) => {
