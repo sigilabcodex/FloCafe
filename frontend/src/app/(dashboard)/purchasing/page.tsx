@@ -26,6 +26,8 @@ import { Badge } from '@/components/ui/badge';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useFormatNumber } from '@/hooks/useFormatNumber';
+import { printerService } from '@/lib/printer/PrinterService';
+import { buildShoppingChecklistHtml } from '@/lib/purchasing/shopping-checklist-print';
 
 const UNITS = ['each', 'g', 'kg', 'ml', 'l'] as const;
 type Unit = (typeof UNITS)[number];
@@ -101,6 +103,11 @@ export default function PurchasingPage() {
   const [actualSupplier, setActualSupplier] = useState('');
   const [actualBrand, setActualBrand] = useState('');
   const [showDone, setShowDone] = useState(false);
+  const [printOptionsOpen, setPrintOptionsOpen] = useState(false);
+  const [printPendingOnly, setPrintPendingOnly] = useState(true);
+  const [printPrices, setPrintPrices] = useState(false);
+  const [printSupplierBrand, setPrintSupplierBrand] = useState(false);
+  const [printPaperWidth, setPrintPaperWidth] = useState<58 | 80>(58);
   const listOperationKey = useRef<string | null>(null);
   const activeListId = useRef<string | null>(null);
   const refreshLocal = useCallback(async (listId?: string) => {
@@ -214,8 +221,10 @@ export default function PurchasingPage() {
   }, [canPurchase, scope, t]);
 
   // Fetching server state is the synchronization boundary for this connected view.
-  // eslint-disable-next-line react/set-state-in-effect
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    // eslint-disable-next-line react/set-state-in-effect
+    void load();
+  }, [load]);
 
   useEffect(() => {
     activeListId.current = null;
@@ -291,6 +300,29 @@ export default function PurchasingPage() {
     } catch (error: unknown) {
       setActionError(errorMessage(error, t('versionConflict'), t('saveFailed')));
     } finally { setSavingList(false); }
+  };
+
+  const printList = async () => {
+    if (!activeList) return;
+    try {
+      const html = buildShoppingChecklistHtml(activeList.name, activeList.id, (activeList.lines || []).map((line) => ({
+        ...line,
+        planned_quantity: fmtNum(line.planned_quantity),
+        reference_price: line.reference_price === null ? null : fmt(line.reference_price),
+      })), {
+        paperWidth: printPaperWidth,
+        pendingOnly: printPendingOnly,
+        showReferencePrices: printPrices,
+        showSupplierBrand: printSupplierBrand,
+        timezone: currentTenant?.timezone || undefined,
+        locale: typeof navigator === 'undefined' ? undefined : navigator.language,
+        labels: { supplier: t('supplier'), brand: t('brand'), reference: t('referencePrice') },
+      });
+      await printerService.printViaBrowser(html, printPaperWidth);
+      setPrintOptionsOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t('loadFailed'));
+    }
   };
 
   const startDetails = (line: PurchasingLine) => {
@@ -432,6 +464,15 @@ export default function PurchasingPage() {
         </section>
       ) : activeList ? (
         <section className="space-y-4">
+          <div className="flex flex-wrap justify-end gap-2"><Button variant="outline" className="min-h-11" onClick={() => setPrintOptionsOpen((open) => !open)}>{tCommon('print')}</Button></div>
+          {printOptionsOpen && <section aria-label={tCommon('print')} className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{tCommon('print')} · {activeList.name}</h2><Button variant="ghost" size="icon" aria-label={tCommon('close')} className="size-11" onClick={() => setPrintOptionsOpen(false)}><X className="size-5" /></Button></div>
+            <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={printPendingOnly} onChange={(event) => setPrintPendingOnly(event.target.checked)} />{tCommon('active')}</label>
+            <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={printPrices} onChange={(event) => setPrintPrices(event.target.checked)} />{t('referencePrice')}</label>
+            <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={printSupplierBrand} onChange={(event) => setPrintSupplierBrand(event.target.checked)} />{t('supplier')} / {t('brand')}</label>
+            <div className="flex gap-2" role="group" aria-label={tCommon('print')}>{([58, 80] as const).map((width) => <Button key={width} type="button" variant={printPaperWidth === width ? 'default' : 'outline'} className="min-h-11 flex-1" onClick={() => setPrintPaperWidth(width)}>{width} mm</Button>)}</div>
+            <div className="flex justify-end"><Button className="min-h-11" onClick={() => void printList()}>{tCommon('print')}</Button></div>
+          </section>}
           <div className="grid grid-cols-2 gap-2">
             <Button variant={!showDone ? 'default' : 'outline'} className="min-h-11 justify-between" onClick={() => { setShowDone(false); setEditingLine(null); }}>{tCommon('active')}<Badge variant="secondary">{activeLines.length}</Badge></Button>
             <Button variant={showDone ? 'default' : 'outline'} className="min-h-11 justify-between" onClick={() => { setShowDone(true); setEditingLine(null); }}>{tCommon('done')}<Badge variant="secondary">{doneLines.length}</Badge></Button>
