@@ -10765,6 +10765,28 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       `);
     },
   },
+  {
+    version: 130,
+    name: 'add_external_catalog_references',
+    up: () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS catalog_external_references (
+          source_system TEXT NOT NULL,
+          source_entity TEXT NOT NULL,
+          external_id TEXT NOT NULL,
+          target_type TEXT NOT NULL,
+          target_id TEXT NOT NULL,
+          source_status TEXT NOT NULL CHECK (source_status IN ('confirmed', 'provisional', 'pending', 'historical', 'approved')),
+          source_fingerprint TEXT NOT NULL,
+          metadata_json TEXT NOT NULL DEFAULT '{}',
+          imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (source_system, source_entity, external_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_catalog_external_target
+          ON catalog_external_references(target_type, target_id);
+      `);
+    },
+  },
 ];
 
 export function backfillWhatsAppMessageAttempts(

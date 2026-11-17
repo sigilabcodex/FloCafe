@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "source_system": "kalali",
+  "source_release": "V1 pilot / catalog V4.3",
+  "source_revision": "2026-11-17",
+  "currency": "MXN",
+  "source_status_vocabulary": ["confirmed", "provisional", "pending", "historical", "approved"],
+  "categories": [
+    { "external_id": "KAL-CAT-BEB", "name": "Bebidas", "source_status": "confirmed", "source_ref": "Menu V4 / Bebidas" },
+    { "external_id": "KAL-CAT-DES", "name": "Desayunos", "source_status": "confirmed", "source_ref": "Menu V4 / Desayunos" },
+    { "external_id": "KAL-CAT-ALI", "name": "Alimentos", "source_status": "confirmed", "source_ref": "Menu V4 / Alimentos" },
+    { "external_id": "KAL-CAT-SAN", "name": "Sándwiches", "source_status": "confirmed", "source_ref": "Menu V4 / Sándwiches; categoría de piloto" }
+  ],
+  "supplies": [
+    { "external_id": "ING-TOT", "name": "Totopos de maíz", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "PREP-SAL-ROJ", "name": "Salsa roja tatemada (DEMO)", "base_unit": "g", "kind": "preparation", "source_status": "provisional", "cost_status": "pending", "source_ref": "Preparaciones; receta y rendimiento pendientes" },
+    { "external_id": "PREP-SAL-VER", "name": "Salsa verde cocida (DEMO)", "base_unit": "g", "kind": "preparation", "source_status": "provisional", "cost_status": "pending", "source_ref": "Preparaciones; receta y rendimiento pendientes" },
+    { "external_id": "ING-QUES-FRE", "name": "Queso ranchero fresco", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos" },
+    { "external_id": "ING-CRE", "name": "Crema", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos" },
+    { "external_id": "ING-CEB", "name": "Cebolla", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos" },
+    { "external_id": "ING-FRI", "name": "Frijoles refritos", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "ING-PAN-BIR", "name": "Virote rústico (DEMO)", "base_unit": "each", "kind": "ingredient", "source_status": "provisional", "cost_status": "pending", "source_ref": "ING-PAN-BIR; confirmar virote/birote y presentación" },
+    { "external_id": "ING-QUES-GOU", "name": "Queso gouda", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "ING-MANT", "name": "Mantequilla", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos; 5 g provisional para molletes" },
+    { "external_id": "ING-PAN-BAG", "name": "Baguette rústica horneada", "base_unit": "each", "kind": "ingredient", "source_status": "provisional", "cost_status": "pending", "source_ref": "ING-PAN-BAG; receta/rendimiento pendientes" },
+    { "external_id": "ING-POL-ENT", "name": "Pollo entero crudo", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "PREP-POL-01", "name": "Pollo cocido y desmenuzado (DEMO)", "base_unit": "g", "kind": "preparation", "source_status": "pending", "cost_status": "pending", "source_ref": "Preparaciones; rendimiento y coproductos pendientes" },
+    { "external_id": "PREP-CAL-01", "name": "Caldo de pollo compartido (DEMO)", "base_unit": "ml", "kind": "preparation", "source_status": "pending", "cost_status": "pending", "source_ref": "Preparaciones; rendimiento y coproductos pendientes" },
+    { "external_id": "PREP-MAS-BAG", "name": "Masa baguette/virote rústico (DEMO)", "base_unit": "g", "kind": "preparation", "source_status": "pending", "cost_status": "pending", "source_ref": "Preparaciones; masa y producto horneado son etapas distintas" },
+    { "external_id": "KAL-PILOT-ING-LECH", "name": "Lechuga (DEMO)", "base_unit": "g", "kind": "ingredient", "source_status": "pending", "cost_status": "pending", "source_ref": "Insumo piloto sin ID maestro confirmado" },
+    { "external_id": "ING-TOM", "name": "Jitomate", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "KAL-PILOT-ING-MOST", "name": "Mostaza (DEMO)", "base_unit": "g", "kind": "ingredient", "source_status": "pending", "cost_status": "pending", "source_ref": "Insumos pendientes; presentación y dosis sin definir" },
+    { "external_id": "KAL-PILOT-ING-MAYO", "name": "Mayonesa (DEMO)", "base_unit": "g", "kind": "ingredient", "source_status": "pending", "cost_status": "pending", "source_ref": "COSTOS 01; fecha y dosis por confirmar" },
+    { "external_id": "KAL-PILOT-ING-ACE-OLI", "name": "Aceite de oliva (DEMO)", "base_unit": "ml", "kind": "ingredient", "source_status": "pending", "cost_status": "pending", "source_ref": "Sin presentación o dosis validada" },
+    { "external_id": "KAL-PILOT-ING-PAPAS", "name": "Papas fritas (DEMO)", "base_unit": "g", "kind": "ingredient", "source_status": "provisional", "cost_status": "pending", "source_ref": "Porción de 35 g; producto y rendimiento de fritura pendientes" },
+    { "external_id": "KAL-PILOT-EMP-WAX", "name": "Papel encerado (DEMO)", "base_unit": "each", "kind": "packaging", "source_status": "pending", "cost_status": "pending", "source_ref": "Empaque de media baguette; conteo/costo pendientes" },
+    { "external_id": "KAL-PILOT-EMP-BAG", "name": "Bolsa de papel (DEMO)", "base_unit": "each", "kind": "packaging", "source_status": "pending", "cost_status": "pending", "source_ref": "Empaque de media baguette; conteo/costo pendientes" },
+    { "external_id": "KAL-PILOT-EMP-PAPAS", "name": "Bolsita independiente para papas (DEMO)", "base_unit": "each", "kind": "packaging", "source_status": "pending", "cost_status": "pending", "source_ref": "Empaque de papas; conteo/costo pendientes" },
+    { "external_id": "KAL-PILOT-EMP-CHILA", "name": "Empaque de chilaquiles (DEMO)", "base_unit": "each", "kind": "packaging", "source_status": "provisional", "cost_status": "provisional", "source_ref": "Presupuesto provisional por orden; proveedor/fecha pendientes" },
+    { "external_id": "ING-CAF", "name": "Café en grano", "base_unit": "g", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Insumos / Cotización prioritaria" },
+    { "external_id": "PREP-ESP-DOB", "name": "Extracción doble espresso (DEMO)", "base_unit": "each", "kind": "preparation", "source_status": "provisional", "cost_status": "pending", "source_ref": "Dosis piloto 12 g; rendimiento de prueba 1 extracción" },
+    { "external_id": "KAL-PILOT-ING-AGUA", "name": "Agua purificada (DEMO)", "base_unit": "ml", "kind": "ingredient", "source_status": "confirmed", "cost_status": "pending", "source_ref": "Bonafont como referencia; volumen de agua para Americano pendiente" },
+    { "external_id": "KAL-PILOT-EMP-VASO", "name": "Vaso/tapa de bebida (DEMO)", "base_unit": "each", "kind": "packaging", "source_status": "pending", "cost_status": "pending", "source_ref": "Empaque según presentación/compatibilidad a confirmar" }
+  ],
+  "preparations": [
+    { "external_id": "PREP-SAL-ROJ", "name": "Salsa roja tatemada", "output_supply_id": "PREP-SAL-ROJ", "yield_quantity": null, "yield_unit": "g", "source_status": "pending", "components": [], "pending_reason": "Fórmula, cantidades y rendimiento medido pendientes." },
+    { "external_id": "PREP-SAL-VER", "name": "Salsa verde cocida", "output_supply_id": "PREP-SAL-VER", "yield_quantity": null, "yield_unit": "g", "source_status": "pending", "components": [], "pending_reason": "Fórmula, cantidades y rendimiento medido pendientes." },
+    { "external_id": "PREP-POL-01", "name": "Pollo entero cocido y desmenuzado", "output_supply_id": "PREP-POL-01", "yield_quantity": null, "yield_unit": "g", "source_status": "pending", "components": [{ "supply_id": "ING-POL-ENT", "quantity": null, "unit": "g", "source_status": "pending" }], "pending_reason": "Rendimiento de carne/caldito y asignación conjunta del costo sin doble conteo." },
+    { "external_id": "PREP-CAL-01", "name": "Caldo de pollo coproducto", "output_supply_id": "PREP-CAL-01", "yield_quantity": null, "yield_unit": "ml", "source_status": "pending", "components": [{ "supply_id": "ING-POL-ENT", "quantity": null, "unit": "g", "source_status": "pending" }], "coproduct_of": "PREP-POL-01", "pending_reason": "FloCafe produce una sola salida por lote. No cargar una segunda receta que vuelva a consumir el pollo." },
+    { "external_id": "PREP-MAS-BAG", "name": "Masa de baguette/virote rústico", "output_supply_id": "PREP-MAS-BAG", "yield_quantity": null, "yield_unit": "g", "source_status": "pending", "components": [], "pending_reason": "Fórmula y rendimiento de masa; conversión de masa a pieza horneada pendientes." },
+    { "external_id": "PREP-ESP-DOB", "name": "Extracción doble espresso", "output_supply_id": "PREP-ESP-DOB", "yield_quantity": 1, "yield_unit": "each", "source_status": "provisional", "test_only": true, "components": [{ "supply_id": "ING-CAF", "quantity": 12, "unit": "g", "source_status": "provisional" }], "pending_reason": "Rendimiento de una extracción de prueba; no representa merma ni estándar comercial aprobado." }
+  ],
+  "products": [
+    {
+      "external_id": "KAL-DES-001", "name": "Chilaquiles rojos", "category_id": "KAL-CAT-DES", "source_status": "confirmed", "source_ref": "Menu V4 / KAL-DES-001", "pilot_status": "provisional",
+      "sale_price_candidates": { "direct": { "amount": 85, "status": "provisional" }, "app_30_percent_scenario": { "amount": 122, "commission_rate": 0.3, "status": "provisional" } },
+      "packaging_candidate": { "supply_id": "KAL-PILOT-EMP-CHILA", "quantity": 1, "unit": "each", "included_in_recipe_cost": false, "status": "provisional" },
+      "recipe": { "external_id": "REC-KAL-DES-001", "yield_quantity": 1, "source_status": "provisional", "components": [
+        { "supply_id": "ING-TOT", "quantity": 80, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "PREP-SAL-ROJ", "quantity": 165, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-QUES-FRE", "quantity": 20, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-CRE", "quantity": 20, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-CEB", "quantity": 3, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-FRI", "quantity": 50, "unit": "g", "source_status": "provisional" }
+      ] }
+    },
+    {
+      "external_id": "KAL-DES-002", "name": "Chilaquiles verdes", "category_id": "KAL-CAT-DES", "source_status": "confirmed", "source_ref": "Menu V4 / KAL-DES-002", "pilot_status": "provisional",
+      "sale_price_candidates": { "direct": { "amount": 85, "status": "provisional" }, "app_30_percent_scenario": { "amount": 122, "commission_rate": 0.3, "status": "provisional" } },
+      "packaging_candidate": { "supply_id": "KAL-PILOT-EMP-CHILA", "quantity": 1, "unit": "each", "included_in_recipe_cost": false, "status": "provisional" },
+      "recipe": { "external_id": "REC-KAL-DES-002", "yield_quantity": 1, "source_status": "provisional", "components": [
+        { "supply_id": "ING-TOT", "quantity": 80, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "PREP-SAL-VER", "quantity": 165, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-QUES-FRE", "quantity": 20, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-CRE", "quantity": 20, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-CEB", "quantity": 3, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-FRI", "quantity": 50, "unit": "g", "source_status": "provisional" }
+      ] }
+    },
+    {
+      "external_id": "KAL-DES-007", "name": "Molletes naturales", "category_id": "KAL-CAT-DES", "source_status": "confirmed", "source_ref": "Menu V4 / KAL-DES-007", "pilot_status": "provisional",
+      "sale_price_candidates": { "direct": { "amount": 55, "status": "provisional" }, "app_30_percent_scenario": { "amount": 79, "commission_rate": 0.3, "status": "provisional" } },
+      "recipe": { "external_id": "REC-KAL-DES-007", "yield_quantity": 1, "source_status": "provisional", "components": [
+        { "supply_id": "ING-PAN-BIR", "quantity": 1, "unit": "each", "source_status": "provisional", "note": "Un virote dividido en dos; porción de pan aproximada, confirmar identidad virote/birote." },
+        { "supply_id": "ING-FRI", "quantity": 75, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-QUES-GOU", "quantity": 35, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-MANT", "quantity": 5, "unit": "g", "source_status": "provisional" }
+      ] }
+    },
+    {
+      "external_id": "KAL-PILOT-PROD-BAG-POLLO", "name": "Media baguette con pollo y gouda (DEMO)", "category_id": "KAL-CAT-SAN", "source_status": "provisional", "source_ref": "Piloto solicitado; base de menú KAL-DES-012", "pilot_status": "pending",
+      "sale_price_candidates": { "direct": { "amount": 95, "status": "provisional" }, "app_30_percent_scenario": { "amount": 136, "commission_rate": 0.3, "status": "provisional" } },
+      "recipe": { "external_id": "KAL-PILOT-REC-BAG-POLLO", "yield_quantity": 1, "source_status": "pending", "components": [
+        { "supply_id": "ING-PAN-BAG", "quantity": 0.5, "unit": "each", "source_status": "provisional" },
+        { "supply_id": "PREP-POL-01", "quantity": 80, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-QUES-GOU", "quantity": 35, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "ING-TOM", "quantity": null, "unit": "g", "source_status": "pending" },
+        { "supply_id": "ING-CEB", "quantity": null, "unit": "g", "source_status": "pending" },
+        { "supply_id": "KAL-PILOT-ING-LECH", "quantity": null, "unit": "g", "source_status": "pending" },
+        { "supply_id": "KAL-PILOT-ING-MOST", "quantity": null, "unit": "g", "source_status": "pending" },
+        { "supply_id": "KAL-PILOT-ING-MAYO", "quantity": null, "unit": "g", "source_status": "pending" },
+        { "supply_id": "KAL-PILOT-ING-ACE-OLI", "quantity": null, "unit": "ml", "source_status": "pending" },
+        { "supply_id": "KAL-PILOT-ING-PAPAS", "quantity": 35, "unit": "g", "source_status": "provisional" },
+        { "supply_id": "KAL-PILOT-EMP-WAX", "quantity": 1, "unit": "each", "source_status": "pending", "cost_class": "packaging" },
+        { "supply_id": "KAL-PILOT-EMP-BAG", "quantity": 1, "unit": "each", "source_status": "pending", "cost_class": "packaging" },
+        { "supply_id": "KAL-PILOT-EMP-PAPAS", "quantity": 1, "unit": "each", "source_status": "pending", "cost_class": "packaging" }
+      ] }
+    },
+    {
+      "external_id": "KAL-BEB-002", "name": "Espresso doble", "category_id": "KAL-CAT-BEB", "source_status": "historical", "source_ref": "Menu V4 / KAL-BEB-002; el maestro conserva estado histórico", "pilot_status": "provisional", "test_activation_reason": "Producto solicitado explícitamente para el piloto; sólo se activa en la base aislada DEMO y mantiene el estado fuente historical.",
+      "sale_price_candidates": { "direct": { "amount": 38, "status": "provisional" }, "app_30_percent_scenario": { "amount": 55, "commission_rate": 0.3, "status": "provisional" } },
+      "recipe": { "external_id": "REC-PILOT-BEB-ESP-DOB", "yield_quantity": 1, "source_status": "provisional", "components": [
+        { "supply_id": "PREP-ESP-DOB", "quantity": 1, "unit": "each", "source_status": "provisional" }
+      ] }
+    },
+    {
+      "external_id": "KAL-BEB-004", "name": "Americano 12 oz", "category_id": "KAL-CAT-BEB", "source_status": "confirmed", "source_ref": "Menu V4 / KAL-BEB-004; preparación de 12 oz en Cuestionario/Actualización", "pilot_status": "pending",
+      "sale_price_candidates": { "direct": { "amount": 45, "status": "provisional" }, "app_30_percent_scenario": { "amount": 65, "commission_rate": 0.3, "status": "provisional" } },
+      "recipe": { "external_id": "REC-KAL-BEB-004", "yield_quantity": 1, "source_status": "pending", "components": [
+        { "supply_id": "PREP-ESP-DOB", "quantity": 1, "unit": "each", "source_status": "provisional" },
+        { "supply_id": "KAL-PILOT-ING-AGUA", "quantity": null, "unit": "ml", "source_status": "pending", "note": "Volumen de agua neto para vaso de 12 oz no definido; no inferirlo." },
+        { "supply_id": "KAL-PILOT-EMP-VASO", "quantity": null, "unit": "each", "source_status": "pending", "note": "Compatibilidad y presentación del empaque pendientes." }
+      ] }
+    }
+  ],
+  "modifiers": [
+    { "external_id": "MOD-PILOT-POLLO", "name": "Pollo cocido", "applicable_to": ["KAL-DES-001", "KAL-DES-002", "KAL-DES-007", "KAL-PILOT-PROD-BAG-POLLO"], "quantity": null, "unit": "g", "price": null, "source_status": "pending", "pending_reason": "Dosis/cargo y disponibilidad de inventario por definir." },
+    { "external_id": "MOD-PILOT-CHIPOTLE", "name": "Chipotle", "applicable_to": ["KAL-DES-007", "KAL-PILOT-PROD-BAG-POLLO"], "quantity": null, "unit": "g", "price": null, "source_status": "pending", "pending_reason": "Dosis/cargo y relación de inventario con supplies no definidos." },
+    { "external_id": "MOD-PILOT-RAJAS", "name": "Rajas de jalapeño", "applicable_to": ["KAL-DES-007", "KAL-PILOT-PROD-BAG-POLLO"], "quantity": null, "unit": "g", "price": null, "source_status": "pending", "pending_reason": "Dosis/cargo y relación de inventario con supplies no definidos." }
+  ],
+  "price_scenario": { "app_commission_rate": 0.3, "status": "provisional", "approved": false, "tax_withholding": "pending; not modeled", "settlement": "pending; platform contracts not verified" },
+  "test_only": {
+    "opening_balances_are_synthetic": true,
+    "opening_balances": {
+      "ING-TOT": 1000, "PREP-SAL-ROJ": 1000, "PREP-SAL-VER": 1000,
+      "ING-QUES-FRE": 1000, "ING-CRE": 1000, "ING-CEB": 1000, "ING-FRI": 1000,
+      "ING-PAN-BIR": 10, "ING-QUES-GOU": 1000, "ING-MANT": 1000, "ING-PAN-BAG": 10,
+      "ING-POL-ENT": 10000, "PREP-POL-01": 1000, "PREP-CAL-01": 1000, "PREP-MAS-BAG": 10000,
+      "KAL-PILOT-ING-LECH": 1000, "ING-TOM": 1000, "KAL-PILOT-ING-MOST": 1000,
+      "KAL-PILOT-ING-MAYO": 1000, "KAL-PILOT-ING-ACE-OLI": 1000, "KAL-PILOT-ING-PAPAS": 1000,
+      "KAL-PILOT-EMP-WAX": 10, "KAL-PILOT-EMP-BAG": 10, "KAL-PILOT-EMP-PAPAS": 10,
+      "KAL-PILOT-EMP-CHILA": 10, "ING-CAF": 100, "PREP-ESP-DOB": 0,
+      "KAL-PILOT-ING-AGUA": 10000, "KAL-PILOT-EMP-VASO": 10
+    },
+    "test_production": [{ "preparation_id": "PREP-ESP-DOB", "quantity": 1, "idempotency_key": "kalali-v1-test-espresso-double" }]
+  }
+}
