@@ -87,6 +87,7 @@ Contributor guidance for Kalali's operator goals and fork-specific development w
 | [operations.md](kalali/operations.md) | Operator-first goals, production flow, WIP, and shift handover. |
 | [inventory-production.md](kalali/inventory-production.md) | Production and inventory contracts, movements, costs, and migration rules. |
 | [development-workflow.md](kalali/development-workflow.md) | Branching, testing, migrations, and upstream contributions. |
+| [catalog-reconciliation-v4.3.md](kalali/catalog-reconciliation-v4.3.md) | Reconciliation proposal for the Kalali V4.3 master catalog and FloCafe's current data model. |
 
 ## Product
 
